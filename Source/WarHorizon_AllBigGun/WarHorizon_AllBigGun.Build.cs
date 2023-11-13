@@ -10,7 +10,7 @@ public class WarHorizon_AllBigGun : ModuleRules
 
 		PublicIncludePaths.AddRange(new string[] { "WarHorizon_AllBigGun" });
 
-		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore" });
+		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput" });
 
 		PrivateDependencyModuleNames.AddRange(new string[] {  });
 

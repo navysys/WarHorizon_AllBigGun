@@ -2,7 +2,11 @@
 
 
 #include "Turret/WHTurret.h"
+#include "DataTable/TurretDataTable.h"
 #include "Game/WHGameSingleton.h"
+#include "Controller/WHTurretAIController.h"
+//#include "ProjectileShell.h"
+#include "Engine/StaticMeshSocket.h"
 
 // Sets default values
 AWHTurret::AWHTurret()
@@ -13,7 +17,7 @@ AWHTurret::AWHTurret()
 	RootComponent = StaticMeshComp;
 	StaticMeshComp->SetCollisionProfileName(TEXT("NoCollision"));
 
-	//AIControllerClass = ATurretAIController::StaticClass();
+	AIControllerClass = AWHTurretAIController::StaticClass();
 	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
 }
 

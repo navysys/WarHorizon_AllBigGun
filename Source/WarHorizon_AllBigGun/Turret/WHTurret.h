@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Pawn.h"
 #include "Enum/ETurretType.h"
+#include "Enum/ETurretAttackType.h"
 #include "Interface/TurretInterface.h"
 #include "WHTurret.generated.h"
 
@@ -32,12 +33,18 @@ public:
 
 	void SetupTurret(APawn* BaseShip, FName Name);
 
-	void SetTargetPawn(APawn* TargetPawn) { Target = TargetPawn; }
+	void SetAttackType(ETurretAttackType Type) { AttackType = Type; }
+	void SetTargetAngle(float Angle) { TargetAngle = Angle; }
+	void SetTargetPoint(FVector Point) { TargetPoint = Point; }
+	void SetTargetPawn(APawn* Pawn) { TargetPawn = Pawn; }
 	void SetMuzzles(UStaticMeshComponent* MeshComp);
 
 	float GetHorizontalAngle() { return HorizontalAngle; }
 	virtual APawn* GetBaseBattleShip() override;
-	virtual APawn* GetTurretTarget() override;
+	virtual uint8 GetAttackType() override;
+	virtual float GetTurretTargetAngle() override;
+	virtual APawn* GetTurretTargetPawn() override;
+	virtual FVector GetTurretTargetPoint() override;
 	virtual float GetRotationSpeed() override;
 	virtual float GetReloadTime() override;
 	virtual uint16 GetAmmo() override;
@@ -57,7 +64,14 @@ protected:
 	float MaxRotationAngle;
 
 	UPROPERTY(VisibleAnywhere)
-	APawn* Target;
+	ETurretAttackType AttackType = ETurretAttackType::Wait;
+
+	UPROPERTY(VisibleAnywhere)
+	float TargetAngle;
+	UPROPERTY(VisibleAnywhere)
+	APawn* TargetPawn;
+	UPROPERTY(VisibleAnywhere)
+	FVector TargetPoint;
 
 	UPROPERTY(VisibleAnywhere)
 	uint16 TurretID;

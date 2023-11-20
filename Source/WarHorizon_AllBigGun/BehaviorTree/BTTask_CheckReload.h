@@ -4,23 +4,18 @@
 
 #include "CoreMinimal.h"
 #include "BehaviorTree/BTTaskNode.h"
-#include "BTTask_CheckRotation.generated.h"
+#include "BTTask_CheckReload.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class WARHORIZON_ALLBIGGUN_API UBTTask_CheckRotation : public UBTTaskNode
+class WARHORIZON_ALLBIGGUN_API UBTTask_CheckReload : public UBTTaskNode
 {
 	GENERATED_BODY()
-
+	
 public:
-
-	UBTTask_CheckRotation();
+	UBTTask_CheckReload();
 
 	virtual EBTNodeResult::Type ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) override;
-
-protected:
-	float CalculateTargetAngle(APawn* Start, APawn* Target);
-	float CalculatePointAngle(APawn* Start, FVector Point);
 };

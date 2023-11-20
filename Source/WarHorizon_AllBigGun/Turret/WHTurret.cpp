@@ -97,9 +97,24 @@ APawn* AWHTurret::GetBaseBattleShip()
 	return BaseBattleShip;
 }
 
-APawn* AWHTurret::GetTurretTarget()
+uint8 AWHTurret::GetAttackType()
 {
-	return Target;
+	return static_cast<uint8>(AttackType);
+}
+
+float AWHTurret::GetTurretTargetAngle()
+{
+	return TargetAngle;
+}
+
+APawn* AWHTurret::GetTurretTargetPawn()
+{
+	return TargetPawn;
+}
+
+FVector AWHTurret::GetTurretTargetPoint()
+{
+	return TargetPoint;
 }
 
 float AWHTurret::GetRotationSpeed()

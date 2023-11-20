@@ -19,7 +19,8 @@ AWHBattleShip::AWHBattleShip()
 
 	StaticMeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMesh"));
 	RootComponent = StaticMeshComp;
-	StaticMeshComp->SetCollisionProfileName(TEXT("BattleShip"));
+	//StaticMeshComp->SetCollisionProfileName(TEXT("BattleShip"));
+	// 팀별로 다른 콜리전 프로파일 적용해야 함 (현재 수동)
 	static ConstructorHelpers::FObjectFinder<UStaticMesh> DefaultMeshObject(TEXT("StaticMesh'/Game/Resource/SM_YamatoBase'"));
 	if (DefaultMeshObject.Succeeded())
 	{
@@ -51,6 +52,14 @@ void AWHBattleShip::BeginPlay()
 	CreateTurretToMeshCompSocket(StaticMeshComp, FName(BattleShipName));
 
 	GetWorld()->GetTimerManager().SetTimer(DetectTimerHandle, this, &AWHBattleShip::DetectBattleShip, 0.2f, true);
+}
+
+void AWHBattleShip::SetSubTurretTarget(APawn* Target)
+{
+	for (auto Turret : SubTurrets1)
+	{
+		Cast<AWHTurret>(Turret)->SetTargetPawn(Target);
+	}
 }
 
 void AWHBattleShip::Tick(float DeltaTime)
@@ -477,10 +486,22 @@ void AWHBattleShip::DetectBattleShip()
 {
 	float Radius = 40000.0f;
 	TArray<FOverlapResult> OverlapResults;
-	FCollisionQueryParams CollisionQueryParam(FName("BattleShip"), false, this);
+	FCollisionQueryParams CollisionQueryParam;
+	CollisionQueryParam.bTraceComplex = true;
+	CollisionQueryParam.AddIgnoredActor(this);
 
-	bool bResult = GetWorld()->OverlapMultiByProfile(OverlapResults, GetActorLocation(), FQuat::Identity, FName("DetectBattleShip"), FCollisionShape::MakeSphere(Radius), CollisionQueryParam);
+	FName PresetName;
+	if (StaticMeshComp)
+	{
+		PresetName = StaticMeshComp->GetCollisionProfileName();
+	}
+	else
+	{
+		PresetName = FName("NoCollision");
+		UE_LOG(LogTemp, Warning, TEXT("스태틱 매시를 찾을 수 없습니다. 적 탐지를 중단합니다."));
+	}
 
+	bool bResult = GetWorld()->OverlapMultiByProfile(OverlapResults, GetActorLocation(), FQuat::Identity, PresetName, FCollisionShape::MakeSphere(Radius), CollisionQueryParam);
 	if (bResult)
 	{
 		TArray<APawn*> ArrayPawn;
@@ -494,7 +515,7 @@ void AWHBattleShip::DetectBattleShip()
 		InRangeShips = ArrayPawn;
 		SortingPawnArrayToDistance(InRangeShips);
 		AttackTargetShip = InRangeShips[0];
-		//SetSubTurretTarget(AttackTargetShip);
+		SetSubTurretTarget(AttackTargetShip);
 	}
 	else
 	{

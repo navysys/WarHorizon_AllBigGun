@@ -29,6 +29,8 @@ EBTNodeResult::Type UBTTask_Fire::ExecuteTask(UBehaviorTreeComponent& OwnerComp,
 
 	TurretPawn->Fire();
 	OwnerComp.GetBlackboardComponent()->SetValueAsFloat(BBKEY_RELOADTIME, TurretPawn->GetReloadTime());
+	OwnerComp.GetBlackboardComponent()->SetValueAsBool(BBKEY_ISLOOKAT, false);
+	OwnerComp.GetBlackboardComponent()->SetValueAsBool(BBKEY_ISRELOAD, false);
 
 	return EBTNodeResult::Succeeded;
 }

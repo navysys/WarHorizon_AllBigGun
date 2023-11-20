@@ -42,6 +42,10 @@ protected:
 
 	//void SetDead();
 
+	// 포탑에 공격할 목표를 할당
+	void SetSubTurretAngle(float Angle);
+	void SetSubTurretPoint(FVector Point);
+	void SetSubTurretTarget(APawn* Target);
 
 public:
 	virtual void Tick(float DeltaTime) override;

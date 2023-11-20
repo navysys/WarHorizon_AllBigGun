@@ -27,7 +27,25 @@ EBTNodeResult::Type UBTTask_GetTarget::ExecuteTask(UBehaviorTreeComponent& Owner
 		return EBTNodeResult::Failed;
 	}
 
-	APawn* TargetPawn = TurretPawn->GetTurretTarget();
+	uint8 AttackType = OwnerComp.GetBlackboardComponent()->GetValueAsBool(BBKEY_ATTACKTYPE);
+	if (AttackType == 0)
+	{
+
+	}
+	else if(AttackType == 1)
+	{
+
+	}
+	else if(AttackType == 2)
+	{
+
+	}
+	else if (AttackType == 3)
+	{
+
+	}
+
+	APawn* TargetPawn = TurretPawn->GetTurretTargetPawn();
 	if (nullptr == TargetPawn)
 	{
 		OwnerComp.GetBlackboardComponent()->SetValueAsObject(BBKEY_TARGET, nullptr);

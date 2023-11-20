@@ -23,7 +23,10 @@ class WARHORIZON_ALLBIGGUN_API ITurretInterface
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
 	virtual APawn* GetBaseBattleShip() = 0;
-	virtual APawn* GetTurretTarget() = 0;
+	virtual uint8 GetAttackType() = 0;
+	virtual float GetTurretTargetAngle() = 0;
+	virtual APawn* GetTurretTargetPawn() = 0;
+	virtual FVector GetTurretTargetPoint() = 0;
 	virtual float GetRotationSpeed() = 0;
 	virtual float GetReloadTime() = 0;
 	virtual uint16 GetAmmo() = 0;

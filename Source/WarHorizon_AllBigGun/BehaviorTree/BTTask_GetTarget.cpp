@@ -27,32 +27,34 @@ EBTNodeResult::Type UBTTask_GetTarget::ExecuteTask(UBehaviorTreeComponent& Owner
 		return EBTNodeResult::Failed;
 	}
 
-	uint8 AttackType = OwnerComp.GetBlackboardComponent()->GetValueAsBool(BBKEY_ATTACKTYPE);
+	uint8 AttackType = OwnerComp.GetBlackboardComponent()->GetValueAsInt(BBKEY_ATTACKTYPE);
 	if (AttackType == 0)
 	{
 
 	}
 	else if(AttackType == 1)
 	{
-
+		float TargetAngle = TurretPawn->GetTurretTargetAngle();
+		OwnerComp.GetBlackboardComponent()->SetValueAsFloat(BBKEY_TARGETANGLE, TargetAngle);
 	}
 	else if(AttackType == 2)
 	{
-
+		FVector TargetPoint = TurretPawn->GetTurretTargetPoint();
+		OwnerComp.GetBlackboardComponent()->SetValueAsVector(BBKEY_POINTANGLE, TargetPoint);
 	}
 	else if (AttackType == 3)
 	{
+		APawn* TargetPawn = TurretPawn->GetTurretTargetPawn();
+		if (nullptr == TargetPawn)
+		{
+			OwnerComp.GetBlackboardComponent()->SetValueAsObject(BBKEY_TARGET, nullptr);
+			return EBTNodeResult::Failed;
+		}
 
+		OwnerComp.GetBlackboardComponent()->SetValueAsObject(BBKEY_TARGET, TargetPawn);
 	}
 
-	APawn* TargetPawn = TurretPawn->GetTurretTargetPawn();
-	if (nullptr == TargetPawn)
-	{
-		OwnerComp.GetBlackboardComponent()->SetValueAsObject(BBKEY_TARGET, nullptr);
-		return EBTNodeResult::Failed;
-	}
-
-	OwnerComp.GetBlackboardComponent()->SetValueAsObject(BBKEY_TARGET, TargetPawn);
+	
 
 	return EBTNodeResult::Succeeded;
 }

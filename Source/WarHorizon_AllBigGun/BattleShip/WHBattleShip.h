@@ -6,11 +6,11 @@
 #include "GameFramework/Pawn.h"
 #include "Interface/BattleShipInterface.h"
 #include "Enum/EBattleShipType.h"
+#include "Game/WHCustomStructs.h"
 #include "WHBattleShip.generated.h"
 
-
+class AWHTurretBase;
 class AWHTurret;
-
 
 UCLASS()
 class WARHORIZON_ALLBIGGUN_API AWHBattleShip : public APawn, public IBattleShipInterface
@@ -18,47 +18,36 @@ class WARHORIZON_ALLBIGGUN_API AWHBattleShip : public APawn, public IBattleShipI
 	GENERATED_BODY()
 
 public:
-	// Sets default values for this pawn's properties
 	AWHBattleShip();
-
 
 protected:
 	virtual void BeginPlay() override;
+	virtual void PostInitializeComponents() override;
 	virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
 
-	// 움직임, 회전 관련 함수
-	void MoveForward();
-	void ChangeRotation(float DeltaTime);
-
 	// 데이터 로드 및 초기화 함수
+	void LoadSingletonData();
 	void LoadDataTableToName(FName Name);
-	void CreateTurretToMeshCompSocket(UStaticMeshComponent* MeshComp, FName BattleShipName);
-	void InitStat();
+	void CreateTurretToMeshCompSocket(USkeletalMeshComponent* MeshComp, FName BattleShipName);
 
 	// 적 탐지 관련 함수
-	void DetectBattleShip();
-	void DetectAircraft();
-	void SortingPawnArrayToDistance(TArray<APawn*> ArrayPawn);
+	void CalculateAngleToSpinTurret();
 
 	//void SetDead();
 
-	// 포탑에 공격할 목표를 할당
-	void SetSubTurretAngle(float Angle);
-	void SetSubTurretPoint(FVector Point);
-	void SetSubTurretTarget(APawn* Target);
-
 public:
 	virtual void Tick(float DeltaTime) override;
-	//virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 
 	// 인터페이스 관련 함수
+	virtual void UserFastFire() override;
 	virtual void UserAttack() override;
 	virtual void UserAttackCancel() override;
-	virtual void UserSkill1() override;
-	virtual void UserSkill2() override;
-	virtual void UserSkill3() override;
-	virtual void UserSkill4() override;
+	virtual void UserSpinTurrets(float Angle, float Distance) override;
+	virtual void UserSpinTurretsToPawn(APawn* Target) override;
+	virtual void UserSpinTurretsToHitPoint(FVector HitPoint) override;
+	virtual void UserSkill(char Key) override;
 	virtual void CalculateRotationToHitPoint(FVector HitPoint) override;
 	virtual void IncreaseMoveSpeed() override;
 	virtual void DecreaseMoveSpeed() override;
@@ -67,21 +56,25 @@ protected:
 	UPROPERTY(VisibleAnywhere, Category = "BattleShip | ID")
 	uint32 ID = 0;
 	UPROPERTY(VisibleAnywhere, Category = "BattleShip | ID")
-	FString BattleShipName = TEXT("None");
+	FString PlayerName;
+	UPROPERTY(VisibleAnywhere, Category = "BattleShip | ID")
+	FString BattleShipName;
 	UPROPERTY(VisibleAnywhere, Category = "BattleShip | ID")
 	EBattleShipType BattleShipType = EBattleShipType::Invalid;
+	UPROPERTY(VisibleAnywhere, Category = "BattleShip | ID")
+	uint8 TeamInt = 1;
 
 
 	// Stat
 protected:
 	UPROPERTY(EditAnywhere, Category = "BattleShip | Stat")
-	float MaxHP;
+	float InitMaxHP;
 
 	UPROPERTY(EditAnywhere, Category = "BattleShip | Stat")
 	float HP;
 
 	UPROPERTY(EditAnywhere, Category = "BattleShip | Stat")
-	float MaxMP;
+	float InitMaxMP;
 
 	UPROPERTY(EditAnywhere, Category = "BattleShip | Stat")
 	float MP;
@@ -90,40 +83,13 @@ protected:
 	// 움직임, 회전 관련 변수
 protected:
 	UPROPERTY(EditAnywhere, Category = "BattleShip | Movement")
-	bool bCanMove;
-
-	UPROPERTY(EditAnywhere, Category = "BattleShip | Rotation")
-	bool bCanRotation;
-
-
-	UPROPERTY(EditAnywhere, Category = "BattleShip | Movement")
 	float InitMaxMoveSpeed;
 
 	UPROPERTY(EditAnywhere, Category = "BattleShip | Movement")
 	float InitAcceleration;
 
 	UPROPERTY(EditAnywhere, Category = "BattleShip | Movement")
-	float MoveSpeed;
-
-	UPROPERTY(EditAnywhere, Category = "BattleShip | Movement")
-	float Acceleration;
-
-	UPROPERTY(EditAnywhere, Category = "BattleShip | Movement")
-	float Deceleration;
-
-
-	UPROPERTY(EditAnywhere, Category = "BattleShip | Rotation")
-	float TurnAngle;
-
-	UPROPERTY(EditAnywhere, Category = "BattleShip | Rotation")
-	float RotationSpeed;
-
-	UPROPERTY(EditAnywhere, Category = "BattleShip | Rotation")
-	float RotationAcceleration;
-
-	UPROPERTY(EditAnywhere, Category = "BattleShip | Rotation")
-	float MaxRotationSpeed;
-
+	float InitDeceleration;
 
 	UPROPERTY(EditAnywhere, Category = "BattleShip | Rotation")
 	float InitMaxRotationSpeed;
@@ -131,77 +97,80 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "BattleShip | Rotation")
 	float InitRotationAcceleration;
 
-	bool bReverseDirection;
-	bool bIsRotationDeceleration;
-	bool bIsTurnLeft;
+	UPROPERTY(EditAnywhere, Category = "BattleShip | Rotation")
+	float InitRotationAccelerationIncrease;
 
-	// 적 탐지 관련
 protected:
-	FTimerHandle DetectTimerHandle;
+	bool bIsMouseTarget;
+	APawn* MouseTarget;
+	float MouseTargetDistance;
 
-	UPROPERTY(VisibleAnywhere, Category = "BattleShip | Attack")
-	TArray<APawn*> InRangeShips;
-	UPROPERTY(VisibleAnywhere, Category = "BattleShip | Attack")
-	TObjectPtr<APawn> AttackTargetShip;
-
-	UPROPERTY(VisibleAnywhere, Category = "BattleShip | Attack")
-	TArray<APawn*> InRangeAircraft;
-	UPROPERTY(VisibleAnywhere, Category = "BattleShip | Attack")
-	TObjectPtr<APawn> AttackTargetAircraft;
 
 
 	// 기본 구성 컴포넌트
 	UPROPERTY(VisibleAnywhere)
-	TObjectPtr<class UStaticMeshComponent> StaticMeshComp;
+	TObjectPtr<class USkeletalMeshComponent> SkeletalMeshComp;
 	UPROPERTY(VisibleAnywhere)
-	TObjectPtr<class UFloatingPawnMovement> FloatingPawnMove;
+	TObjectPtr<class UWHCBattleShipMovement> BattleShipMovementComp;
 	UPROPERTY(VisibleAnywhere)
-	TObjectPtr<class UCameraComponent> CameraComp;
+	TObjectPtr<class UWHCDetectEnemy> DetectEnemyComp;
 	UPROPERTY(VisibleAnywhere)
-	TObjectPtr<class USpringArmComponent> SpringArmComp;
+	TObjectPtr<class UWHCSkillHandler> SkillHandlerComp;
+	UPROPERTY(VisibleAnywhere)
+	TObjectPtr<class UWHCTargetSelector> TargetSelectorComp;
+
+	//어빌리티 시스템
 
 	// HP UI
 protected:
 
-
-
 	// 소켓을 포함하는 선체 매시
 	UPROPERTY(EditAnywhere, Category = "BattleShip | Mesh")
-	class UStaticMesh* BaseMesh;
+	TObjectPtr<class USkeletalMesh> BaseMesh;
 
+	UPROPERTY(EditAnywhere, Category = "BattleShip | Skill")
+	TSoftObjectPtr<UObject> SkillPtrQ;
+	UPROPERTY(EditAnywhere, Category = "BattleShip | Skill")
+	TSoftObjectPtr<UObject> SkillPtrW;
+	UPROPERTY(EditAnywhere, Category = "BattleShip | Skill")
+	TSoftObjectPtr<UObject> SkillPtrE;
+	UPROPERTY(EditAnywhere, Category = "BattleShip | Skill")
+	TSoftObjectPtr<UObject> SkillPtrR;
 
 protected:
 	// 모든 터렛을 저장
 	UPROPERTY(EditAnywhere, Category = "BattleShip | Turrets")
-	TArray<AWHTurret*> AllTurrets;
+	TArray<FTurretArray> AllTurretArray;
 
-	UPROPERTY(EditAnywhere, Category = "BattleShip | Turrets")
-	TArray<AWHTurret*> MainTurrets;
+	//UPROPERTY(EditAnywhere, Category = "BattleShip | Turrets")
+	//FTurretArray MainTurrets1;
+	//UPROPERTY(EditAnywhere, Category = "BattleShip | Turrets")
+	//FTurretArray MainTurrets2;
 
-	UPROPERTY(EditAnywhere, Category = "BattleShip | Turrets")
-	TArray<AWHTurret*> TorpedoLaunchers;
+	//UPROPERTY(EditAnywhere, Category = "BattleShip | Turrets")
+	//FTurretArray TorpedoLaunchers1;
+	//UPROPERTY(EditAnywhere, Category = "BattleShip | Turrets")
+	//FTurretArray TorpedoLaunchers2;
 
+	//UPROPERTY(EditAnywhere, Category = "BattleShip | Turrets")
+	//FTurretArray SubTurrets1;
+	//UPROPERTY(EditAnywhere, Category = "BattleShip | Turrets")
+	//FTurretArray SubTurrets2;
 
-	UPROPERTY(EditAnywhere, Category = "BattleShip | Turrets")
-	TArray<AWHTurret*> SubTurrets1;
+	//UPROPERTY(EditAnywhere, Category = "BattleShip | Turrets")
+	//FTurretArray AirTurrets1;
+	//UPROPERTY(EditAnywhere, Category = "BattleShip | Turrets")
+	//FTurretArray AirTurrets2;
 
-	UPROPERTY(EditAnywhere, Category = "BattleShip | Turrets")
-	TArray<AWHTurret*> SubTurrets2;
+	//UPROPERTY(EditAnywhere, Category = "BattleShip | Turrets")
+	//FTurretArray DualTurrets1;
+	//UPROPERTY(EditAnywhere, Category = "BattleShip | Turrets")
+	//FTurretArray DualTurrets2;
 
+protected:
+	UPROPERTY(EditAnywhere, Category = "BattleShip | Target")
+	TArray<APawn*> EnemyBattleShips;
 
-	UPROPERTY(EditAnywhere, Category = "BattleShip | Turrets")
-	TArray<AWHTurret*> AirTurrets1;
-	UPROPERTY(EditAnywhere, Category = "BattleShip | Turrets")
-	TArray<AWHTurret*> AirTurrets2;
-	UPROPERTY(EditAnywhere, Category = "BattleShip | Turrets")
-	TArray<AWHTurret*> AirTurrets3;
-	UPROPERTY(EditAnywhere, Category = "BattleShip | Turrets")
-	TArray<AWHTurret*> AirTurrets4;
-
-
-	UPROPERTY(EditAnywhere, Category = "BattleShip | Turrets")
-	TArray<AWHTurret*> DualPurposeTurrets1;
-
-	UPROPERTY(EditAnywhere, Category = "BattleShip | Turrets")
-	TArray<AWHTurret*> DualPurposeTurrets2;
+	UPROPERTY(EditAnywhere, Category = "BattleShip | Target")
+	TArray<APawn*> EnemyAircrafts;
 };

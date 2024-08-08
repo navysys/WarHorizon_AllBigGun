@@ -3,14 +3,13 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/Pawn.h"
-#include "Enum/ETurretType.h"
+#include "Turret/WHTurretBase.h"
 #include "Enum/ETurretAttackType.h"
 #include "Interface/TurretInterface.h"
 #include "WHTurret.generated.h"
 
 UCLASS()
-class WARHORIZON_ALLBIGGUN_API AWHTurret : public APawn, public ITurretInterface
+class WARHORIZON_ALLBIGGUN_API AWHTurret : public AWHTurretBase, public ITurretInterface
 {
 	GENERATED_BODY()
 
@@ -21,25 +20,21 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
-
-	// 데이터 
-	void LoadDataTableToName(FName Name);
-	void InitStat();
-
+	virtual void PostInitializeComponents() override;
 
 public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	void SetupTurret(APawn* BaseShip, FName Name);
+	
 
 	void SetAttackType(ETurretAttackType Type) { AttackType = Type; }
 	void SetTargetAngle(float Angle) { TargetAngle = Angle; }
 	void SetTargetPoint(FVector Point) { TargetPoint = Point; }
 	void SetTargetPawn(APawn* Pawn) { TargetPawn = Pawn; }
-	void SetMuzzles(UStaticMeshComponent* MeshComp);
+	void SetTargetDistance(float Dist) { TargetDistance = Dist; }
 
-	float GetHorizontalAngle() { return HorizontalAngle; }
+	virtual float GetMaxHorizontalAngle() override;
 	virtual APawn* GetBaseBattleShip() override;
 	virtual uint8 GetAttackType() override;
 	virtual float GetTurretTargetAngle() override;
@@ -47,18 +42,14 @@ public:
 	virtual FVector GetTurretTargetPoint() override;
 	virtual float GetRotationSpeed() override;
 	virtual float GetReloadTime() override;
-	virtual uint16 GetAmmo() override;
 	virtual void Fire() override;
 
 public:
-	UPROPERTY(VisibleAnywhere)
-	APawn* BaseBattleShip;
+	class AWHPlayerController* PlayerController;
 
 protected:
-	UPROPERTY(VisibleAnywhere)
-	TObjectPtr<UStaticMeshComponent> StaticMeshComp;
-
-
+	UPROPERTY(EditAnywhere)
+	TArray<float> Dispersion;
 
 	UPROPERTY(VisibleAnywhere)
 	float MaxRotationAngle;
@@ -72,35 +63,14 @@ protected:
 	APawn* TargetPawn;
 	UPROPERTY(VisibleAnywhere)
 	FVector TargetPoint;
+	UPROPERTY(VisibleAnywhere)
+	float TargetDistance;
 
 	UPROPERTY(VisibleAnywhere)
-	uint16 TurretID;
+	FVector ShellVelocityVector = FVector::ZeroVector;
 	UPROPERTY(VisibleAnywhere)
-	FString TurretName;
-	UPROPERTY(VisibleAnywhere)
-	ETurretType TurretType;
-
+	float ShellVelocity = 0.0f;
 	UPROPERTY(EditAnywhere)
-	class UStaticMesh* TurretMesh;
-
-	UPROPERTY(VisibleAnywhere)
-	TArray<UStaticMeshSocket*> Muzzles;
-
-	UPROPERTY(EditAnywhere)
-	uint16 MaxAmmo;
-	UPROPERTY(EditAnywhere)
-	uint16 Ammo;
-	UPROPERTY(EditAnywhere)
-	float ReloadTime;
-	UPROPERTY(EditAnywhere)
-	float Range;
-
-	UPROPERTY(EditAnywhere)
-	float HorizontalAngle;
-	UPROPERTY(EditAnywhere)
-	float VerticalAngle;
-
-	UPROPERTY(EditAnywhere)
-	float RotationSpeed;
+	float ShellLaunchAngle;
 
 };

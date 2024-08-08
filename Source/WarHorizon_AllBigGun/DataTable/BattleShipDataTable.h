@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Engine/DataTable.h"
 #include "Enum/EBattleShipType.h"
+#include "Skill/WHSkillBase.h"
 #include "BattleShipDataTable.generated.h"
 
 /**
@@ -27,7 +28,16 @@ struct WARHORIZON_ALLBIGGUN_API FBattleShipDataTable : public FTableRowBase
 
 	// 소켓을 포함하는 함체 매시
 	UPROPERTY(EditAnywhere)
-	UStaticMesh* BaseMesh;
+	USkeletalMesh* BaseMesh;
+
+	UPROPERTY(EditAnywhere)
+	TSoftObjectPtr<UObject> SkillQ;
+	UPROPERTY(EditAnywhere)
+	TSoftObjectPtr<UObject> SkillW;
+	UPROPERTY(EditAnywhere)
+	TSoftObjectPtr<UObject> SkillE;
+	UPROPERTY(EditAnywhere)
+	TSoftObjectPtr<UObject> SkillR;
 
 	UPROPERTY(EditAnywhere)
 	float HP;
@@ -51,5 +61,7 @@ struct WARHORIZON_ALLBIGGUN_API FBattleShipDataTable : public FTableRowBase
 	// 회전 가속도
 	UPROPERTY(EditAnywhere)
 	float RotationAcceleration;
-
+	// 회전가속 증가량
+	UPROPERTY(EditAnywhere)
+	float RotationAccelerationIncrease;
 };

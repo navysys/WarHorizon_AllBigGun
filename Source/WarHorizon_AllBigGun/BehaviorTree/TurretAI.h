@@ -9,3 +9,8 @@
 #define BBKEY_POINT TEXT("Point")
 #define BBKEY_POINTANGLE TEXT("PointAngle")
 #define BBKEY_ATTACKTYPE TEXT("AttackType")
+#define BBKEY_INITROTATION TEXT("InitRotation")
+#define BBKEY_ROTATIONSPEED TEXT("RotationSpeed")
+#define BBKEY_ATTACKRANGE TEXT("AttackRange")
+#define BBKEY_MOUSEANGLE TEXT("MouseAngle")
+#define BBKEY_BATTLESHIPANGLE TEXT("BattleShipAngle")

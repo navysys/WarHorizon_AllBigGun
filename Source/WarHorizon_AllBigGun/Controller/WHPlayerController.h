@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerController.h"
 #include "InputActionValue.h"
+#include "Game/WHCustomStructs.h"
 #include "WHPlayerController.generated.h"
 
 /**
@@ -35,8 +36,8 @@ protected:
 	virtual void SetupInputComponent() override;
 
 private:
-	class IBattleShipInterface* PawnBattleShip;
-
+	class IBattleShipInterface* BattleShipPawn;
+	class AWHCameraPawn* CameraPawn;
 
 
 protected:
@@ -53,10 +54,16 @@ protected:
 
 	// IA
 	UPROPERTY(EditAnywhere, Category = Input)
-	TObjectPtr<class UInputAction> MoveOrAttackAction;
+	TObjectPtr<class UInputAction> MoveOrTargetingAction;
+
+	UPROPERTY(EditAnywhere, Category = Input)
+	TObjectPtr<class UInputAction> FastFireAction;
 
 	UPROPERTY(EditAnywhere, Category = Input)
 	TObjectPtr<class UInputAction> AttackAction;
+
+	UPROPERTY(EditAnywhere, Category = Input)
+	TObjectPtr<class UInputAction> SpinTurretAction;
 
 	UPROPERTY(EditAnywhere, Category = Input)
 	TObjectPtr<class UInputAction> AccelerationAction;
@@ -67,14 +74,36 @@ protected:
 	UPROPERTY(EditAnywhere, Category = Input)
 	TObjectPtr<class UInputAction> ChangeContextAction;
 
+
 	// 
-	void MoveOrAttack(const FInputActionValue& Value);
+	void MoveOrTargeting(const FInputActionValue& Value);
+
+	void FastFire(const FInputActionValue& Value);
 
 	void Attack(const FInputActionValue& Value);
+
+	void SpinTurret(const FInputActionValue& Value);
 
 	void Acceleration(const FInputActionValue& Value);
 
 	void Deceleration(const FInputActionValue& Value);
 
 	void ChangeContext(const FInputActionValue& Value);
+
+public:
+
+	FBattleShipDataStruct GetBattleShipData();
+
+	void SetBattleShipPawn(class IBattleShipInterface* BattleShipPawn);
+
+public:
+	UPROPERTY(EditAnywhere)
+	FPlayerDataStruct PlayerData;
+	UPROPERTY(EditAnywhere)
+	FBattleShipDataStruct BattleShipData;
+	UPROPERTY(EditAnywhere)
+	FTurretDataStruct TurretData;
+	
+
+	float ShellSpeed;
 };

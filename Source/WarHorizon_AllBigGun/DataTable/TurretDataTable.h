@@ -26,8 +26,6 @@ struct WARHORIZON_ALLBIGGUN_API FTurretDataTable : public FTableRowBase
 	UStaticMesh* TurretMesh;
 
 	UPROPERTY(EditAnywhere)
-	uint16 Ammo;
-	UPROPERTY(EditAnywhere)
 	float ReloadTime;
 	UPROPERTY(EditAnywhere)
 	float Range;

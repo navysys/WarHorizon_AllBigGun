@@ -21,7 +21,7 @@ EBTNodeResult::Type UBTTask_CheckRotation::ExecuteTask(UBehaviorTreeComponent& O
 		return EBTNodeResult::Failed;
 	}
 
-	uint8 AttackType = OwnerComp.GetBlackboardComponent()->GetValueAsBool(BBKEY_ATTACKTYPE);
+	uint8 AttackType = OwnerComp.GetBlackboardComponent()->GetValueAsInt(BBKEY_ATTACKTYPE);
 	if (AttackType == 0)
 	{
 
@@ -50,22 +50,24 @@ EBTNodeResult::Type UBTTask_CheckRotation::ExecuteTask(UBehaviorTreeComponent& O
 		APawn* TargetPawn = Cast<APawn>(OwnerComp.GetBlackboardComponent()->GetValueAsObject(BBKEY_TARGET));
 		if (nullptr == TargetPawn)
 		{
-			OwnerComp.GetBlackboardComponent()->SetValueAsBool(BBKEY_ISLOOKAT, true);
 			return EBTNodeResult::Failed;
 		}
 
 
 		float TargetAngle = CalculateTargetAngle(ControllingPawn, TargetPawn);
+
 		OwnerComp.GetBlackboardComponent()->SetValueAsFloat(BBKEY_TARGETANGLE, TargetAngle);
 
 		if ((FMath::Abs(TargetAngle - ControllingPawn->GetActorRotation().Yaw) <= 2.0f))
 		{
+			OwnerComp.GetBlackboardComponent()->SetValueAsBool(BBKEY_ISLOOKAT, true);
 			return EBTNodeResult::Succeeded;
 		}
 	}
 	
 
 	// 최대 회전 각보다 클 경우 발사하지 못하도록 대기
+	// 조건에 어긋나면 ISLOOKAT false로 변경
 
 	return EBTNodeResult::InProgress;
 }
@@ -80,11 +82,11 @@ float UBTTask_CheckRotation::CalculateTargetAngle(APawn* Start, APawn* Target)
 
 	FVector Dir = TargetLotation - StartLocation;
 
-	float Dot = FVector::DotProduct(FVector::RightVector, Dir.GetSafeNormal());
+	float Dot = FVector::DotProduct(FVector::ForwardVector, Dir.GetSafeNormal());
 	float AcosAngle = FMath::Acos(Dot);
 	float Angle = FMath::RadiansToDegrees(AcosAngle);
 
-	FVector Cross = FVector::CrossProduct(FVector::RightVector, Dir.GetSafeNormal());
+	FVector Cross = FVector::CrossProduct(FVector::ForwardVector, Dir.GetSafeNormal());
 
 	if (Cross.Z > 0)
 	{
@@ -92,7 +94,7 @@ float UBTTask_CheckRotation::CalculateTargetAngle(APawn* Start, APawn* Target)
 	}
 	else if (Cross.Z < 0)
 	{
-		return -Angle;
+		return 360-Angle;
 	}
 
 	return 0.0f;
@@ -108,11 +110,11 @@ float UBTTask_CheckRotation::CalculatePointAngle(APawn* Start, FVector Point)
 
 	FVector Dir = PointLocation - StartLocation;
 
-	float Dot = FVector::DotProduct(FVector::RightVector, Dir.GetSafeNormal());
+	float Dot = FVector::DotProduct(FVector::ForwardVector, Dir.GetSafeNormal());
 	float AcosAngle = FMath::Acos(Dot);
 	float Angle = FMath::RadiansToDegrees(AcosAngle);
 
-	FVector Cross = FVector::CrossProduct(FVector::RightVector, Dir.GetSafeNormal());
+	FVector Cross = FVector::CrossProduct(FVector::ForwardVector, Dir.GetSafeNormal());
 
 	if (Cross.Z > 0)
 	{
@@ -123,5 +125,5 @@ float UBTTask_CheckRotation::CalculatePointAngle(APawn* Start, FVector Point)
 		return -Angle;
 	}
 
-	return 0.0f;
+	return 0;
 }

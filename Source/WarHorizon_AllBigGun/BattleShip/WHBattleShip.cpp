@@ -3,44 +3,37 @@
 
 #include "BattleShip/WHBattleShip.h"
 #include "Game/WHGameSingleton.h"
-#include "Camera/CameraComponent.h"
-#include "GameFramework/SpringArmComponent.h"
-#include "GameFramework/FloatingPawnMovement.h"
+#include "Controller/WHPlayerController.h"
+#include "Components/SkeletalMeshComponent.h"
+#include "Engine/SkeletalMeshSocket.h"
+#include "Component/WHCBattleShipMovement.h"
+#include "Component/WHCDetectEnemy.h"
+#include "Component/WHCSkillHandler.h"
+#include "Component/WHCTargetSelector.h"
 #include "Turret/WHTurret.h"
-#include "Engine/StaticMeshSocket.h"
-#include "DrawDebugHelpers.h"
-#include "TimerManager.h"
+#include "Enum/ETurretAttackType.h"
+#include "Containers/Array.h"
+
+
 
 // Sets default values
 AWHBattleShip::AWHBattleShip()
 {
 	PrimaryActorTick.bCanEverTick = true;
+	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
+	Tags.Add(FName("BattleShip"));
 
+	//RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
 
-	StaticMeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMesh"));
-	RootComponent = StaticMeshComp;
-	//StaticMeshComp->SetCollisionProfileName(TEXT("BattleShip"));
-	// 팀별로 다른 콜리전 프로파일 적용해야 함 (현재 수동)
-	static ConstructorHelpers::FObjectFinder<UStaticMesh> DefaultMeshObject(TEXT("StaticMesh'/Game/Resource/SM_YamatoBase'"));
-	if (DefaultMeshObject.Succeeded())
-	{
-		StaticMeshComp->SetStaticMesh(DefaultMeshObject.Object);
-	}
+	// 스켈레탈 매시
+	SkeletalMeshComp = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("SkeletalMesh"));
+	SkeletalMeshComp->SetCollisionProfileName(TEXT("TeamABattleShipPreset"));
+	RootComponent = SkeletalMeshComp;
 
-	FloatingPawnMove = CreateDefaultSubobject<UFloatingPawnMovement>(TEXT("MovementComponent"));
-	FloatingPawnMove->TurningBoost = 1;
-
-	SpringArmComp = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArmComponent"));
-	SpringArmComp->SetRelativeRotation(FRotator(-50.0f, 90.0f, 0.0f));
-	SpringArmComp->TargetArmLength = 50000.0f;
-	SpringArmComp->bDoCollisionTest = false;
-	SpringArmComp->bInheritPitch = false;
-	SpringArmComp->bInheritYaw = false;
-	SpringArmComp->bInheritRoll = false;
-	SpringArmComp->SetupAttachment(StaticMeshComp);
-
-	CameraComp = CreateDefaultSubobject<UCameraComponent>(TEXT("CameraComponent"));
-	CameraComp->SetupAttachment(SpringArmComp);
+	BattleShipMovementComp = CreateDefaultSubobject<UWHCBattleShipMovement>(TEXT("BattleShipMovementComp"));
+	DetectEnemyComp = CreateDefaultSubobject<UWHCDetectEnemy>(TEXT("DetectEnemyComp"));
+	SkillHandlerComp = CreateDefaultSubobject<UWHCSkillHandler>(TEXT("SkillHandlerComp"));
+	TargetSelectorComp = CreateDefaultSubobject<UWHCTargetSelector>(TEXT("TargetSelectorComp"));
 }
 
 void AWHBattleShip::BeginPlay()
@@ -48,17 +41,45 @@ void AWHBattleShip::BeginPlay()
 	Super::BeginPlay();
 
 
-	LoadDataTableToName((TEXT("Yamato")));		// 테스트용 현재 모델링이 하나 밖에 없음..
-	CreateTurretToMeshCompSocket(StaticMeshComp, FName(BattleShipName));
-
-	GetWorld()->GetTimerManager().SetTimer(DetectTimerHandle, this, &AWHBattleShip::DetectBattleShip, 0.2f, true);
 }
 
-void AWHBattleShip::SetSubTurretTarget(APawn* Target)
+void AWHBattleShip::PostInitializeComponents()
 {
-	for (auto Turret : SubTurrets1)
+	Super::PostInitializeComponents();
+
+	APawn* OwnerPawn = Cast<APawn>(GetInstigator());
+	if (OwnerPawn != nullptr)
 	{
-		Cast<AWHTurret>(Turret)->SetTargetPawn(Target);
+		AWHPlayerController* OwnerController = Cast<AWHPlayerController>(OwnerPawn->GetController());
+		if (OwnerController != nullptr)
+		{
+			BattleShipName = OwnerController->GetBattleShipData().BattleShipName;
+		}
+	}
+
+	LoadDataTableToName(FName(BattleShipName));
+	CreateTurretToMeshCompSocket(SkeletalMeshComp, FName(BattleShipName));
+
+	if (BattleShipMovementComp != nullptr)
+	{
+		BattleShipMovementComp->InitBattleShipMovementComponent(InitMaxMoveSpeed, InitAcceleration, InitDeceleration, InitMaxRotationSpeed, InitRotationAcceleration, InitRotationAccelerationIncrease);
+	}
+
+	if (DetectEnemyComp != nullptr)
+	{
+		DetectEnemyComp->InitDetectEnemyComponent(TeamInt);
+		DetectEnemyComp->SetDetectedBattleShips(&EnemyBattleShips);
+		DetectEnemyComp->SetDetectedAircrafts(&EnemyAircrafts);
+	}
+
+	if (SkillHandlerComp != nullptr)
+	{
+		SkillHandlerComp->InitSkillHandlerComponent(SkillPtrQ, SkillPtrW, SkillPtrE, SkillPtrR);
+	}
+
+	if (TargetSelectorComp != nullptr)
+	{
+		TargetSelectorComp->InitTargetSelectorComponent(AllTurretArray, EnemyBattleShips, EnemyAircrafts);
 	}
 }
 
@@ -66,39 +87,64 @@ void AWHBattleShip::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	MoveForward();
-	ChangeRotation(DeltaTime);
+	if (bIsMouseTarget)
+	{
+		CalculateAngleToSpinTurret();
+	}
+}
+
+
+void AWHBattleShip::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
+{
+	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
 }
 
-//void AWHBattleShip::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
-//{
-//	Super::SetupPlayerInputComponent(PlayerInputComponent);
-//
-//}
+void AWHBattleShip::UserFastFire()
+{
+	TargetSelectorComp->CommandTurretsFire(ETurretType::Main);
+}
 
 void AWHBattleShip::UserAttack()
 {
+	// 현재는 fastfire 와 같지만 이후에는 조준 완료 시에만 발사하고 조준이 안된 함포 회전하는 것 까지
+	TargetSelectorComp->CommandTurretsFire(ETurretType::Main);
 }
 
 void AWHBattleShip::UserAttackCancel()
 {
 }
 
-void AWHBattleShip::UserSkill1()
+void AWHBattleShip::UserSpinTurrets(float Angle, float Distance)
 {
+	bIsMouseTarget = false;
+	TargetSelectorComp->SetTurretsAttackType(ETurretType::Main, ETurretAttackType::AngleAttack);
+	TargetSelectorComp->SetTurretsTarget(ETurretType::Main, Angle);
+	TargetSelectorComp->SetTurretsTargetDistance(ETurretType::Main, Distance);
 }
 
-void AWHBattleShip::UserSkill2()
+void AWHBattleShip::UserSpinTurretsToPawn(APawn* Target)
 {
+	TargetSelectorComp->SetTurretsAttackType(ETurretType::Main, ETurretAttackType::AngleAttack);
+	bIsMouseTarget = true; // Tick 에서 타겟인 적을 적과의 거리를 지속적으로 계산
+
+	if (IsValid(Target))
+	{
+		MouseTarget = Target;
+		CalculateAngleToSpinTurret(); // Tick 호출 이전에도 계산
+	}
 }
 
-void AWHBattleShip::UserSkill3()
+void AWHBattleShip::UserSpinTurretsToHitPoint(FVector HitPoint)
 {
+
 }
 
-void AWHBattleShip::UserSkill4()
+
+
+void AWHBattleShip::UserSkill(char Key)
 {
+
 }
 
 float AWHBattleShip::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
@@ -122,67 +168,42 @@ float AWHBattleShip::TakeDamage(float DamageAmount, FDamageEvent const& DamageEv
 
 void AWHBattleShip::CalculateRotationToHitPoint(FVector HitPoint)
 {
-	FVector Point = FVector(HitPoint.X, HitPoint.Y, 0.0f);
-	FVector Start = FVector(GetTransform().GetLocation().X, GetTransform().GetLocation().Y, 0.0f);
-
-	FVector Dir = Point - Start;
-
-	float Dot = FVector::DotProduct(GetActorRightVector(), Dir.GetSafeNormal());			// 현재 모델링이 90도 회전한 상태라 RightVector 사용 중
-	float AcosAngle = FMath::Acos(Dot);
-	float Angle = FMath::RadiansToDegrees(AcosAngle);
-
-	FVector Cross = FVector::CrossProduct(GetActorRightVector(), Dir.GetSafeNormal());	// 현재 모델링이 90도 회전한 상태라 RightVector 사용 중
-	if (Cross.Z > 0)
+	if (BattleShipMovementComp)
 	{
-		if (bIsTurnLeft)
-		{
-			bReverseDirection = true;
-		}
-		TurnAngle = Angle;
-		bIsTurnLeft = false;
-	}
-	else if (Cross.Z < 0)
-	{
-		if (!bIsTurnLeft)
-		{
-			bReverseDirection = true;
-		}
-		TurnAngle = -Angle;
-		bIsTurnLeft = true;
+		BattleShipMovementComp->CalculateAngle(HitPoint);
 	}
 }
 
 void AWHBattleShip::IncreaseMoveSpeed()
 {
-	MoveSpeed += Acceleration * GetWorld()->DeltaTimeSeconds;
-	if (MoveSpeed > InitMaxMoveSpeed)
+	if (BattleShipMovementComp)
 	{
-		MoveSpeed = InitMaxMoveSpeed;
-	}
-	if (FloatingPawnMove)
-	{
-		FloatingPawnMove->MaxSpeed = MoveSpeed;
+		UE_LOG(LogTemp, Warning, TEXT("Increase call"));
+		BattleShipMovementComp->IncreaseSpeedType();
 	}
 }
 
 void AWHBattleShip::DecreaseMoveSpeed()
 {
-	MoveSpeed -= Deceleration * GetWorld()->DeltaTimeSeconds;
-	if (MoveSpeed < 0)
+	if (BattleShipMovementComp)
 	{
-		MoveSpeed = 0;
-	}
-	if (FloatingPawnMove)
-	{
-		FloatingPawnMove->MaxSpeed = MoveSpeed;
+		UE_LOG(LogTemp, Warning, TEXT("Decrease call"));
+		BattleShipMovementComp->DecreaseSpeedType();
 	}
 }
 
-
+void AWHBattleShip::LoadSingletonData()
+{
+	UE_LOG(LogTemp, Warning, TEXT("Load Singleton Data"));
+	PlayerName = UWHGameSingleton::Get().GetPlayerName();
+	BattleShipName = UWHGameSingleton::Get().GetBattleShipName();
+	TeamInt = UWHGameSingleton::Get().GetTeamInt();
+}
 
 /*			데이터 관련 함수			*/
 void AWHBattleShip::LoadDataTableToName(FName Name)
 {
+	UE_LOG(LogTemp, Warning, TEXT("Load DataTable Data"));
 	UDataTable* BattleShipData = UWHGameSingleton::Get().GetBattleShipDataTable();
 	FBattleShipDataTable* Table = BattleShipData->FindRow<FBattleShipDataTable>(Name, "");
 
@@ -193,342 +214,332 @@ void AWHBattleShip::LoadDataTableToName(FName Name)
 		BattleShipType = Table->Type;
 		BaseMesh = Table->BaseMesh;
 
-		HP = Table->HP;
-		MaxHP = Table->MaxHP;
-		MP = Table->MP;
-		MaxMP = Table->MaxMP;
+		InitMaxHP = Table->MaxHP;
+		InitMaxMP = Table->MaxMP;
 
 		InitMaxMoveSpeed = Table->MoveSpeed;
 		InitAcceleration = Table->Acceleration;
+		InitDeceleration = Table->Acceleration / 2;
 		InitMaxRotationSpeed = Table->RotationSpeed;
 		InitRotationAcceleration = Table->RotationAcceleration;
+		InitRotationAccelerationIncrease = Table->RotationAccelerationIncrease;
 
-		InitStat();
+		SkillPtrQ = Table->SkillQ;
+		SkillPtrW = Table->SkillW;
+		SkillPtrE = Table->SkillE;
+		SkillPtrR = Table->SkillR;
+
+		SkeletalMeshComp->SetSkeletalMesh(BaseMesh);
 	}
 }
 
-void AWHBattleShip::InitStat()
-{
 
-	MoveSpeed = 0;
-	Acceleration = InitAcceleration;
-	Deceleration = Acceleration;
-	FloatingPawnMove->MaxSpeed = MoveSpeed;
-	FloatingPawnMove->Acceleration = InitAcceleration;
-	FloatingPawnMove->Deceleration = Deceleration;
-
-	TurnAngle = 0;
-	RotationSpeed = 0;
-	MaxRotationSpeed = InitMaxRotationSpeed;
-	RotationAcceleration = InitRotationAcceleration;
-
-	bCanMove = true;
-	bCanRotation = true;
-	bReverseDirection = false;
-	bIsRotationDeceleration = false;
-	bIsTurnLeft = false;
-
-	StaticMeshComp->SetStaticMesh(BaseMesh);
-
-}
 // 매시 컴포넌트를 인자로 받아 소켓의 위치 방향을 받아 포탑을 생성
-void AWHBattleShip::CreateTurretToMeshCompSocket(UStaticMeshComponent* MeshComp, FName ShipName)
+void AWHBattleShip::CreateTurretToMeshCompSocket(USkeletalMeshComponent* MeshComp, FName ShipName)
 {
 	FString BSName = ShipName.ToString();
 	FActorSpawnParameters SpawnParams;
 	SpawnParams.Owner = this;
+	SpawnParams.Instigator = Cast<APawn>(GetInstigator());
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
+	TArray<FName> MTSocketNames1;
+	TArray<FName> MTSocketNames2;
+	TArray<FName> DLSocketNames1;
+	TArray<FName> DLSocketNames2;
+	TArray<FName> STSocketNames1;
+	TArray<FName> STSocketNames2;
+	TArray<FName> ATSocketNames1;
+	TArray<FName> ATSocketNames2;
+	TArray<FName> DTSocketNames1;
+	TArray<FName> DTSocketNames2;
 
-	TArray<UStaticMeshSocket*> MainTurretSockets = MeshComp->GetStaticMesh()->GetSocketsByTag(TEXT("MainTurret"));
-	TArray<UStaticMeshSocket*> SubTurretSockets1 = MeshComp->GetStaticMesh()->GetSocketsByTag(TEXT("SubTurret1"));
-	TArray<UStaticMeshSocket*> AirTurretSockets1 = MeshComp->GetStaticMesh()->GetSocketsByTag(TEXT("AirTurret1"));
-	TArray<UStaticMeshSocket*> AirTurretSockets2 = MeshComp->GetStaticMesh()->GetSocketsByTag(TEXT("AirTurret2"));
-	TArray<UStaticMeshSocket*> AirTurretSockets3 = MeshComp->GetStaticMesh()->GetSocketsByTag(TEXT("AirTurret3"));
-	TArray<UStaticMeshSocket*> AirTurretSockets4 = MeshComp->GetStaticMesh()->GetSocketsByTag(TEXT("AirTurret4"));
-
-
-	if (MainTurretSockets.Num() > 0)
+	// 소켓 분류
+	TArray<FName> SocketNames = SkeletalMeshComp->GetAllSocketNames();
+	for (int i = 0; i < SocketNames.Num(); i++)
 	{
-		FString TurretDataName = BSName + TEXT("_MT");
-		for (int i = 0; i < MainTurretSockets.Num(); i++)
-		{
-			AWHTurret* SpawnedTurret = GetWorld()->SpawnActor<AWHTurret>(MainTurretSockets[i]->RelativeLocation, FRotator::ZeroRotator, SpawnParams);
-			SpawnedTurret->SetupTurret(this, FName(TurretDataName));
-			SpawnedTurret->AttachToActor(this, FAttachmentTransformRules::SnapToTargetNotIncludingScale, *MainTurretSockets[i]->SocketName.ToString());
+		FName SocketName = SocketNames[i];
+		FString StringName = SocketNames[i].ToString();
 
-			AllTurrets.Emplace(SpawnedTurret);
-			MainTurrets.Emplace(SpawnedTurret);
+		if (StringName.Contains(TEXT("MT")))
+		{
+			if (StringName[3] == TCHAR('1'))
+			{
+				MTSocketNames1.AddUnique(SocketName);
+			}
+			else
+			{
+				MTSocketNames2.AddUnique(SocketName);
+			}
+		}
+		else if (StringName.Contains(TEXT("ST")))
+		{
+			if (StringName[3] == TCHAR('1'))
+			{
+				STSocketNames1.AddUnique(SocketName);
+			}
+			else
+			{
+				STSocketNames2.AddUnique(SocketName);
+			}
+		}
+		else if (StringName.Contains(TEXT("AT")))
+		{
+			if (StringName[3] == TCHAR('1'))
+			{
+				ATSocketNames1.AddUnique(SocketName);
+			}
+			else
+			{
+				ATSocketNames2.AddUnique(SocketName);
+			}
+		}
+		else if (StringName.Contains(TEXT("DT")))
+		{
+			if (StringName[3] == TCHAR('1'))
+			{
+				DTSocketNames1.AddUnique(SocketName);
+			}
+			else
+			{
+				DTSocketNames2.AddUnique(SocketName);
+			}
+		}
+		else if (StringName.Contains(TEXT("DL")))
+		{
+			if (StringName[3] == TCHAR('1'))
+			{
+				DLSocketNames1.AddUnique(SocketName);
+			}
+			else
+			{
+				DLSocketNames2.AddUnique(SocketName);
+			}
 		}
 	}
 
-	if (SubTurretSockets1.Num() > 0)
+	// 소켓에 포탑 생성 및 부착
+	if (MTSocketNames1.Num() > 0)
+	{
+		FString TurretDataName = BSName + TEXT("_MT_1");
+		FTurretArray MainTurrets1;
+		for (int i = 0; i < MTSocketNames1.Num(); i++)
+		{
+			const USkeletalMeshSocket* Sock = SkeletalMeshComp->GetSocketByName(MTSocketNames1[i]);
+			if (Sock != nullptr)
+			{
+				AWHTurret* SpawnedTurret = GetWorld()->SpawnActor<AWHTurret>(Sock->GetSocketLocation(SkeletalMeshComp), FRotator::ZeroRotator, SpawnParams);
+				SpawnedTurret->SetupTurret(this, FName(TurretDataName));
+				SpawnedTurret->AttachToActor(this, FAttachmentTransformRules::SnapToTargetNotIncludingScale, Sock->SocketName);
+				SpawnedTurret->SetFrontDirection(MTSocketNames1[i].ToString()[8]);
+
+				MainTurrets1.Turrets.Emplace(SpawnedTurret);
+			}
+		}
+		MainTurrets1.TurretsType = ETurretType::Main;
+		AllTurretArray.Emplace(MainTurrets1);
+	}
+	if (MTSocketNames2.Num() > 0)
+	{
+		FString TurretDataName = BSName + TEXT("_MT_2");
+		FTurretArray MainTurrets2;
+		for (int i = 0; i < MTSocketNames2.Num(); i++)
+		{
+			const USkeletalMeshSocket* Sock = SkeletalMeshComp->GetSocketByName(MTSocketNames2[i]);
+			if (Sock != nullptr)
+			{
+				AWHTurret* SpawnedTurret = GetWorld()->SpawnActor<AWHTurret>(Sock->GetSocketLocation(SkeletalMeshComp), FRotator::ZeroRotator, SpawnParams);
+				SpawnedTurret->SetupTurret(this, FName(TurretDataName));
+				SpawnedTurret->AttachToActor(this, FAttachmentTransformRules::SnapToTargetNotIncludingScale, Sock->SocketName);
+				SpawnedTurret->SetFrontDirection(MTSocketNames2[i].ToString()[8]);
+
+				MainTurrets2.Turrets.Emplace(SpawnedTurret);
+				
+			}
+		}
+		MainTurrets2.TurretsType = ETurretType::Main;
+		AllTurretArray.Emplace(MainTurrets2);
+	}
+	if (STSocketNames1.Num() > 0)
 	{
 		FString TurretDataName = BSName + TEXT("_ST_1");
-		for (int i = 0; i < SubTurretSockets1.Num(); i++)
+		FTurretArray SubTurrets1;
+		for (int i = 0; i < STSocketNames1.Num(); i++)
 		{
-			AWHTurret* SpawnedTurret = GetWorld()->SpawnActor<AWHTurret>(SubTurretSockets1[i]->RelativeLocation, FRotator::ZeroRotator, SpawnParams);
-			SpawnedTurret->SetupTurret(this, FName(TurretDataName));
-			SpawnedTurret->AttachToActor(this, FAttachmentTransformRules::SnapToTargetNotIncludingScale, *SubTurretSockets1[i]->SocketName.ToString());
+			const USkeletalMeshSocket* Sock = SkeletalMeshComp->GetSocketByName(STSocketNames1[i]);
+			if (Sock != nullptr)
+			{
+				AWHTurret* SpawnedTurret = GetWorld()->SpawnActor<AWHTurret>(Sock->GetSocketLocation(SkeletalMeshComp), FRotator::ZeroRotator, SpawnParams);
+				SpawnedTurret->SetupTurret(this, FName(TurretDataName));
+				SpawnedTurret->AttachToActor(this, FAttachmentTransformRules::SnapToTargetNotIncludingScale, Sock->SocketName);
+				SpawnedTurret->SetFrontDirection(STSocketNames1[i].ToString()[8]);
 
-			AllTurrets.Emplace(SpawnedTurret);
-			SubTurrets1.Emplace(SpawnedTurret);
+				SubTurrets1.Turrets.Emplace(SpawnedTurret);
+			}
 		}
+		SubTurrets1.TurretsType = ETurretType::Sub;
+		AllTurretArray.Emplace(SubTurrets1);
 	}
+	if (STSocketNames2.Num() > 0)
+	{
+		FString TurretDataName = BSName + TEXT("_ST_2");
+		FTurretArray SubTurrets2;
+		for (int i = 0; i < STSocketNames2.Num(); i++)
+		{
+			const USkeletalMeshSocket* Sock = SkeletalMeshComp->GetSocketByName(STSocketNames2[i]);
+			if (Sock != nullptr)
+			{
+				AWHTurret* SpawnedTurret = GetWorld()->SpawnActor<AWHTurret>(Sock->GetSocketLocation(SkeletalMeshComp), FRotator::ZeroRotator, SpawnParams);
+				SpawnedTurret->SetupTurret(this, FName(TurretDataName));
+				SpawnedTurret->AttachToActor(this, FAttachmentTransformRules::SnapToTargetNotIncludingScale, Sock->SocketName);
+				SpawnedTurret->SetFrontDirection(STSocketNames2[i].ToString()[8]);
 
-	if (AirTurretSockets1.Num() > 0)
+				SubTurrets2.Turrets.Emplace(SpawnedTurret);
+			}
+		}
+		SubTurrets2.TurretsType = ETurretType::Sub;
+		AllTurretArray.Emplace(SubTurrets2);
+	}
+	if (ATSocketNames1.Num() > 0)
 	{
 		FString TurretDataName = BSName + TEXT("_AT_1");
-		for (int i = 0; i < AirTurretSockets1.Num(); i++)
+		FTurretArray AirTurrets1;
+		for (int i = 0; i < ATSocketNames1.Num(); i++)
 		{
-			AWHTurret* SpawnedTurret = GetWorld()->SpawnActor<AWHTurret>(AirTurretSockets1[i]->RelativeLocation, FRotator::ZeroRotator, SpawnParams);
-			SpawnedTurret->SetupTurret(Cast<APawn>(this), FName(TurretDataName));
-			SpawnedTurret->AttachToActor(this, FAttachmentTransformRules::SnapToTargetNotIncludingScale, *AirTurretSockets1[i]->SocketName.ToString());
+			const USkeletalMeshSocket* Sock = SkeletalMeshComp->GetSocketByName(ATSocketNames1[i]);
+			if (Sock != nullptr)
+			{
+				AWHTurretBase* SpawnedTurret = GetWorld()->SpawnActor<AWHTurretBase>(Sock->GetSocketLocation(SkeletalMeshComp), FRotator::ZeroRotator, SpawnParams);
+				SpawnedTurret->SetupTurret(this, FName(TurretDataName));
+				SpawnedTurret->AttachToActor(this, FAttachmentTransformRules::SnapToTargetNotIncludingScale, Sock->SocketName);
+				SpawnedTurret->SetFrontDirection(ATSocketNames1[i].ToString()[8]);
 
-			AllTurrets.Emplace(SpawnedTurret);
-			AirTurrets1.Emplace(SpawnedTurret);
+				AirTurrets1.Turrets.Emplace(SpawnedTurret);
+			}
 		}
+		AirTurrets1.TurretsType = ETurretType::Air;
+		AllTurretArray.Emplace(AirTurrets1);
 	}
-
-	if (AirTurretSockets2.Num() > 0)
+	if (ATSocketNames2.Num() > 0)
 	{
 		FString TurretDataName = BSName + TEXT("_AT_2");
-		for (int i = 0; i < AirTurretSockets2.Num(); i++)
+		FTurretArray AirTurrets2;
+		for (int i = 0; i < ATSocketNames2.Num(); i++)
 		{
-			AWHTurret* SpawnedTurret = GetWorld()->SpawnActor<AWHTurret>(AirTurretSockets2[i]->RelativeLocation, FRotator::ZeroRotator, SpawnParams);
-			SpawnedTurret->SetupTurret(Cast<APawn>(this), FName(TurretDataName));
-			SpawnedTurret->AttachToActor(this, FAttachmentTransformRules::SnapToTargetNotIncludingScale, *AirTurretSockets2[i]->SocketName.ToString());
+			const USkeletalMeshSocket* Sock = SkeletalMeshComp->GetSocketByName(ATSocketNames2[i]);
+			if (Sock != nullptr)
+			{
+				AWHTurretBase* SpawnedTurret = GetWorld()->SpawnActor<AWHTurretBase>(Sock->GetSocketLocation(SkeletalMeshComp), FRotator::ZeroRotator, SpawnParams);
+				SpawnedTurret->SetupTurret(this, FName(TurretDataName));
+				SpawnedTurret->AttachToActor(this, FAttachmentTransformRules::SnapToTargetNotIncludingScale, Sock->SocketName);
+				SpawnedTurret->SetFrontDirection(ATSocketNames2[i].ToString()[8]);
 
-			AllTurrets.Emplace(SpawnedTurret);
-			AirTurrets2.Emplace(SpawnedTurret);
+				AirTurrets2.Turrets.Emplace(SpawnedTurret);
+			}
 		}
+		AirTurrets2.TurretsType = ETurretType::Air;
+		AllTurretArray.Emplace(AirTurrets2);
 	}
-
-	if (AirTurretSockets3.Num() > 0)
+	if (DTSocketNames1.Num() > 0)
 	{
-		FString TurretDataName = BSName + TEXT("_AT_3");
-		for (int i = 0; i < AirTurretSockets3.Num(); i++)
+		FString TurretDataName = BSName + TEXT("_DT_1");
+		FTurretArray DualTurrets1;
+		for (int i = 0; i < DTSocketNames1.Num(); i++)
 		{
-			AWHTurret* SpawnedTurret = GetWorld()->SpawnActor<AWHTurret>(AirTurretSockets3[i]->RelativeLocation, FRotator::ZeroRotator, SpawnParams);
-			SpawnedTurret->SetupTurret(Cast<APawn>(this), FName(TurretDataName));
-			SpawnedTurret->AttachToActor(this, FAttachmentTransformRules::SnapToTargetNotIncludingScale, *AirTurretSockets3[i]->SocketName.ToString());
+			const USkeletalMeshSocket* Sock = SkeletalMeshComp->GetSocketByName(DTSocketNames1[i]);
+			if (Sock != nullptr)
+			{
+				AWHTurret* SpawnedTurret = GetWorld()->SpawnActor<AWHTurret>(Sock->GetSocketLocation(SkeletalMeshComp), FRotator::ZeroRotator, SpawnParams);
+				SpawnedTurret->SetupTurret(this, FName(TurretDataName));
+				SpawnedTurret->AttachToActor(this, FAttachmentTransformRules::SnapToTargetNotIncludingScale, Sock->SocketName);
+				SpawnedTurret->SetFrontDirection(DTSocketNames1[i].ToString()[8]);
 
-			AllTurrets.Emplace(SpawnedTurret);
-			AirTurrets3.Emplace(SpawnedTurret);
+				DualTurrets1.Turrets.Emplace(SpawnedTurret);
+			}
 		}
+		DualTurrets1.TurretsType = ETurretType::DualPurpose;
+		AllTurretArray.Emplace(DualTurrets1);
 	}
-
-	if (AirTurretSockets4.Num() > 0)
+	if (DTSocketNames2.Num() > 0)
 	{
-		FString TurretDataName = BSName + TEXT("_AT_4");
-		for (int i = 0; i < AirTurretSockets4.Num(); i++)
+		FString TurretDataName = BSName + TEXT("_DT_2");
+		FTurretArray DualTurrets2;
+		for (int i = 0; i < DTSocketNames2.Num(); i++)
 		{
-			AWHTurret* SpawnedTurret = GetWorld()->SpawnActor<AWHTurret>(AirTurretSockets4[i]->RelativeLocation, FRotator::ZeroRotator, SpawnParams);
-			SpawnedTurret->SetupTurret(Cast<APawn>(this), FName(TurretDataName));
-			SpawnedTurret->AttachToActor(this, FAttachmentTransformRules::SnapToTargetNotIncludingScale, *AirTurretSockets4[i]->SocketName.ToString());
+			const USkeletalMeshSocket* Sock = SkeletalMeshComp->GetSocketByName(DTSocketNames2[i]);
+			if (Sock != nullptr)
+			{
+				AWHTurret* SpawnedTurret = GetWorld()->SpawnActor<AWHTurret>(Sock->GetSocketLocation(SkeletalMeshComp), FRotator::ZeroRotator, SpawnParams);
+				SpawnedTurret->SetupTurret(this, FName(TurretDataName));
+				SpawnedTurret->AttachToActor(this, FAttachmentTransformRules::SnapToTargetNotIncludingScale, Sock->SocketName);
+				SpawnedTurret->SetFrontDirection(DTSocketNames2[i].ToString()[8]);
 
-			AllTurrets.Emplace(SpawnedTurret);
-			AirTurrets4.Emplace(SpawnedTurret);
+				DualTurrets2.Turrets.Emplace(SpawnedTurret);
+			}
 		}
+		DualTurrets2.TurretsType = ETurretType::DualPurpose;
+		AllTurretArray.Emplace(DualTurrets2);
 	}
-
-}
-
-
-
-
-/*			움직임 회전 함수			*/
-void AWHBattleShip::MoveForward()
-{
-	if (bCanMove)
+	if (DLSocketNames1.Num() > 0)
 	{
-		AddMovementInput(GetActorRightVector());		// 현재 모델링이 90도 회전한 상태라 RightVector 사용 중
+		FString TurretDataName = BSName + TEXT("_DL_1");
+		FTurretArray TorpedoLaunchers1;
+		for (int i = 0; i < DLSocketNames1.Num(); i++)
+		{
+			const USkeletalMeshSocket* Sock = SkeletalMeshComp->GetSocketByName(DLSocketNames1[i]);
+			if (Sock != nullptr)
+			{
+				AWHTurret* SpawnedTurret = GetWorld()->SpawnActor<AWHTurret>(Sock->GetSocketLocation(SkeletalMeshComp), FRotator::ZeroRotator, SpawnParams);
+				SpawnedTurret->SetupTurret(this, FName(TurretDataName));
+				SpawnedTurret->AttachToActor(this, FAttachmentTransformRules::SnapToTargetNotIncludingScale, Sock->SocketName);
+				SpawnedTurret->SetFrontDirection(DLSocketNames1[i].ToString()[8]);
+
+				TorpedoLaunchers1.Turrets.Emplace(SpawnedTurret);
+			}
+		}
+		TorpedoLaunchers1.TurretsType = ETurretType::Torpedo;
+		AllTurretArray.Emplace(TorpedoLaunchers1);
 	}
-}
-
-void AWHBattleShip::ChangeRotation(float DeltaTime)
-{
-
-	if (bCanRotation)	// 회전 운동, 계산을 아예 하지 않으려면 false
+	if (DLSocketNames2.Num() > 0)
 	{
-		float AbsTurnAngle = FMath::Abs(TurnAngle);
-
-		// 반대 방향으로 회전할 때 천천히 회전하기 위한 bReverseDirection 확인
-		if (bReverseDirection)
+		FString TurretDataName = BSName + TEXT("_DL_2");
+		FTurretArray TorpedoLaunchers2;
+		for (int i = 0; i < DLSocketNames2.Num(); i++)
 		{
-			if (RotationSpeed > 0)
+			const USkeletalMeshSocket* Sock = SkeletalMeshComp->GetSocketByName(DLSocketNames2[i]);
+			if (Sock != nullptr)
 			{
-				RotationSpeed -= RotationAcceleration * 2 * DeltaTime;
+				AWHTurret* SpawnedTurret = GetWorld()->SpawnActor<AWHTurret>(Sock->GetSocketLocation(SkeletalMeshComp), FRotator::ZeroRotator, SpawnParams);
+				SpawnedTurret->SetupTurret(this, FName(TurretDataName));
+				SpawnedTurret->AttachToActor(this, FAttachmentTransformRules::SnapToTargetNotIncludingScale, Sock->SocketName);
+				SpawnedTurret->SetFrontDirection(DLSocketNames2[i].ToString()[8]);
 
-				// 역방향으로 방향을 전환할 경우 RotationSpeed가 0으로 감소된 이후 bReverseDirection 변경
-				if (RotationSpeed <= 0)
-				{
-					RotationSpeed = 0;
-					bReverseDirection = false;
-				}
-			}
-			else
-			{
-				// 처음 방향전환을 실행할 경우 실행
-				bReverseDirection = false;
+				TorpedoLaunchers2.Turrets.Emplace(SpawnedTurret);
 			}
 		}
-		else if (bIsRotationDeceleration)
-		{
-			if (AbsTurnAngle > RotationSpeed)
-			{
-				bIsRotationDeceleration = false;
-			}
-			else
-			{
-				RotationSpeed = AbsTurnAngle;
-			}
-
-			if (RotationSpeed <= 0)
-			{
-				RotationSpeed = 0;
-				bIsRotationDeceleration = false;
-			}
-		}
-		// 역방향 이동이 아니고 감속하지 않아야 할 경우 정상적인 회전속도 증가
-		else if (TurnAngle != 0)
-		{
-			if (MaxRotationSpeed > RotationSpeed)
-			{
-				RotationSpeed += RotationAcceleration * DeltaTime;
-
-				if (MaxRotationSpeed < RotationSpeed)
-				{
-					RotationSpeed = MaxRotationSpeed;
-				}
-			}
-			else if (MaxRotationSpeed < RotationSpeed)
-			{
-				RotationSpeed = MaxRotationSpeed;
-			}
-		}
-
-		// TurnAngle을 기준으로 얼마나 회전해야하는지 계산
-		if (!bReverseDirection)
-		{
-			if (TurnAngle > 0)
-			{
-				TurnAngle -= RotationSpeed * DeltaTime;
-				if (TurnAngle <= 0)
-				{
-					TurnAngle = 0;
-				}
-			}
-			else if (TurnAngle < 0)
-			{
-				TurnAngle += RotationSpeed * DeltaTime;
-				if (TurnAngle >= 0)
-				{
-					TurnAngle = 0;
-				}
-			}
-		}
-
-		if (AbsTurnAngle < RotationSpeed)
-		{
-			bIsRotationDeceleration = true;
-		}
-		if (bIsRotationDeceleration)
-		{
-			if (AbsTurnAngle > RotationSpeed)
-			{
-				bIsRotationDeceleration = false;
-			}
-		}
-
-		// TurnAngle을 토대로 Actor의 방향을 직접 회전
-		if (TurnAngle != 0)
-		{
-			// 이전 프레임과 같은 정방향 회전하는 경우 실행
-			if (!bReverseDirection)
-			{
-				if (TurnAngle > 0)
-				{
-					AddActorLocalRotation(FRotator(0.0f, RotationSpeed * DeltaTime, 0.0f));
-				}
-				else
-				{
-					AddActorLocalRotation(FRotator(0.0f, RotationSpeed * -1.0f * DeltaTime, 0.0f));
-				}
-			}
-			// 이전 프레임과 반대 방향으로 진행해야하는 경우 실행
-			else
-			{
-				if (TurnAngle < 0)
-				{
-					AddActorLocalRotation(FRotator(0.0f, RotationSpeed * DeltaTime, 0.0f));
-				}
-				else
-				{
-					AddActorLocalRotation(FRotator(0.0f, RotationSpeed * -1.0f * DeltaTime, 0.0f));
-				}
-			}
-
-		}
-		else
-		{
-			RotationSpeed = 0;
-		}
+		TorpedoLaunchers2.TurretsType = ETurretType::Torpedo;
+		AllTurretArray.Emplace(TorpedoLaunchers2);
 	}
 }
 
 
 
-
-
-/*			적 탐지 할당 함수			*/
-void AWHBattleShip::DetectBattleShip()
+void AWHBattleShip::CalculateAngleToSpinTurret()
 {
-	float Radius = 40000.0f;
-	TArray<FOverlapResult> OverlapResults;
-	FCollisionQueryParams CollisionQueryParam;
-	CollisionQueryParam.bTraceComplex = true;
-	CollisionQueryParam.AddIgnoredActor(this);
-
-	FName PresetName;
-	if (StaticMeshComp)
+	if (IsValid(MouseTarget))
 	{
-		PresetName = StaticMeshComp->GetCollisionProfileName();
-	}
-	else
-	{
-		PresetName = FName("NoCollision");
-		UE_LOG(LogTemp, Warning, TEXT("스태틱 매시를 찾을 수 없습니다. 적 탐지를 중단합니다."));
-	}
-
-	bool bResult = GetWorld()->OverlapMultiByProfile(OverlapResults, GetActorLocation(), FQuat::Identity, PresetName, FCollisionShape::MakeSphere(Radius), CollisionQueryParam);
-	if (bResult)
-	{
-		TArray<APawn*> ArrayPawn;
-		for (auto const& OverlapResult : OverlapResults)
+		FVector Pos = FVector(GetActorLocation().X, GetActorLocation().Y, 0.0f);
+		FVector TargetPos = FVector(MouseTarget->GetActorLocation().X, MouseTarget->GetActorLocation().Y, 0.0f);
+		FVector Direction = (TargetPos - Pos).GetSafeNormal();
+		float Angle = FRotationMatrix::MakeFromX(Direction).Rotator().Yaw;
+		if (Angle < 0)
 		{
-			APawn* Pawn = Cast<APawn>(OverlapResult.GetActor());
-			ArrayPawn.Emplace(Pawn);
-
-			DrawDebugSphere(GetWorld(), GetActorLocation(), Radius, 20, FColor::Green, false, 0.2f);
+			Angle += 360.0f;
 		}
-		InRangeShips = ArrayPawn;
-		SortingPawnArrayToDistance(InRangeShips);
-		AttackTargetShip = InRangeShips[0];
-		SetSubTurretTarget(AttackTargetShip);
+
+		MouseTargetDistance = FVector::Distance(Pos, TargetPos);
+
+		TargetSelectorComp->SetTurretsTarget(ETurretType::Main, Angle);
+		TargetSelectorComp->SetTurretsTargetDistance(ETurretType::Main, MouseTargetDistance);
 	}
-	else
-	{
-		DrawDebugSphere(GetWorld(), GetActorLocation(), Radius, 20, FColor::Red, false, 0.2f);
-	}
-}
-
-void AWHBattleShip::DetectAircraft()
-{
-
-}
-
-void AWHBattleShip::SortingPawnArrayToDistance(TArray<APawn*> ArrayPawn)
-{
-	ArrayPawn.Sort([this](const APawn& A, const APawn& B) { return A.GetDistanceTo(this) < B.GetDistanceTo(this); });
 }

@@ -1,6 +1,7 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
 using UnrealBuildTool;
+using UnrealBuildTool.Rules;
 
 public class WarHorizon_AllBigGun : ModuleRules
 {
@@ -10,7 +11,7 @@ public class WarHorizon_AllBigGun : ModuleRules
 
 		PublicIncludePaths.AddRange(new string[] { "WarHorizon_AllBigGun" });
 
-		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput" });
+		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput", "AIModule", "Niagara", "Water" });
 
 		PrivateDependencyModuleNames.AddRange(new string[] {  });
 

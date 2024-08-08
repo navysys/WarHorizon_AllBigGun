@@ -29,7 +29,7 @@ public:
 	virtual FVector GetTurretTargetPoint() = 0;
 	virtual float GetRotationSpeed() = 0;
 	virtual float GetReloadTime() = 0;
-	virtual uint16 GetAmmo() = 0;
+	virtual float GetMaxHorizontalAngle() = 0;
 
 	virtual void Fire() = 0;
 };

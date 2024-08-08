@@ -14,7 +14,7 @@ AWHAircraftsBase::AWHAircraftsBase()
 
 	MaxSpeed = 1500.0f;
 
-	static ConstructorHelpers::FObjectFinder<UStaticMesh> DefaultMeshObject(TEXT("StaticMesh'/Game/Resource/AircraftTest/Aircraft_Type0'"));
+	static ConstructorHelpers::FObjectFinder<UStaticMesh> DefaultMeshObject(TEXT("StaticMesh'/Game/Resource/Aircraft/Aircraft_Type0'"));
 	if (DefaultMeshObject.Succeeded())
 	{
 		StaticMeshRef = DefaultMeshObject.Object;

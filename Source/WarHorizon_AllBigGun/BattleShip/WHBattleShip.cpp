@@ -192,6 +192,11 @@ void AWHBattleShip::DecreaseMoveSpeed()
 	}
 }
 
+void AWHBattleShip::SpawnAircrafts(int Index)
+{
+
+}
+
 void AWHBattleShip::LoadSingletonData()
 {
 	UE_LOG(LogTemp, Warning, TEXT("Load Singleton Data"));

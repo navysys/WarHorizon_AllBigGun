@@ -32,4 +32,5 @@ public:
 	virtual void CalculateRotationToHitPoint(FVector HitPoint) = 0;
 	virtual void IncreaseMoveSpeed() = 0;
 	virtual void DecreaseMoveSpeed() = 0;
+	virtual void SpawnAircrafts(int Index) = 0;
 };

@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "UObject/NoExportTypes.h"
-#include "Enum/ETurretAttackType.h"
+#include "Enum/ETurretType.h"
 #include "WHCustomStructs.generated.h"
 
 /**

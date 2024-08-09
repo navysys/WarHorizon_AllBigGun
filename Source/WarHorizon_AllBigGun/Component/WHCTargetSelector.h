@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
 #include "Game/WHCustomStructs.h"
+#include "Enum/ETurretAttackType.h"
 #include "WHCTargetSelector.generated.h"
 
 struct FTurretArray;

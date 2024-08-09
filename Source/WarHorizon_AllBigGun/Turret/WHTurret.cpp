@@ -8,6 +8,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "WHShell.h"
 #include "Controller/WHPlayerController.h"
+#include "NiagaraSystem.h"
 
 // Sets default values
 AWHTurret::AWHTurret()
@@ -17,10 +18,10 @@ AWHTurret::AWHTurret()
 	AIControllerClass = AWHTurretAIController::StaticClass();
 	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
 
-	static ConstructorHelpers::FObjectFinder<UNiagaraSystem> GunFireEffectObject(TEXT("NiagaraSystem'/Game/Resource/Niagara/NS_GunFire'"));
-	if (GunFireEffectObject.Succeeded())
+	static ConstructorHelpers::FObjectFinder<UNiagaraSystem> GunFireEffectRef(TEXT("NiagaraSystem'/Game/Resource/Niagara/NS_GunFire'"));
+	if (GunFireEffectRef.Succeeded())
 	{
-		GunFireEffect = GunFireEffectObject.Object;
+		GunFireEffect = GunFireEffectRef.Object;
 	}
 	else
 	{

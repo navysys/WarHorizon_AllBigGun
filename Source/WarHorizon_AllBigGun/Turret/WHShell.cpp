@@ -21,7 +21,7 @@ AWHShell::AWHShell()
 	StaticMeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMeshComp"));
 	RootComponent = StaticMeshComp;
 	StaticMeshComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	static ConstructorHelpers::FObjectFinder<UStaticMesh> DefaultMeshObject(TEXT("StaticMesh'/Game/Resource/StaticMesh/SM_Shell'"));
+	static ConstructorHelpers::FObjectFinder<UStaticMesh> DefaultMeshObject(TEXT("StaticMesh'/Game/Resource/Turret/SM_Shell'"));
 	if (DefaultMeshObject.Succeeded())
 	{
 		StaticMeshComp->SetStaticMesh(DefaultMeshObject.Object);

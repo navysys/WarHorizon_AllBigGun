@@ -51,6 +51,7 @@ public:
 	virtual void CalculateRotationToHitPoint(FVector HitPoint) override;
 	virtual void IncreaseMoveSpeed() override;
 	virtual void DecreaseMoveSpeed() override;
+	virtual void SpawnAircrafts(int Index) override;
 
 protected:
 	UPROPERTY(VisibleAnywhere, Category = "BattleShip | ID")
@@ -119,7 +120,6 @@ protected:
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<class UWHCTargetSelector> TargetSelectorComp;
 
-	//어빌리티 시스템
 
 	// HP UI
 protected:
@@ -141,6 +141,9 @@ protected:
 	// 모든 터렛을 저장
 	UPROPERTY(EditAnywhere, Category = "BattleShip | Turrets")
 	TArray<FTurretArray> AllTurretArray;
+
+	UPROPERTY(EditAnywhere, Category = "BattleShip | Aircraft")
+	TArray<APawn*> AllAircraftsArray;
 
 	//UPROPERTY(EditAnywhere, Category = "BattleShip | Turrets")
 	//FTurretArray MainTurrets1;

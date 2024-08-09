@@ -43,6 +43,9 @@ public:
 	UPROPERTY(VisibleAnywhere, Category = "Aircrafts")
 	EAircraftType AircraftType;
 
+	UPROPERTY(VisibleAnywhere, Category = "Aircrafts")
+	APawn* MotherShipPawn;
+
 	UPROPERTY(VisibleAnywhere, Category = "Aircrafts | Stat")
 	int MaxHP;
 	UPROPERTY(VisibleAnywhere, Category = "Aircrafts | Stat")

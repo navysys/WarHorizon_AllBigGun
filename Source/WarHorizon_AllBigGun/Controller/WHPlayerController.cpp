@@ -95,6 +95,7 @@ void AWHPlayerController::BeginPlay()
 	if (UEnhancedInputLocalPlayerSubsystem* SubSystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer()))
 	{
 		SubSystem->AddMappingContext(DefaultContext, 0);
+		
 	}
 }
 

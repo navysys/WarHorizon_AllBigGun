@@ -4,7 +4,6 @@
 
 #include "CoreMinimal.h"
 #include "AIController.h"
-#include "Interface/TurretInterface.h"
 #include "WHTurretAIController.generated.h"
 
 /**
@@ -30,9 +29,4 @@ private:
 
 	UPROPERTY()
 	TObjectPtr<class UBehaviorTree> BTAsset;
-
-	UPROPERTY()
-	APawn* ControllingPawn;
-
-	ITurretInterface* TurretPawn;
 };

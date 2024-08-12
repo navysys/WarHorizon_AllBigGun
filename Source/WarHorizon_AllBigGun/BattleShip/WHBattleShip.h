@@ -102,6 +102,10 @@ protected:
 	float InitRotationAccelerationIncrease;
 
 protected:
+	UPROPERTY(EditAnywhere, Category = "BattleShip | Aircraft")
+	TArray<int> AircraftIDs;
+
+protected:
 	bool bIsMouseTarget;
 	APawn* MouseTarget;
 	float MouseTargetDistance;
@@ -142,33 +146,9 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "BattleShip | Turrets")
 	TArray<FTurretArray> AllTurretArray;
 
+	// 모든 항공기를 저장
 	UPROPERTY(EditAnywhere, Category = "BattleShip | Aircraft")
-	TArray<APawn*> AllAircraftsArray;
-
-	//UPROPERTY(EditAnywhere, Category = "BattleShip | Turrets")
-	//FTurretArray MainTurrets1;
-	//UPROPERTY(EditAnywhere, Category = "BattleShip | Turrets")
-	//FTurretArray MainTurrets2;
-
-	//UPROPERTY(EditAnywhere, Category = "BattleShip | Turrets")
-	//FTurretArray TorpedoLaunchers1;
-	//UPROPERTY(EditAnywhere, Category = "BattleShip | Turrets")
-	//FTurretArray TorpedoLaunchers2;
-
-	//UPROPERTY(EditAnywhere, Category = "BattleShip | Turrets")
-	//FTurretArray SubTurrets1;
-	//UPROPERTY(EditAnywhere, Category = "BattleShip | Turrets")
-	//FTurretArray SubTurrets2;
-
-	//UPROPERTY(EditAnywhere, Category = "BattleShip | Turrets")
-	//FTurretArray AirTurrets1;
-	//UPROPERTY(EditAnywhere, Category = "BattleShip | Turrets")
-	//FTurretArray AirTurrets2;
-
-	//UPROPERTY(EditAnywhere, Category = "BattleShip | Turrets")
-	//FTurretArray DualTurrets1;
-	//UPROPERTY(EditAnywhere, Category = "BattleShip | Turrets")
-	//FTurretArray DualTurrets2;
+	TArray<class AWHAircraftsBase*> AllAircraftsArray;
 
 protected:
 	UPROPERTY(EditAnywhere, Category = "BattleShip | Target")

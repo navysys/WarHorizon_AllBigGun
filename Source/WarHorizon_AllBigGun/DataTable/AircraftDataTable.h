@@ -16,8 +16,6 @@ struct WARHORIZON_ALLBIGGUN_API FAircraftDataTable : public FTableRowBase
 	GENERATED_BODY()
 	
 	UPROPERTY(EditAnywhere)
-	uint16 AircraftID;
-	UPROPERTY(EditAnywhere)
 	FString AircraftName;
 	UPROPERTY(EditAnywhere)
 	EAircraftType AircraftType;

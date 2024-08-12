@@ -53,6 +53,7 @@ void AWHTurretAIController::StopAI()
 void AWHTurretAIController::OnPossess(APawn* InPawn)
 {
 	Super::OnPossess(InPawn);
+	// 여기서 폰을 인터페이스로 변환하고 데이터 받아오기
 
 	RunAI();
 }

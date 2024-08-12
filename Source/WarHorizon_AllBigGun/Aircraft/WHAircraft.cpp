@@ -16,8 +16,6 @@ void AWHAircraft::BeginPlay()
 {
 	Super::BeginPlay();
 	SetActorScale3D(FVector(0.5f, 0.5f, 0.5f));
-	MoveSpeed = MaxSpeed;
-
 }
 
 // Called every frame

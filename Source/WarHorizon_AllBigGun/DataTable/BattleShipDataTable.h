@@ -64,4 +64,16 @@ struct WARHORIZON_ALLBIGGUN_API FBattleShipDataTable : public FTableRowBase
 	// 회전가속 증가량
 	UPROPERTY(EditAnywhere)
 	float RotationAccelerationIncrease;
+
+	UPROPERTY(EditAnywhere)
+	int AircraftsID = 0;
+
+	UPROPERTY(EditAnywhere)
+	int AircraftsID2 = 0;
+
+	UPROPERTY(EditAnywhere)
+	int AircraftsID3 = 0;
+
+	UPROPERTY(EditAnywhere)
+	int AircraftsID4 = 0;
 };

@@ -20,6 +20,13 @@ UWHGameSingleton::UWHGameSingleton()
 		TurretDataTable = TurretDataRef.Object;
 		check(TurretDataTable->GetRowMap().Num() > 0);
 	}
+
+	static ConstructorHelpers::FObjectFinder<UDataTable> AircraftDataRef(TEXT("/Game/DataTable/DT_AircraftData"));
+	if (nullptr != AircraftDataRef.Object)
+	{
+		AircraftDataTable = AircraftDataRef.Object;
+		check(AircraftDataTable->GetRowMap().Num() > 0);
+	}
 }
 
 UWHGameSingleton& UWHGameSingleton::Get()

@@ -31,9 +31,14 @@ public:
 public:
 
 	UPROPERTY(VisibleAnywhere)
+	USceneComponent* DefaultSceneComp;
+	UPROPERTY(VisibleAnywhere)
 	UStaticMesh* StaticMeshRef;
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<class UWHCAircraftsMovement> AircraftMovementComp;
+
+	UPROPERTY(VisibleAnywhere, Category = "Aircrafts")
+	APawn* MotherShipPawn;
 
 	UPROPERTY(VisibleAnywhere, Category = "Aircrafts")
 	uint32 ID;
@@ -42,9 +47,6 @@ public:
 
 	UPROPERTY(VisibleAnywhere, Category = "Aircrafts")
 	EAircraftType AircraftType;
-
-	UPROPERTY(VisibleAnywhere, Category = "Aircrafts")
-	APawn* MotherShipPawn;
 
 	UPROPERTY(VisibleAnywhere, Category = "Aircrafts | Stat")
 	int MaxHP;
@@ -81,16 +83,18 @@ public:
 	TArray<FVector> AircraftFormations;
 
 public:
+	void InitToDataTable(int Id);
 	void MoveFront();
 	void IncreaseHeight();
 	void DecreaseHeight();
 	void GunAttack();
 	void BombAttack();
 	void ChangeMovePoint();
-	virtual void AddAircraft(FVector StartPos) override;
-	virtual TArray<AActor*> GetArrayAircrafts() override;
+	virtual void SpawnAircraft(FVector StartPos) override;
+	//virtual TArray<AActor*> GetArrayAircrafts() override;
 	virtual uint8 GetAircraftType() override;
-	void DeleteAircraft();
+	virtual void DestroyAircraft(int Index) override;
+	virtual APawn* GetMotherShip() override;
 	void SetInitAircraftPosition();
 	void SetAircraftFormations();
 	void SetTargetAircraft();

@@ -18,6 +18,7 @@ EBTNodeResult::Type UBTTask_SpawnAircraft::ExecuteTask(UBehaviorTreeComponent& O
 		AActor* MotherShipActor = Cast<AActor>(OwnerComp.GetBlackboardComponent()->GetValueAsObject(BBKEY_MOTHERSHIPACTOR));
 		if (MotherShipActor == nullptr)
 		{
+			UE_LOG(LogTemp, Warning, TEXT("AActor Cast Failed"));
 			return EBTNodeResult::Failed;
 		}
 
@@ -41,8 +42,8 @@ EBTNodeResult::Type UBTTask_SpawnAircraft::ExecuteTask(UBehaviorTreeComponent& O
 			{
 				OwnerComp.GetBlackboardComponent()->SetValueAsBool(BBKEY_ISSPAWNEND, true);
 			}
-			AircraftsPawn->AddAircraft(MotherShipActor->GetActorLocation());
-			return EBTNodeResult::Succeeded;
+			AircraftsPawn->SpawnAircraft(MotherShipActor->GetActorLocation());
+			return EBTNodeResult::InProgress;
 		}
 	}
 	

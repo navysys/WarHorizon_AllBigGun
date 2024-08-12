@@ -4,7 +4,8 @@
 #include "Aircraft/WHAircraftsBase.h"
 #include "Aircraft/WHAircraft.h"
 #include "Component/WHCAircraftsMovement.h"
-//#include ""
+#include "Controller/WHAircraftsAIController.h"
+#include "Game/WHGameSingleton.h"
 
 // Sets default values
 AWHAircraftsBase::AWHAircraftsBase()
@@ -12,7 +13,13 @@ AWHAircraftsBase::AWHAircraftsBase()
  	// Set this pawn to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
+	AIControllerClass = AWHAircraftsAIController::StaticClass();
+	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
+
 	MaxSpeed = 1500.0f;
+
+	DefaultSceneComp = CreateDefaultSubobject<USceneComponent>(TEXT("SceneComponent"));
+	RootComponent = DefaultSceneComp;
 
 	static ConstructorHelpers::FObjectFinder<UStaticMesh> DefaultMeshObject(TEXT("StaticMesh'/Game/Resource/Aircraft/Aircraft_Type0'"));
 	if (DefaultMeshObject.Succeeded())
@@ -20,8 +27,9 @@ AWHAircraftsBase::AWHAircraftsBase()
 		StaticMeshRef = DefaultMeshObject.Object;
 	}
 	AircraftMovementComp = CreateDefaultSubobject<UWHCAircraftsMovement>("AircraftMovementComp");
-	AircraftMovementComp->MaxSpeed = this->MaxSpeed;
-	
+	AircraftMovementComp->MaxSpeed = 1500.0f;
+	AircraftMovementComp->Acceleration = 1200.0f;
+	AircraftMovementComp->Deceleration = 800.0f;
 }
 
 // Called when the game starts or when spawned
@@ -29,10 +37,10 @@ void AWHAircraftsBase::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	AddAircraft(FVector(0, 0, 0));
-	AddAircraft(FVector(0, 0, 0));
-	AddAircraft(FVector(0, 0, 0));
-	AddAircraft(FVector(0, 0, 0));
+	//SpawnAircraft(FVector(0, 0, 0));
+	//SpawnAircraft(FVector(0, 0, 0));
+	//SpawnAircraft(FVector(0, 0, 0));
+	//SpawnAircraft(FVector(0, 0, 0));
 }
 
 // Called every frame
@@ -50,6 +58,25 @@ void AWHAircraftsBase::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 
 }
 
+void AWHAircraftsBase::InitToDataTable(int Id)
+{
+	FName IDName = FName(FString::FromInt(Id));
+	UDataTable* AircraftData = UWHGameSingleton::Get().GetAircraftDataTable();
+	FAircraftDataTable* Table = AircraftData->FindRow<FAircraftDataTable>(IDName, "");
+
+	if (Table)
+	{
+		ID = Id;
+		Name = Table->AircraftName;
+		AircraftType = Table->AircraftType;
+		StaticMeshRef = Table->AircraftMesh;
+		// 추후 모든 변수 테이블에서 가져오기
+
+		
+	}
+	
+}
+
 void AWHAircraftsBase::MoveFront()
 {
 	AircraftMovementComp->AddInputVector(GetActorForwardVector());
@@ -57,7 +84,7 @@ void AWHAircraftsBase::MoveFront()
 
 void AWHAircraftsBase::IncreaseHeight()
 {
-
+	
 }
 
 void AWHAircraftsBase::DecreaseHeight()
@@ -77,7 +104,7 @@ void AWHAircraftsBase::ChangeMovePoint()
 
 }
 
-void AWHAircraftsBase::AddAircraft(FVector StartPos)
+void AWHAircraftsBase::SpawnAircraft(FVector StartPos)
 {
 	FActorSpawnParameters SpawnParams;
 	SpawnParams.Owner = this;
@@ -91,31 +118,38 @@ void AWHAircraftsBase::AddAircraft(FVector StartPos)
 	SetInitAircraftPosition();
 }
 
-TArray<AActor*> AWHAircraftsBase::GetArrayAircrafts()
-{
-	TArray<AActor*> ArrayAirs;
-	for (AWHAircraft* air : ArrayAircrafts)
-	{
-		ArrayAirs.Emplace(air);
-	}
-
-	return ArrayAirs;
-}
+//TArray<AActor*> AWHAircraftsBase::GetArrayAircrafts()
+//{
+//	TArray<AActor*> ArrayAirs;
+//	for (AWHAircraft* air : ArrayAircrafts)
+//	{
+//		ArrayAirs.Emplace(air);
+//	}
+//
+//	return ArrayAirs;
+//}
 
 uint8 AWHAircraftsBase::GetAircraftType()
 {
 	return (uint8)AircraftType;
 }
 
-void AWHAircraftsBase::DeleteAircraft()
+void AWHAircraftsBase::DestroyAircraft(int Index)
 {
-	//아직 리스트 삭제는 구현X
+	ArrayAircrafts[Index]->Destroy();		// 차후에는 비행기가 불나면서 중력 낙하하도록하는 함수 호출
+	ArrayAircrafts.RemoveAt(Index);
 	AircraftsNum = ArrayAircrafts.Num();
 	SetInitAircraftPosition();
 }
 
+APawn* AWHAircraftsBase::GetMotherShip()
+{
+	return MotherShipPawn;
+}
+
 void AWHAircraftsBase::SetInitAircraftPosition()
 {
+	// 나중에 파일에서 위치값 받아오도록 변경
 	InitAircraftPosition.Empty();
 
 	if (AircraftsNum == 1)

@@ -4,7 +4,6 @@
 
 #include "CoreMinimal.h"
 #include "AIController.h"
-#include "Interface/AircraftsInterface.h"
 #include "WHAircraftsAIController.generated.h"
 
 /**
@@ -33,15 +32,10 @@ private:
 	UPROPERTY()
 	TObjectPtr<class UBehaviorTree> BTAsset;
 
-	UPROPERTY()
-	APawn* ControllingPawn;
-
-	IAircraftsInterface* AircraftsPawn;
-
 	UPROPERTY(VisibleAnywhere)
 	APawn* MotherShipPawn;
 	UPROPERTY(VisibleAnywhere)
 	int MaxAircraftSpawnCount;
-	//UPROPERTY(VisibleAnywhere)
-	//int MaxAircraftSpawnCount;
+	UPROPERTY(VisibleAnywhere)
+	int CurrentAircraftSpawnCount;
 };

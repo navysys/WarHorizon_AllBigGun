@@ -6,6 +6,7 @@
 #include "UObject/NoExportTypes.h"
 #include "DataTable/BattleShipDataTable.h"
 #include "DataTable/TurretDataTable.h"
+#include "DataTable/AircraftDataTable.h"
 #include "WHGameSingleton.generated.h"
 
 
@@ -26,6 +27,7 @@ public:
 public:
 	FORCEINLINE UDataTable* GetBattleShipDataTable() { return BattleShipDataTable; }
 	FORCEINLINE UDataTable* GetTurretDataTable() { return TurretDataTable; }
+	FORCEINLINE UDataTable* GetAircraftDataTable() { return AircraftDataTable; }
 
 	FString GetPlayerName() { return PlayerName; }
 	FString GetBattleShipName() { return BattleShipName; }
@@ -40,6 +42,7 @@ public:
 private:
 	UDataTable* BattleShipDataTable;
 	UDataTable* TurretDataTable;
+	UDataTable* AircraftDataTable;
 
 	FString PlayerName = TEXT("TEST");
 	FString BattleShipName = TEXT("Yamato");

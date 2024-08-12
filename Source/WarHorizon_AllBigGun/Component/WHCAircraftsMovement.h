@@ -15,6 +15,7 @@ class WARHORIZON_ALLBIGGUN_API UWHCAircraftsMovement : public UFloatingPawnMovem
 	GENERATED_BODY()
 	
 public:
+	UWHCAircraftsMovement();
 	virtual void TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 public:

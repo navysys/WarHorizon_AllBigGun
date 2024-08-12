@@ -3,6 +3,11 @@
 
 #include "Component/WHCAircraftsMovement.h"
 
+UWHCAircraftsMovement::UWHCAircraftsMovement()
+{
+	PawnOwner = Cast<APawn>(GetOwner());
+}
+
 void UWHCAircraftsMovement::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);

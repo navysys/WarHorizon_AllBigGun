@@ -11,6 +11,7 @@
 #include "Component/WHCSkillHandler.h"
 #include "Component/WHCTargetSelector.h"
 #include "Turret/WHTurret.h"
+#include "Aircraft/WHAircraftsBase.h"
 #include "Enum/ETurretAttackType.h"
 #include "Containers/Array.h"
 
@@ -40,7 +41,8 @@ void AWHBattleShip::BeginPlay()
 {
 	Super::BeginPlay();
 
-
+	//test
+	SpawnAircrafts(0);
 }
 
 void AWHBattleShip::PostInitializeComponents()
@@ -194,7 +196,21 @@ void AWHBattleShip::DecreaseMoveSpeed()
 
 void AWHBattleShip::SpawnAircrafts(int Index)
 {
+	int Val = AircraftIDs[Index];
 
+	FActorSpawnParameters SpawnParams;
+	SpawnParams.Owner = this;
+	// MotherShip 초기화를 위해 사용
+	SpawnParams.Instigator = this;
+	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+
+	if (Val != 0)
+	{
+		AWHAircraftsBase* SpawnedAircrafts = GetWorld()->SpawnActor<AWHAircraftsBase>(GetActorLocation(), FRotator::ZeroRotator, SpawnParams);
+		SpawnedAircrafts->InitToDataTable(AircraftIDs[Index]);
+		AllAircraftsArray.Emplace(SpawnedAircrafts);
+
+	}
 }
 
 void AWHBattleShip::LoadSingletonData()
@@ -233,6 +249,11 @@ void AWHBattleShip::LoadDataTableToName(FName Name)
 		SkillPtrW = Table->SkillW;
 		SkillPtrE = Table->SkillE;
 		SkillPtrR = Table->SkillR;
+
+		AircraftIDs.Emplace(Table->AircraftsID);
+		AircraftIDs.Emplace(Table->AircraftsID2);
+		AircraftIDs.Emplace(Table->AircraftsID3);
+		AircraftIDs.Emplace(Table->AircraftsID4);
 
 		SkeletalMeshComp->SetSkeletalMesh(BaseMesh);
 	}

@@ -37,10 +37,6 @@ void AWHAircraftsBase::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	//SpawnAircraft(FVector(0, 0, 0));
-	//SpawnAircraft(FVector(0, 0, 0));
-	//SpawnAircraft(FVector(0, 0, 0));
-	//SpawnAircraft(FVector(0, 0, 0));
 }
 
 // Called every frame
@@ -82,13 +78,19 @@ void AWHAircraftsBase::MoveFront()
 	AircraftMovementComp->AddInputVector(GetActorForwardVector());
 }
 
-void AWHAircraftsBase::IncreaseHeight()
+void AWHAircraftsBase::Turn(float Angle)
 {
-	
+	AircraftMovementComp->Turn(Angle);
 }
 
-void AWHAircraftsBase::DecreaseHeight()
+void AWHAircraftsBase::IncreaseHeight(float MaxZ)
 {
+	AircraftMovementComp->IncreaseHeight(MaxZ);
+}
+
+void AWHAircraftsBase::DecreaseHeight(float MinZ)
+{
+	AircraftMovementComp->DecreaseHeight(MinZ);
 }
 
 void AWHAircraftsBase::GunAttack()
@@ -147,6 +149,14 @@ APawn* AWHAircraftsBase::GetMotherShip()
 	return MotherShipPawn;
 }
 
+void AWHAircraftsBase::SetIsSpawnEnd()
+{
+	for (AWHAircraft* air : ArrayAircrafts)
+	{
+		air->IsSpawnEnd = true;
+	}
+}
+
 void AWHAircraftsBase::SetInitAircraftPosition()
 {
 	// 나중에 파일에서 위치값 받아오도록 변경
@@ -194,6 +204,7 @@ void AWHAircraftsBase::SetAircraftFormations()
 			for (int i = 0; i < ArrayAircrafts.Num(); i++)
 			{
 				ArrayAircrafts[i]->CurrentPosition = AircraftFormations[i];
+				ArrayAircrafts[i]->HeadDir = Rotator;
 			}
 		}
 	}

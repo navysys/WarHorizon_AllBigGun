@@ -19,19 +19,16 @@ public:
 	virtual void TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 public:
-	float CurrentHeight = 6000.0f;
+	float TickDeltaTime;
+
 	float MaxHeight;
 	float MinHeight;
 
-	//float MaxAscentSpeed = 600.0f;
-	float AscentSpeed = 1000;
-	//float MaxDescentSpeed = 600.0f;
-	float DescentSpeed = 1000;
-
-	//float AscentAcceleration = 120.0f;
+	float PitchRotSpeed;
+	float YawRotSpeed;
 
 public:
-	void IncreaseHeight(float DeltaTime);
-	void DecreaseHeight(float DeltaTime);
-	void Turn(float DeltaTime);
+	void IncreaseHeight(float MaxZ);
+	void DecreaseHeight(float MinZ);
+	void Turn(float Angle);
 };

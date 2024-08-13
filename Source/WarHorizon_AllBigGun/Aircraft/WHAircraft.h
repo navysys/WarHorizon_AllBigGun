@@ -23,8 +23,17 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+	//UPROPERTY(VisibleAnywhere)
+	//USceneComponent* SceneComp;
 	UStaticMesh* StaticMesh;
+	UPROPERTY(VisibleAnywhere)
 	UStaticMeshComponent* StaticMeshComp;
+
+	UPROPERTY(VisibleAnywhere)
+	FRotator HeadDir;
+
+	UPROPERTY(VisibleAnywhere)
+	bool IsSpawnEnd = false;
 
 	UPROPERTY(VisibleAnywhere)
 	float MaxSpeed;

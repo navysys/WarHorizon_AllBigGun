@@ -31,6 +31,7 @@ void AWHAircraftsAIController::RunAI()
 		Blackboard->SetValueAsInt(BBKEY_CURRENTSPAWNCOUNT, 0);
 		Blackboard->SetValueAsBool(BBKEY_ISSPAWNEND, false);
 		Blackboard->SetValueAsObject(BBKEY_MOTHERSHIPACTOR, MotherShipPawn);
+		Blackboard->SetValueAsVector(BBKEY_TARGETPOSITION, FVector(10000, 10000, 12000));
 
 		bool RunResult = RunBehaviorTree(BTAsset);
 		ensure(RunResult);

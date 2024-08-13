@@ -4,3 +4,4 @@
 #define BBKEY_CURRENTSPAWNCOUNT TEXT("CurrentSpawnCount")
 #define BBKEY_ISSPAWNEND TEXT("IsSpawnEnd")
 #define BBKEY_MOTHERSHIPACTOR TEXT("MotherShipActor")
+#define BBKEY_TARGETPOSITION TEXT("TargetPosition")

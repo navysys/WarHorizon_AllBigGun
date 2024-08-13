@@ -23,9 +23,13 @@ public:
 	//virtual TArray<AActor*> GetArrayAircrafts() = 0;
 	
 	virtual uint8 GetAircraftType() = 0;
+	virtual APawn* GetMotherShip() = 0;
 	virtual void SpawnAircraft(FVector StartPos) = 0;
 	virtual void DestroyAircraft(int Index) = 0;
-	virtual APawn* GetMotherShip() = 0;
+	virtual void IncreaseHeight(float MaxZ) = 0;
+	virtual void DecreaseHeight(float MinZ) = 0;
+	virtual void Turn(float Angle) = 0;
+	virtual void SetIsSpawnEnd() = 0;
 
 	virtual void Fire() = 0;
 };

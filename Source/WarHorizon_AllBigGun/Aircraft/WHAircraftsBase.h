@@ -63,6 +63,9 @@ public:
 	UPROPERTY(VisibleAnywhere, Category = "Aircrafts | Stat")
 	float CurretHeight;
 
+	UPROPERTY(VisibleAnywhere)
+	bool IsSpawnEnd = false;
+
 	UPROPERTY(VisibleAnywhere, Category = "Aircrafts | Stat")
 	TArray<class AWHAircraft*> ArrayAircrafts;
 	UPROPERTY(VisibleAnywhere, Category = "Aircrafts | Stat")
@@ -85,8 +88,9 @@ public:
 public:
 	void InitToDataTable(int Id);
 	void MoveFront();
-	void IncreaseHeight();
-	void DecreaseHeight();
+	virtual void Turn(float Angle) override;
+	virtual void IncreaseHeight(float MaxZ) override;
+	virtual void DecreaseHeight(float MinZ) override;
 	void GunAttack();
 	void BombAttack();
 	void ChangeMovePoint();
@@ -95,6 +99,7 @@ public:
 	virtual uint8 GetAircraftType() override;
 	virtual void DestroyAircraft(int Index) override;
 	virtual APawn* GetMotherShip() override;
+	virtual void SetIsSpawnEnd() override;
 	void SetInitAircraftPosition();
 	void SetAircraftFormations();
 	void SetTargetAircraft();

@@ -78,7 +78,7 @@ void AWHAircraftsBase::MoveFront()
 	AircraftMovementComp->AddInputVector(GetActorForwardVector());
 }
 
-void AWHAircraftsBase::Turn(float Angle)
+void AWHAircraftsBase::Turn(int Angle)
 {
 	AircraftMovementComp->Turn(Angle);
 }

@@ -30,5 +30,5 @@ public:
 public:
 	void IncreaseHeight(float MaxZ);
 	void DecreaseHeight(float MinZ);
-	void Turn(float Angle);
+	void Turn(int Angle);
 };

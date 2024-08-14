@@ -9,7 +9,7 @@ UWHCAircraftsMovement::UWHCAircraftsMovement()
 
 	PitchRotSpeed = 30.0f;
 	// 공격 모드 일때는 60~70 정도로
-	YawRotSpeed = 20.0f;
+	YawRotSpeed = 40.0f;
 }
 
 void UWHCAircraftsMovement::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
@@ -85,17 +85,27 @@ void UWHCAircraftsMovement::DecreaseHeight(float MinZ)
 	}
 }
 
-void UWHCAircraftsMovement::Turn(float Angle)
+void UWHCAircraftsMovement::Turn(int Angle)
 {
-	FRotator Rot = PawnOwner->GetActorRotation();
-	if (Angle > 0)
+	if (Angle != 0)
 	{
-		Rot.Yaw -= YawRotSpeed * TickDeltaTime;
+		FRotator Rot = PawnOwner->GetActorRotation();
+		if (abs(Angle) > YawRotSpeed)
+		{
+			if (Angle > 1)
+			{
+				Rot.Yaw -= YawRotSpeed * TickDeltaTime;
+			}
+			else if (Angle < -1)
+			{
+				Rot.Yaw += YawRotSpeed * TickDeltaTime;
+			}
+		}
+		else
+		{
+			Rot.Yaw -= Angle * TickDeltaTime;
+		}
 		PawnOwner->SetActorRotation(Rot);
 	}
-	else if (Angle < 0)
-	{
-		Rot.Yaw += YawRotSpeed * TickDeltaTime;
-		PawnOwner->SetActorRotation(Rot);
-	}
+
 }

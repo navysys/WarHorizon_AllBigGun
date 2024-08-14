@@ -88,7 +88,7 @@ public:
 public:
 	void InitToDataTable(int Id);
 	void MoveFront();
-	virtual void Turn(float Angle) override;
+	virtual void Turn(int Angle) override;
 	virtual void IncreaseHeight(float MaxZ) override;
 	virtual void DecreaseHeight(float MinZ) override;
 	void GunAttack();

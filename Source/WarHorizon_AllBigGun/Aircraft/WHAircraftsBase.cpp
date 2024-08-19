@@ -64,7 +64,7 @@ void AWHAircraftsBase::InitToDataTable(int Id)
 	{
 		ID = Id;
 		Name = Table->AircraftName;
-		AircraftType = Table->AircraftType;
+		AircraftsType = Table->AircraftsType;
 		StaticMeshRef = Table->AircraftMesh;
 		// 추후 모든 변수 테이블에서 가져오기
 
@@ -133,7 +133,7 @@ void AWHAircraftsBase::SpawnAircraft(FVector StartPos)
 
 uint8 AWHAircraftsBase::GetAircraftType()
 {
-	return (uint8)AircraftType;
+	return (uint8)AircraftsType;
 }
 
 void AWHAircraftsBase::DestroyAircraft(int Index)
@@ -155,6 +155,11 @@ void AWHAircraftsBase::SetIsSpawnEnd()
 	{
 		air->IsSpawnEnd = true;
 	}
+}
+
+AActor* AWHAircraftsBase::GetTargetAircrafts()
+{
+	return Cast<AActor>(TargetAircrafts);
 }
 
 void AWHAircraftsBase::SetInitAircraftPosition()

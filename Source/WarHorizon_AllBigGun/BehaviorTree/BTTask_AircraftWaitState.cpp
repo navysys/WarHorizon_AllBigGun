@@ -5,6 +5,7 @@
 #include "BehaviorTree/BlackboardComponent.h"
 #include "AircraftsAI.h"
 #include "AIController.h"
+#include "Enum/EAircraftsState.h"
 
 UBTTask_AircraftWaitState::UBTTask_AircraftWaitState()
 {
@@ -15,8 +16,8 @@ EBTNodeResult::Type UBTTask_AircraftWaitState::ExecuteTask(UBehaviorTreeComponen
 {
 	Super::ExecuteTask(OwnerComp, NodeMemory);
 
-	bool bIsReachTargetPosition = OwnerComp.GetBlackboardComponent()->GetValueAsBool(BBKEY_ISREACHTAGETPOSITION);
-	if (bIsReachTargetPosition)
+	EAircraftsState AircraftsState = static_cast<EAircraftsState>(OwnerComp.GetBlackboardComponent()->GetValueAsEnum(BBKEY_AIRCRAFTSSTATE));
+	if (AircraftsState == EAircraftsState::Wait)
 	{
 		FVector WaitingPos = OwnerComp.GetBlackboardComponent()->GetValueAsVector(BBKEY_WAITINGPOSITION);
 		FVector TargetPos = OwnerComp.GetBlackboardComponent()->GetValueAsVector(BBKEY_TARGETPOSITION);
@@ -28,31 +29,14 @@ EBTNodeResult::Type UBTTask_AircraftWaitState::ExecuteTask(UBehaviorTreeComponen
 		return EBTNodeResult::InProgress;
 	}
 
-	return EBTNodeResult::Failed;
+	return EBTNodeResult::Succeeded;
 }
 
 void UBTTask_AircraftWaitState::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds)
 {
-	bool bIsReachTargetPosition = OwnerComp.GetBlackboardComponent()->GetValueAsBool(BBKEY_ISREACHTAGETPOSITION);
-	if (bIsReachTargetPosition == false)
+	EAircraftsState AircraftsState = static_cast<EAircraftsState>(OwnerComp.GetBlackboardComponent()->GetValueAsEnum(BBKEY_AIRCRAFTSSTATE));
+	if (AircraftsState != EAircraftsState::Wait)
 	{
 		FinishLatentTask(OwnerComp, EBTNodeResult::Failed);
 	}
-	APawn* OwnerPawn = OwnerComp.GetAIOwner()->GetPawn();
-
-	static float Angle = 0.0f;
-	float RotationSpeed = 30.0f; // 초기 회전 속도 (도 단위)
-	FVector Center = OwnerComp.GetBlackboardComponent()->GetValueAsVector(BBKEY_WAITINGPOSITION); // 원의 중심
-	FVector CurrentLocation = OwnerPawn->GetActorLocation();
-
-	Angle += RotationSpeed * DeltaSeconds;
-	if (Angle >= 180.0f)
-	{
-		RotationSpeed = 15.0f;	// 현재 속도 1500 기준 15도로 회전하면 원형으로 제자리 회전
-	}
-
-	FRotator Rot = OwnerPawn->GetActorRotation();
-	Rot.Yaw += RotationSpeed * DeltaSeconds;
-
-	OwnerPawn->SetActorRotation(Rot);
 }

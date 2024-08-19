@@ -4,7 +4,7 @@
 #include "CoreMinimal.h"
 
 UENUM()
-enum class EAircraftType : uint8
+enum class EAircraftsType : uint8
 {
 	Fighter = 1 UMETA(DisplayName = "Air to Air"),
 	DiveBomber UMETA(DisplayName = "Dive Bomber"),

@@ -15,5 +15,9 @@ class WARHORIZON_ALLBIGGUN_API UBTTask_SpawnAircraft : public UBTTaskNode
 	GENERATED_BODY()
 	
 public:
+	float Time = 0.0f;
+
+	UBTTask_SpawnAircraft();
 	virtual EBTNodeResult::Type ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) override;
+	virtual void TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds) override;
 };

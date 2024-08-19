@@ -7,11 +7,16 @@
 #include "AIController.h"
 #include "Interface/AircraftsInterface.h"
 
+UBTTask_SpawnAircraft::UBTTask_SpawnAircraft()
+{
+	bNotifyTick = true;
+}
+
 EBTNodeResult::Type UBTTask_SpawnAircraft::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
 {
 	Super::ExecuteTask(OwnerComp, NodeMemory);
-	bool bIsSpawnEnd = OwnerComp.GetBlackboardComponent()->GetValueAsBool(BBKEY_ISSPAWNEND);
-	if (bIsSpawnEnd == false)
+	bool IsSpawnEnd = OwnerComp.GetBlackboardComponent()->GetValueAsBool(BBKEY_ISSPAWNEND);
+	if (IsSpawnEnd == false)
 	{
 		int MaxSpawnCount = OwnerComp.GetBlackboardComponent()->GetValueAsInt(BBKEY_MAXSPAWNCOUNT);
 		int CurrentSpawnCount = OwnerComp.GetBlackboardComponent()->GetValueAsInt(BBKEY_CURRENTSPAWNCOUNT);
@@ -49,4 +54,15 @@ EBTNodeResult::Type UBTTask_SpawnAircraft::ExecuteTask(UBehaviorTreeComponent& O
 	}
 	
 	return EBTNodeResult::Succeeded;
+}
+
+void UBTTask_SpawnAircraft::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds)
+{
+	Time += DeltaSeconds;
+	float SpawnTime = OwnerComp.GetBlackboardComponent()->GetValueAsFloat(BBKEY_SPAWNTIME);
+	if (Time > SpawnTime)
+	{
+		Time = 0.0f;
+		FinishLatentTask(OwnerComp, EBTNodeResult::Failed);
+	}
 }

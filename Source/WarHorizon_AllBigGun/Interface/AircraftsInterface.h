@@ -24,6 +24,7 @@ public:
 	
 	virtual uint8 GetAircraftType() = 0;
 	virtual APawn* GetMotherShip() = 0;
+	virtual AActor* GetTargetAircrafts() = 0;
 	virtual void SpawnAircraft(FVector StartPos) = 0;
 	virtual void DestroyAircraft(int Index) = 0;
 	virtual void IncreaseHeight(float MaxZ) = 0;

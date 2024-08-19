@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Pawn.h"
 #include "Interface/AircraftsInterface.h"
-#include "Enum/EAircraftType.h"
+#include "Enum/EAircraftsType.h"
 #include "WHAircraftsBase.generated.h"
 
 UCLASS()
@@ -46,7 +46,7 @@ public:
 	FString Name;
 
 	UPROPERTY(VisibleAnywhere, Category = "Aircrafts")
-	EAircraftType AircraftType;
+	EAircraftsType AircraftsType;
 
 	UPROPERTY(VisibleAnywhere, Category = "Aircrafts | Stat")
 	int MaxHP;
@@ -75,7 +75,7 @@ public:
 	TArray<FVector> MovePoint;
 
 	UPROPERTY(VisibleAnywhere, Category = "Aircrafts | Attack")
-	TArray<APawn*> TargetAircrafts;
+	APawn* TargetAircrafts;
 	UPROPERTY(VisibleAnywhere, Category = "Aircrafts | Attack")
 	APawn* TargetBattleShip;
 
@@ -100,6 +100,7 @@ public:
 	virtual void DestroyAircraft(int Index) override;
 	virtual APawn* GetMotherShip() override;
 	virtual void SetIsSpawnEnd() override;
+	virtual AActor* GetTargetAircrafts() override;
 	void SetInitAircraftPosition();
 	void SetAircraftFormations();
 	void SetTargetAircraft();

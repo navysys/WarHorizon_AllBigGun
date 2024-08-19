@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Engine/DataTable.h"
-#include "Enum/EAircraftType.h"
+#include "Enum/EAircraftsType.h"
 #include "AircraftDataTable.generated.h"
 
 /**
@@ -18,7 +18,7 @@ struct WARHORIZON_ALLBIGGUN_API FAircraftDataTable : public FTableRowBase
 	UPROPERTY(EditAnywhere)
 	FString AircraftName;
 	UPROPERTY(EditAnywhere)
-	EAircraftType AircraftType;
+	EAircraftsType AircraftsType;
 
 	UPROPERTY(EditAnywhere)
 	UStaticMesh* AircraftMesh;

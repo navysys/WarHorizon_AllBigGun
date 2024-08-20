@@ -21,7 +21,7 @@ EBTNodeResult::Type UBTTask_AircraftMoveStraight::ExecuteTask(UBehaviorTreeCompo
 		return EBTNodeResult::InProgress;
 	}
 
-	return EBTNodeResult::Succeeded;
+	return EBTNodeResult::Failed;
 }
 
 void UBTTask_AircraftMoveStraight::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds)
@@ -30,6 +30,6 @@ void UBTTask_AircraftMoveStraight::TickTask(UBehaviorTreeComponent& OwnerComp, u
 	if (AircraftsState != EAircraftsState::MoveStraight)
 	{
 		OwnerComp.GetBlackboardComponent()->SetValueAsBool(BBKEY_ISSTRAIGHTREADY, false);
-		FinishLatentTask(OwnerComp, EBTNodeResult::Failed);
+		FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
 	}
 }

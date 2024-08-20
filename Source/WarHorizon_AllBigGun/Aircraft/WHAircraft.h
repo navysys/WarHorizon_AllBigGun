@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "Enum/EAircraftState.h"
 #include "WHAircraft.generated.h"
 
 UCLASS()
@@ -28,6 +29,9 @@ public:
 	UStaticMesh* StaticMesh;
 	UPROPERTY(VisibleAnywhere)
 	UStaticMeshComponent* StaticMeshComp;
+
+	UPROPERTY(VisibleAnywhere)
+	EAircraftState AircraftState = EAircraftState::Landing;
 
 	UPROPERTY(VisibleAnywhere)
 	FRotator HeadDir;

@@ -3,6 +3,8 @@
 // float 타입
 #define BBKEY_SPAWNTIME TEXT("SpawnTime")
 #define BBKEY_WAITANGLE TEXT("WaitAngle")
+#define BBKEY_ATAATTACKRANGE TEXT("AtAAttackRange")
+#define BBKEY_ATBATTACKRANGE TEXT("AtBAttackRange")
 
 // int 타입
 #define BBKEY_MAXSPAWNCOUNT TEXT("MaxSpawnCount")
@@ -18,6 +20,8 @@
 
 // object 타입 (Actor)
 #define BBKEY_MOTHERSHIPACTOR TEXT("MotherShipActor")
+#define BBKEY_TARGETAIRCRAFTS TEXT("TargetAircrafts")
+#define BBKEY_TARGETBATTLESHIP TEXT("TargetBattleShip")
 
 // Enum 타입
 #define BBKEY_AIRCRAFTSSTATE TEXT("AircraftsState")

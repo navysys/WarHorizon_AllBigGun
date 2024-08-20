@@ -76,15 +76,6 @@ void UBTService_AircraftChangeAngle::TickNode(UBehaviorTreeComponent& OwnerComp,
 			FVector Dir = (Target - Loc).GetSafeNormal2D();
 			int Angle = ControllingPawn->GetActorRotation().Yaw - Dir.Rotation().Yaw;
 
-			// 목표 위치에 도달하였는지 dist 로 판단
-			float Dist = FVector::Dist(Target, Loc);
-			// IsReachTargetPosition 을 false 전환은 WaitState Task노드
-			if (Dist < 100.0f)
-			{
-				OwnerComp.GetBlackboardComponent()->SetValueAsEnum(BBKEY_AIRCRAFTSSTATE, static_cast<uint8>(EAircraftsState::Wait));
-				return;
-			}
-
 			if (Angle > 180)
 			{
 				Angle -= 360;
@@ -121,6 +112,27 @@ void UBTService_AircraftChangeAngle::TickNode(UBehaviorTreeComponent& OwnerComp,
 
 		case EAircraftsState::AtA:
 		{
+			FVector Target = OwnerComp.GetBlackboardComponent()->GetValueAsVector(BBKEY_TARGETPOSITION);
+			FVector Loc = ControllingPawn->GetActorLocation();
+			Target.Z = 0;
+			Loc.Z = 0;
+			FVector Dir = (Target - Loc).GetSafeNormal2D();
+			int Angle = ControllingPawn->GetActorRotation().Yaw - Dir.Rotation().Yaw;
+
+			// 목표 위치에 도달하였는지 dist 로 판단
+			float Dist = FVector::Dist(Target, Loc);
+			// IsReachTargetPosition 을 false 전환은 WaitState Task노드
+
+			if (Angle > 180)
+			{
+				Angle -= 360;
+			}
+			else if (Angle < -180)
+			{
+				Angle += 360;
+			}
+			AircraftsPawn->Turn(Angle);
+
 			break;
 		}
 

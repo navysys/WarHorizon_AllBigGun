@@ -4,21 +4,18 @@
 
 #include "CoreMinimal.h"
 #include "BehaviorTree/BTTaskNode.h"
-#include "BTTask_AircraftATAMove.generated.h"
+#include "BTTask_AircraftATAAttack.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class WARHORIZON_ALLBIGGUN_API UBTTask_AircraftATAMove : public UBTTaskNode
+class WARHORIZON_ALLBIGGUN_API UBTTask_AircraftATAAttack : public UBTTaskNode
 {
 	GENERATED_BODY()
 	
 public:
-	UBTTask_AircraftATAMove();
+	UBTTask_AircraftATAAttack();
 	virtual EBTNodeResult::Type ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) override;
 	virtual void TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds) override;
-
-public:
-	bool IsHasTarget;
 };

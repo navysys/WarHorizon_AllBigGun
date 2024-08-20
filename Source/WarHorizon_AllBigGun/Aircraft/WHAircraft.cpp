@@ -28,6 +28,30 @@ void AWHAircraft::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 	MoveToCurrentPositionAndRotation(DeltaTime);
+	// Aircrafts 클래스에서 방향과 거리만 전달 받고 지정된 위치를 지키지 않도록 수정해야함
+	switch (AircraftState)
+	{
+	case EAircraftState::Landing:
+		// 처음 스폰 이후 활주로 직선으로 이동
+		break;
+	case EAircraftState::FollowGroup:
+		//랜딩 이후 빠른 속도로 그룹을 향해 이동
+		break;
+	case EAircraftState::Normal:
+		break;
+	case EAircraftState::AtA:
+		// 타겟 추적
+		break;
+	case EAircraftState::AtB:
+		// 공격 준비 상태 진입
+		// 진입 상태에서 일정 조건 달성 or 공격 한번 더 입력으로 공격
+		break;
+	case EAircraftState::Invalid:
+		break;
+	default:
+		//원하지 않은 상태 오류 띄워야함
+		break;
+	}
 }
 
 void AWHAircraft::MoveToCurrentPositionAndRotation(float DeltaTime)

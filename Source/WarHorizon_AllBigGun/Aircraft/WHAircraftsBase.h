@@ -99,7 +99,7 @@ public:
 	virtual uint8 GetAircraftType() override;
 	virtual void DestroyAircraft(int Index) override;
 	virtual APawn* GetMotherShip() override;
-	virtual void SetIsSpawnEnd() override;
+	//virtual void SetIsSpawnEnd() override;
 	virtual AActor* GetTargetAircrafts() override;
 	void SetInitAircraftPosition();
 	void SetAircraftFormations();

@@ -149,14 +149,6 @@ APawn* AWHAircraftsBase::GetMotherShip()
 	return MotherShipPawn;
 }
 
-void AWHAircraftsBase::SetIsSpawnEnd()
-{
-	for (AWHAircraft* air : ArrayAircrafts)
-	{
-		air->IsSpawnEnd = true;
-	}
-}
-
 AActor* AWHAircraftsBase::GetTargetAircrafts()
 {
 	return Cast<AActor>(TargetAircrafts);
@@ -173,21 +165,21 @@ void AWHAircraftsBase::SetInitAircraftPosition()
 	}
 	else if (AircraftsNum == 2)
 	{
-		InitAircraftPosition.Emplace(FVector(0.0f, -400.0f, 0.0f));
-		InitAircraftPosition.Emplace(FVector(0.0f, 400.0f, 0.0f));
+		InitAircraftPosition.Emplace(FVector(0.0f, -600.0f, 0.0f));
+		InitAircraftPosition.Emplace(FVector(0.0f, 600.0f, 0.0f));
 	}
 	else if (AircraftsNum == 3)
 	{
 		InitAircraftPosition.Emplace(FVector::ZeroVector);
-		InitAircraftPosition.Emplace(FVector(-600.0f, -400.0f, 0.0f));
-		InitAircraftPosition.Emplace(FVector(-600.0f, 400.0f, 0.0f));
+		InitAircraftPosition.Emplace(FVector(-100.0f, -800.0f, 0.0f));
+		InitAircraftPosition.Emplace(FVector(-100.0f, 800.0f, 0.0f));
 	}
 	else if (AircraftsNum == 4)
 	{
 		InitAircraftPosition.Emplace(FVector::ZeroVector);
-		InitAircraftPosition.Emplace(FVector(-600.0f, -400.0f, 0.0f));
-		InitAircraftPosition.Emplace(FVector(-600.0f, 400.0f, 0.0f));
-		InitAircraftPosition.Emplace(FVector(-1200.0f, 0.0f, 0.0f));
+		InitAircraftPosition.Emplace(FVector(-100.0f, -800.0f, 0.0f));
+		InitAircraftPosition.Emplace(FVector(-100.0f, 800.0f, 0.0f));
+		InitAircraftPosition.Emplace(FVector(-300.0f, -1600.0f, 0.0f));
 	}
 }
 

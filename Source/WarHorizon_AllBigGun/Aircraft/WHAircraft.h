@@ -37,13 +37,23 @@ public:
 	FRotator HeadDir;
 
 	UPROPERTY(VisibleAnywhere)
-	bool IsSpawnEnd = false;
-
-	UPROPERTY(VisibleAnywhere)
 	float MaxSpeed;
 
 	UPROPERTY(VisibleAnywhere)
 	float MoveSpeed;
+
+	UPROPERTY(VisibleAnywhere)
+	float TargetHeight;
+
+	UPROPERTY(VisibleAnywhere)
+	float CurrentHeight;
+
+	UPROPERTY(VisibleAnywhere)
+	float HeightAcceleration;
+
+	UPROPERTY(VisibleAnywhere)
+	float LandingTime;
+
 
 	UPROPERTY(VisibleAnywhere)
 	FVector CurrentPosition;

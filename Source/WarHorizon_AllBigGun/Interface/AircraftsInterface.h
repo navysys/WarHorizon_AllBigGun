@@ -30,7 +30,7 @@ public:
 	virtual void IncreaseHeight(float MaxZ) = 0;
 	virtual void DecreaseHeight(float MinZ) = 0;
 	virtual void Turn(int Angle) = 0;
-	virtual void SetIsSpawnEnd() = 0;
+	//virtual void SetIsSpawnEnd() = 0;
 
 	virtual void Fire() = 0;
 };

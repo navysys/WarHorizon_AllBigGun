@@ -37,6 +37,9 @@ public:
 	FRotator HeadDir;
 
 	UPROPERTY(VisibleAnywhere)
+	float InitMaxSpeed;
+
+	UPROPERTY(VisibleAnywhere)
 	float MaxSpeed;
 
 	UPROPERTY(VisibleAnywhere)

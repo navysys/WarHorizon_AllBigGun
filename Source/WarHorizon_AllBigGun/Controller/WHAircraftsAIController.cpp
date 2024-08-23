@@ -35,9 +35,9 @@ void AWHAircraftsAIController::RunAI()
 		Blackboard->SetValueAsBool(BBKEY_ISSPAWNEND, false);
 		Blackboard->SetValueAsBool(BBKEY_ISSTRAIGHTREADY, false);
 		Blackboard->SetValueAsObject(BBKEY_MOTHERSHIPACTOR, MotherShipPawn);
-		Blackboard->SetValueAsVector(BBKEY_TARGETPOSITION, FVector(10000, 10000, 12000));
+		Blackboard->SetValueAsVector(BBKEY_TARGETPOSITION, FVector(20000, 20000, 12000));
 		Blackboard->SetValueAsVector(BBKEY_WAITINGPOSITION, FVector(0, 0, 0));
-		Blackboard->SetValueAsEnum(BBKEY_AIRCRAFTSSTATE, static_cast<uint8>(EAircraftsState::MoveNormal));
+		Blackboard->SetValueAsEnum(BBKEY_AIRCRAFTSSTATE, static_cast<uint8>(EAircraftsState::MoveStraight));
 
 		bool RunResult = RunBehaviorTree(BTAsset);
 		ensure(RunResult);

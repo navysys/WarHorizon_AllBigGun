@@ -28,8 +28,8 @@ AWHAircraftsBase::AWHAircraftsBase()
 	}
 	AircraftMovementComp = CreateDefaultSubobject<UWHCAircraftsMovement>("AircraftMovementComp");
 	AircraftMovementComp->MaxSpeed = 1500.0f;
-	AircraftMovementComp->Acceleration = 1200.0f;
-	AircraftMovementComp->Deceleration = 800.0f;
+	AircraftMovementComp->Acceleration = 3000.0f;
+	AircraftMovementComp->Deceleration = 500.0f;
 }
 
 // Called when the game starts or when spawned
@@ -114,7 +114,7 @@ void AWHAircraftsBase::SpawnAircraft(FVector StartPos)
 	//임시 위치 조정
 	AWHAircraft* SpawnedAircraft = GetWorld()->SpawnActor<AWHAircraft>(StartPos, FRotator::ZeroRotator, SpawnParams);
 	SpawnedAircraft->StaticMeshComp->SetStaticMesh(StaticMeshRef);
-	SpawnedAircraft->MaxSpeed = this->MaxSpeed;
+	SpawnedAircraft->InitMaxSpeed = this->MaxSpeed;
 	ArrayAircrafts.Emplace(SpawnedAircraft);
 	AircraftsNum = ArrayAircrafts.Num();
 	SetInitAircraftPosition();
@@ -165,21 +165,21 @@ void AWHAircraftsBase::SetInitAircraftPosition()
 	}
 	else if (AircraftsNum == 2)
 	{
-		InitAircraftPosition.Emplace(FVector(0.0f, -600.0f, 0.0f));
-		InitAircraftPosition.Emplace(FVector(0.0f, 600.0f, 0.0f));
+		InitAircraftPosition.Emplace(FVector::ZeroVector);
+		InitAircraftPosition.Emplace(FVector(-100.0f, -1500.0f, 0.0f));
 	}
 	else if (AircraftsNum == 3)
 	{
 		InitAircraftPosition.Emplace(FVector::ZeroVector);
-		InitAircraftPosition.Emplace(FVector(-100.0f, -800.0f, 0.0f));
-		InitAircraftPosition.Emplace(FVector(-100.0f, 800.0f, 0.0f));
+		InitAircraftPosition.Emplace(FVector(-100.0f, -1500.0f, 0.0f));
+		InitAircraftPosition.Emplace(FVector(-100.0f, 1500.0f, 0.0f));
 	}
 	else if (AircraftsNum == 4)
 	{
 		InitAircraftPosition.Emplace(FVector::ZeroVector);
-		InitAircraftPosition.Emplace(FVector(-100.0f, -800.0f, 0.0f));
-		InitAircraftPosition.Emplace(FVector(-100.0f, 800.0f, 0.0f));
-		InitAircraftPosition.Emplace(FVector(-300.0f, -1600.0f, 0.0f));
+		InitAircraftPosition.Emplace(FVector(-100.0f, -1500.0f, 0.0f));
+		InitAircraftPosition.Emplace(FVector(-100.0f, 1500.0f, 0.0f));
+		InitAircraftPosition.Emplace(FVector(-300.0f, -3000.0f, 0.0f));
 	}
 }
 
@@ -202,6 +202,7 @@ void AWHAircraftsBase::SetAircraftFormations()
 			{
 				ArrayAircrafts[i]->CurrentPosition = AircraftFormations[i];
 				ArrayAircrafts[i]->HeadDir = Rotator;
+				ArrayAircrafts[i]->TargetHeight = Location.Z;
 			}
 		}
 	}

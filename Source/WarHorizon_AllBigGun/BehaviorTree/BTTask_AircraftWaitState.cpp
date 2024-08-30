@@ -16,20 +16,14 @@ EBTNodeResult::Type UBTTask_AircraftWaitState::ExecuteTask(UBehaviorTreeComponen
 {
 	Super::ExecuteTask(OwnerComp, NodeMemory);
 
-	EAircraftsState AircraftsState = static_cast<EAircraftsState>(OwnerComp.GetBlackboardComponent()->GetValueAsEnum(BBKEY_AIRCRAFTSSTATE));
-	if (AircraftsState == EAircraftsState::Wait)
+	FVector WaitingPos = OwnerComp.GetBlackboardComponent()->GetValueAsVector(BBKEY_WAITINGPOSITION);
+	FVector TargetPos = OwnerComp.GetBlackboardComponent()->GetValueAsVector(BBKEY_TARGETPOSITION);
+	if (WaitingPos == FVector(0, 0, 0))
 	{
-		FVector WaitingPos = OwnerComp.GetBlackboardComponent()->GetValueAsVector(BBKEY_WAITINGPOSITION);
-		FVector TargetPos = OwnerComp.GetBlackboardComponent()->GetValueAsVector(BBKEY_TARGETPOSITION);
-		if (WaitingPos == FVector(0, 0, 0))
-		{
-			OwnerComp.GetBlackboardComponent()->SetValueAsVector(BBKEY_WAITINGPOSITION, TargetPos);
-		}
-
-		return EBTNodeResult::InProgress;
+		OwnerComp.GetBlackboardComponent()->SetValueAsVector(BBKEY_WAITINGPOSITION, TargetPos);
 	}
 
-	return EBTNodeResult::Failed;
+	return EBTNodeResult::InProgress;
 }
 
 void UBTTask_AircraftWaitState::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds)

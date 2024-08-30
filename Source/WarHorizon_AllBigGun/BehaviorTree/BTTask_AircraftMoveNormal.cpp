@@ -16,13 +16,7 @@ EBTNodeResult::Type UBTTask_AircraftMoveNormal::ExecuteTask(UBehaviorTreeCompone
 {
 	Super::ExecuteTask(OwnerComp, NodeMemory);
 
-	EAircraftsState AircraftsState = static_cast<EAircraftsState>(OwnerComp.GetBlackboardComponent()->GetValueAsEnum(BBKEY_AIRCRAFTSSTATE));
-	if (AircraftsState == EAircraftsState::MoveNormal)
-	{
-		return EBTNodeResult::InProgress;
-	}
-
-	return EBTNodeResult::Failed;
+	return EBTNodeResult::InProgress;
 }
 
 void UBTTask_AircraftMoveNormal::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds)

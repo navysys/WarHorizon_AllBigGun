@@ -15,13 +15,7 @@ EBTNodeResult::Type UBTTask_AircraftMoveStraight::ExecuteTask(UBehaviorTreeCompo
 {
 	Super::ExecuteTask(OwnerComp, NodeMemory);
 
-	EAircraftsState AircraftsState = static_cast<EAircraftsState>(OwnerComp.GetBlackboardComponent()->GetValueAsEnum(BBKEY_AIRCRAFTSSTATE));
-	if (AircraftsState == EAircraftsState::MoveStraight)
-	{
-		return EBTNodeResult::InProgress;
-	}
-
-	return EBTNodeResult::Failed;
+	return EBTNodeResult::InProgress;
 }
 
 void UBTTask_AircraftMoveStraight::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds)

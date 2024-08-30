@@ -18,56 +18,52 @@ EBTNodeResult::Type UBTTask_AircraftATAMove::ExecuteTask(UBehaviorTreeComponent&
 {
 	Super::ExecuteTask(OwnerComp, NodeMemory);
 
-	EAircraftsState AircraftsState = static_cast<EAircraftsState>(OwnerComp.GetBlackboardComponent()->GetValueAsEnum(BBKEY_AIRCRAFTSSTATE));
-	if (AircraftsState == EAircraftsState::AtA)
+	APawn* ControllingPawn = OwnerComp.GetAIOwner()->GetPawn();
+	if (ControllingPawn == nullptr)
 	{
-		APawn* ControllingPawn = OwnerComp.GetAIOwner()->GetPawn();
-		if (ControllingPawn == nullptr)
-		{
-			return EBTNodeResult::Failed;
-		}
+		return EBTNodeResult::Failed;
+	}
 
-		IAircraftsInterface* AircraftsPawn = Cast<IAircraftsInterface>(ControllingPawn);
-		if (AircraftsPawn == nullptr)
-		{
-			return EBTNodeResult::Failed;
-		}
+	IAircraftsInterface* AircraftsPawn = Cast<IAircraftsInterface>(ControllingPawn);
+	if (AircraftsPawn == nullptr)
+	{
+		return EBTNodeResult::Failed;
+	}
 
-		AActor* TargetAircrafts = AircraftsPawn->GetTargetAircrafts();
-		OwnerComp.GetBlackboardComponent()->SetValueAsObject(BBKEY_TARGETAIRCRAFTS, Cast<UObject>(TargetAircrafts));
+	AActor* TargetAircrafts = AircraftsPawn->GetTargetAircrafts();
+	OwnerComp.GetBlackboardComponent()->SetValueAsObject(BBKEY_TARGETAIRCRAFTS, Cast<UObject>(TargetAircrafts));
 
-		if (TargetAircrafts != nullptr)
+	if (TargetAircrafts != nullptr)
+	{
+		IsHasTarget = true;
+		OwnerComp.GetBlackboardComponent()->SetValueAsVector(BBKEY_TARGETPOSITION, TargetAircrafts->GetActorLocation());
+		return EBTNodeResult::InProgress;
+	}
+	else
+	{
+		TArray<TEnumAsByte<EObjectTypeQuery>> traceObjectTypes;
+		traceObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECollisionChannel::ECC_Pawn)); // 이후 채널 수정
+		FVector TargetLoc = OwnerComp.GetBlackboardComponent()->GetValueAsVector(BBKEY_TARGETPOSITION);
+		float Radius = 1000.0f;
+		TArray<AActor*> OutActors;
+
+		UKismetSystemLibrary::SphereOverlapActors(GetWorld(), TargetLoc, Radius, traceObjectTypes, nullptr, {}, OutActors);
+
+		if (OutActors.Num() > 0)
 		{
+			OutActors.Sort([&TargetLoc](const AActor& A, const AActor& B)
+				{
+					return FVector::Dist(TargetLoc, A.GetActorLocation()) < FVector::Dist(TargetLoc, B.GetActorLocation());
+				});
+			OwnerComp.GetBlackboardComponent()->SetValueAsObject(BBKEY_TARGETAIRCRAFTS, Cast<UObject>(OutActors[0]));
 			IsHasTarget = true;
 			OwnerComp.GetBlackboardComponent()->SetValueAsVector(BBKEY_TARGETPOSITION, TargetAircrafts->GetActorLocation());
 			return EBTNodeResult::InProgress;
 		}
 		else
 		{
-			TArray<TEnumAsByte<EObjectTypeQuery>> traceObjectTypes;
-			traceObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECollisionChannel::ECC_Pawn)); // 이후 채널 수정
-			FVector TargetLoc = OwnerComp.GetBlackboardComponent()->GetValueAsVector(BBKEY_TARGETPOSITION);
-			float Radius = 1000.0f;
-			TArray<AActor*> OutActors;
-
-			UKismetSystemLibrary::SphereOverlapActors(GetWorld(), TargetLoc, Radius, traceObjectTypes, nullptr, {}, OutActors);
-
-			if (OutActors.Num() > 0)
-			{
-				OutActors.Sort([&TargetLoc](const AActor& A, const AActor& B)
-					{
-						return FVector::Dist(TargetLoc, A.GetActorLocation()) < FVector::Dist(TargetLoc, B.GetActorLocation());
-					});
-				OwnerComp.GetBlackboardComponent()->SetValueAsObject(BBKEY_TARGETAIRCRAFTS, Cast<UObject>(OutActors[0]));
-				IsHasTarget = true;
-				OwnerComp.GetBlackboardComponent()->SetValueAsVector(BBKEY_TARGETPOSITION, TargetAircrafts->GetActorLocation());
-				return EBTNodeResult::InProgress;
-			}
-			else
-			{
-				IsHasTarget = false;
-				return EBTNodeResult::InProgress;
-			}
+			IsHasTarget = false;
+			return EBTNodeResult::InProgress;
 		}
 	}
 	return EBTNodeResult::Failed;

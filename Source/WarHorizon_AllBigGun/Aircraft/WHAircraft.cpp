@@ -12,8 +12,6 @@ AWHAircraft::AWHAircraft()
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
-	//SceneComp = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
-	//
 	StaticMeshComp = CreateDefaultSubobject<UStaticMeshComponent>("StaticMeshComp");
 	RootComponent = StaticMeshComp;
 }
@@ -28,6 +26,8 @@ void AWHAircraft::BeginPlay()
 	LandingTime = 1.5f;
 	TargetHeight = 12000.0f;
 	HeightAcceleration = 2000.0f;
+
+	GetWorld()->GetTimerManager().SetTimer(AircraftTimer, this, &AWHAircraft::CalculateDist, 0.1f, true);
 
 	//변수 init 함수 만들어서 수치 aircrafts base 에서 받아서 동작하도록 이후 수정
 }
@@ -59,37 +59,10 @@ void AWHAircraft::Tick(float DeltaTime)
 
 		case EAircraftState::FollowGroup:
 		{
-			// 움직임 관련 (속도)
-
 			FVector Loc = GetActorLocation();
-			FVector Loc2D = Loc;
-			Loc2D.Z = 0;
-			FVector CurrentPos2D = CurrentPosition;
-			CurrentPos2D.Z = 0;
+			// 움직임 관련 (XY 계산)
+			FVector ForwardXY = GetActorForwardVector().GetSafeNormal2D();
 
-			// 최대 속도 제어
-			float Dist = FVector::Dist(Loc2D, CurrentPos2D);
-			if (Dist < 10.0f)
-			{
-				MaxSpeed = InitMaxSpeed;
-				AircraftState = EAircraftState::Normal;
-			}
-			else if (Dist < 250.0f)
-			{
-				MaxSpeed = InitMaxSpeed * 1.4f;
-			}
-			else if (Dist < 500.0f)
-			{
-				MaxSpeed = InitMaxSpeed * 1.6f;
-			}
-			else if (Dist < 1000.0f)
-			{
-				MaxSpeed = InitMaxSpeed * 1.8f;
-			}
-			else
-			{
-				MaxSpeed = InitMaxSpeed * 2.0f;
-			}
 
 			// 현재 속도 제어
 			if (MaxSpeed > MoveSpeed)
@@ -101,9 +74,6 @@ void AWHAircraft::Tick(float DeltaTime)
 				}
 			}
 			
-			// 움직임 관련 (XY 계산)
-			FVector ForwardXY = GetActorForwardVector().GetSafeNormal2D();
-
 			// 움직임 관련 (Z 계산)
 			CurrentHeight = GetActorLocation().Z;
 			if (TargetHeight > CurrentHeight)
@@ -155,64 +125,6 @@ void AWHAircraft::Tick(float DeltaTime)
 					CurrentYaw += 45.0f * DeltaTime;
 				}
 			}
-			// 직선 상에 있는지 검사하는 코드 현재 필요 X
-			// 
-			//else
-			//{
-			//	CurrentYaw = TargetYaw;
-
-			//	FVector NextPos2D = NextPos;
-			//	NextPos2D.Z = 0;
-
-			//	float CurrentDist = FVector::Dist(CurrentPos2D, NextPos2D);
-			//	FVector LineEnd = NextPos2D + ForwardXY * CurrentDist;
-			//	float LineDist = FVector::Dist(LineEnd, CurrentPos2D);
-
-			//	UE_LOG(LogTemp, Warning, TEXT("LineEnd : %s"), *LineEnd.ToString());
-			//	UE_LOG(LogTemp, Warning, TEXT("LineDist : %f"), LineDist);
-
-			//	if (FMath::IsNearlyZero(LineDist, 0.001) == false)
-			//	{
-			//		int LineAngle = (CurrentPos2D - LineEnd).GetSafeNormal2D().Rotation().Yaw;
-			//		UE_LOG(LogTemp, Warning, TEXT("Angle : %i"), LineAngle);
-			//		if (LineAngle > 180)
-			//		{
-			//			LineAngle -= 360;
-			//		}
-			//		else if (LineAngle < -180)
-			//		{
-			//			LineAngle += 360;
-			//		}
-
-			//		if (LineAngle > 0)
-			//		{
-			//			//NextPos += GetActorRightVector().GetSafeNormal2D() * MoveSpeed * 0.2f * DeltaTime;
-			//		}
-			//		else if (LineAngle < 0)
-			//		{
-			//			//NextPos -= GetActorRightVector().GetSafeNormal2D() * MoveSpeed * 0.2f * DeltaTime;
-			//		}
-			//	}
-
-				//int Angle = Dir.Rotation().Yaw - HeadDir.Yaw;
-
-
-
-				//if (Angle > 0)
-				//{
-				//	UE_LOG(LogTemp, Warning, TEXT("Angle > : %i"), Angle);
-				//	NextPos += GetActorRightVector().GetSafeNormal2D() * MoveSpeed * 0.2f * DeltaTime;
-				//}
-				//else if (Angle < 0)
-				//{
-				//	UE_LOG(LogTemp, Warning, TEXT("Angle < : %i"), Angle);
-				//	NextPos -= GetActorRightVector().GetSafeNormal2D() * MoveSpeed * 0.2f * DeltaTime;
-				//}
-				//else
-				//{
-				//	UE_LOG(LogTemp, Warning, TEXT("Angle = 0 : %i"), Angle);
-				//}
-			//}
 
 			Rot.Yaw = CurrentYaw;
 
@@ -227,47 +139,7 @@ void AWHAircraft::Tick(float DeltaTime)
 			MaxSpeed = InitMaxSpeed;
 			FVector Loc = GetActorLocation();
 			FVector ForwardXY = GetActorForwardVector().GetSafeNormal2D();
-			FVector DirXY = (Loc - CurrentPosition).GetSafeNormal2D();
-			FVector Loc2D = Loc;
-			Loc2D.Z = 0;
-			FVector CurrentPos2D = CurrentPosition;
-			CurrentPos2D.Z = 0;
 			
-			float Dist = FVector::Dist(Loc2D, CurrentPos2D);
-			float Dot = FVector::DotProduct(ForwardXY, DirXY);
-			if (Dot > 0)
-			{
-				if (Dist < 20.0f)
-				{
-					MaxSpeed = InitMaxSpeed;
-				}
-				else if (Dist < 100.0f)
-				{
-					MaxSpeed = InitMaxSpeed * 1.2f;
-				}
-				else
-				{
-					MaxSpeed = InitMaxSpeed * 1.4f;
-				}
-			}
-			else if (Dot < 0)
-			{
-				if (Dist < 20.0f)
-				{
-					MaxSpeed = InitMaxSpeed;
-				}
-				else if (Dist < 100.0f)
-				{
-					MaxSpeed = InitMaxSpeed * 0.8f;
-				}
-				else
-				{
-					MaxSpeed = InitMaxSpeed * 0.6f;
-				}
-			}
-			
-			//UE_LOG(LogTemp, Warning, TEXT("Dot : %f"), Dot);
-			// 움직임 관련 (속도)
 			if (MaxSpeed > MoveSpeed)
 			{
 				MoveSpeed += MaxSpeed * DeltaTime;
@@ -362,50 +234,94 @@ void AWHAircraft::Tick(float DeltaTime)
 
 }
 
-void AWHAircraft::MoveToCurrentPositionAndRotation(float DeltaTime)
+void AWHAircraft::CalculateDist()
 {
-	FVector CurrentLocation = GetActorLocation();
-	
-	FVector Dist = CurrentPosition - GetActorLocation();
-	FVector Dir = Dist.GetSafeNormal();
-	float Alpha = 1;
 
-	// 차후 상승할 때 직선 거리가 줄어들고 속도가 조금 감소하게 수정
-	float DistanceFloat = FVector::Dist(FVector(0,0,0), Dist);
-	if (DistanceFloat > 400)
-	{
-		MoveSpeed = MaxSpeed * 2.0f;
-	}
-	if (DistanceFloat > 250)
-	{
-		MoveSpeed = MaxSpeed * 1.8f;
-	}
-	else if(DistanceFloat >200)
-	{
-		MoveSpeed = MaxSpeed * 1.1f;
-	}
-	else if(DistanceFloat > 150)
-	{
-		MoveSpeed = MaxSpeed * 0.9f;
-	}
-	else if(DistanceFloat > 100)
-	{
-		MoveSpeed = MaxSpeed * 0.8f;
-	}
-	else if(DistanceFloat > 50)
-	{
-		MoveSpeed = MaxSpeed * 0.6f;
-	}
-	else
-	{
-		MoveSpeed = MaxSpeed * 0.1f;
-	}
-	
-	CurrentLocation += Dir * MoveSpeed * DeltaTime;
+	FVector Loc = GetActorLocation();
+	Loc.Z = 0;
+	FVector CurrentPos2D = CurrentPosition;
+	CurrentPos2D.Z = 0;
 
-	FRotator MidRotator = UKismetMathLibrary::RLerp(Dir.ToOrientationRotator(), HeadDir, Alpha, true);
+	// 최대 속도 제어
+	Dist = FVector::Dist(Loc, CurrentPos2D);
 
-	SetActorLocation(CurrentLocation);
-	SetActorRotation(MidRotator);
+	switch (AircraftState)
+	{
+	case EAircraftState::Landing:
+		break;
+
+	case EAircraftState::FollowGroup:
+	{
+		if (Dist < 10.0f)
+		{
+			MaxSpeed = InitMaxSpeed;
+			AircraftState = EAircraftState::Normal;
+		}
+		else if (Dist < 250.0f)
+		{
+			MaxSpeed = InitMaxSpeed * 1.4f;
+		}
+		else if (Dist < 500.0f)
+		{
+			MaxSpeed = InitMaxSpeed * 1.6f;
+		}
+		else if (Dist < 1000.0f)
+		{
+			MaxSpeed = InitMaxSpeed * 1.8f;
+		}
+		else
+		{
+			MaxSpeed = InitMaxSpeed * 2.0f;
+		}
+		break;
+	}
+
+	case EAircraftState::Normal:
+	{
+		FVector ForwardXY = GetActorForwardVector().GetSafeNormal2D();
+		FVector DirXY = (Loc - CurrentPosition).GetSafeNormal2D();
+		float Dot = FVector::DotProduct(ForwardXY, DirXY);
+		if (Dot > 0)
+		{
+			if (Dist < 20.0f)
+			{
+				MaxSpeed = InitMaxSpeed;
+			}
+			else if (Dist < 100.0f)
+			{
+				MaxSpeed = InitMaxSpeed * 1.2f;
+			}
+			else
+			{
+				MaxSpeed = InitMaxSpeed * 1.4f;
+			}
+		}
+		else if (Dot < 0)
+		{
+			if (Dist < 20.0f)
+			{
+				MaxSpeed = InitMaxSpeed;
+			}
+			else if (Dist < 100.0f)
+			{
+				MaxSpeed = InitMaxSpeed * 0.8f;
+			}
+			else
+			{
+				MaxSpeed = InitMaxSpeed * 0.6f;
+			}
+		}
+		break;
+	}
+
+	case EAircraftState::AtA:
+		break;
+	case EAircraftState::AtB:
+		break;
+	case EAircraftState::Invalid:
+		break;
+	default:
+		break;
+	}
 }
 

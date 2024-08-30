@@ -33,6 +33,8 @@ public:
 	UPROPERTY(VisibleAnywhere)
 	EAircraftState AircraftState = EAircraftState::Landing;
 
+	FTimerHandle AircraftTimer;
+
 	UPROPERTY(VisibleAnywhere)
 	FRotator HeadDir;
 
@@ -57,9 +59,11 @@ public:
 	UPROPERTY(VisibleAnywhere)
 	float LandingTime;
 
+	float Dist;
+
 
 	UPROPERTY(VisibleAnywhere)
 	FVector CurrentPosition;
 
-	void MoveToCurrentPositionAndRotation(float DeltaTime);
+	void CalculateDist();
 };

@@ -46,7 +46,6 @@ EBTNodeResult::Type UBTTask_SpawnAircraft::ExecuteTask(UBehaviorTreeComponent& O
 			if (MaxSpawnCount <= CurrentSpawnCount)
 			{
 				OwnerComp.GetBlackboardComponent()->SetValueAsBool(BBKEY_ISSPAWNEND, true);
-				//AircraftsPawn->SetIsSpawnEnd();
 			}
 			AircraftsPawn->SpawnAircraft(MotherShipActor->GetActorLocation());
 			return EBTNodeResult::InProgress;

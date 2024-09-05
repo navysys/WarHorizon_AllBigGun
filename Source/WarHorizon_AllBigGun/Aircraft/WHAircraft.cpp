@@ -95,41 +95,27 @@ void AWHAircraft::Tick(float DeltaTime)
 			Loc.Z = CurrentHeight;
 
 			FVector NextPos = Loc + ForwardXY * MoveSpeed * DeltaTime;
-			
+			SetActorLocation(NextPos);
 
 			// 회전 관련 (Yaw)
-			FRotator Rot = GetActorRotation();
-			float CurrentYaw = Rot.Yaw;
-
-			FVector TargetDir = (CurrentPosition - Loc).GetSafeNormal2D();
-			float TargetYaw = TargetDir.Rotation().Yaw;
-
-			float Angle = CurrentYaw - TargetYaw;
-			if (Angle > 180)
+			RotationTime += DeltaTime;
+			if (RotationTime >= 0.05f)
 			{
-				Angle -= 360;
-			}
-			else if (Angle < -180)
-			{
-				Angle += 360;
-			}
-
-			if (FMath::IsNearlyZero(Angle, 0.1) == false)
-			{
+				FRotator CurRot = GetActorRotation();
 				if (Angle > 0)
 				{
-					CurrentYaw -= 45.0f * DeltaTime;
+					CurRot.Yaw += 1;
 				}
 				else if (Angle < 0)
 				{
-					CurrentYaw += 45.0f * DeltaTime;
+					CurRot.Yaw -= 1;
 				}
+				SetActorRotation(CurRot);
+				RotationTime -= 0.05f;
 			}
 
-			Rot.Yaw = CurrentYaw;
-
-			SetActorLocation(NextPos);
-			SetActorRotation(Rot);
+			
+			
 			
 			break;
 		}
@@ -178,27 +164,24 @@ void AWHAircraft::Tick(float DeltaTime)
 			Loc.Z = CurrentHeight;
 
 			FVector NextPos = Loc + ForwardXY * MoveSpeed * DeltaTime;
-
+			SetActorLocation(NextPos);
 
 			// 회전 관련 (Yaw)
-			FRotator Rot = GetActorRotation();
-			float CurrentYaw = Rot.Yaw;
-			int IntCurrentYaw = CurrentYaw;
-			int AircraftsYaw = HeadDir.Yaw;
-
-			if (IntCurrentYaw > AircraftsYaw)
+			RotationTime += DeltaTime;
+			if (RotationTime >= 0.05f)
 			{
-				CurrentYaw -= 45.0f * DeltaTime;
+				FRotator CurRot = GetActorRotation();
+				if (Angle > 0)
+				{
+					CurRot.Yaw += 1;
+				}
+				else if (Angle < 0)
+				{
+					CurRot.Yaw-= 1;
+				}
+				SetActorRotation(CurRot);
+				RotationTime -= 0.05f;
 			}
-			else if (IntCurrentYaw < AircraftsYaw)
-			{
-				CurrentYaw += 45.0f * DeltaTime;
-			}
-
-			Rot.Yaw = CurrentYaw;
-
-			SetActorLocation(NextPos);
-			SetActorRotation(Rot);
 
 			break;
 		}
@@ -252,27 +235,58 @@ void AWHAircraft::CalculateDist()
 
 	case EAircraftState::FollowGroup:
 	{
-		if (Dist < 10.0f)
+		FVector ForwardXY = GetActorForwardVector().GetSafeNormal2D();
+		FVector DirXY = (CurrentPos2D - Loc).GetSafeNormal2D();
+		float Dot = FVector::DotProduct(ForwardXY, DirXY);
+
+		// 속도 관련
+		if (Dist < 100.0f || Dot < 0)
 		{
 			MaxSpeed = InitMaxSpeed;
 			AircraftState = EAircraftState::Normal;
 		}
 		else if (Dist < 250.0f)
 		{
-			MaxSpeed = InitMaxSpeed * 1.4f;
+			MaxSpeed = InitMaxSpeed * 1.2f;
 		}
 		else if (Dist < 500.0f)
 		{
-			MaxSpeed = InitMaxSpeed * 1.6f;
+			MaxSpeed = InitMaxSpeed * 1.4f;
 		}
 		else if (Dist < 1000.0f)
 		{
-			MaxSpeed = InitMaxSpeed * 1.8f;
+			MaxSpeed = InitMaxSpeed * 1.6f;
 		}
 		else
 		{
 			MaxSpeed = InitMaxSpeed * 2.0f;
 		}
+
+		if (Dot > 0)
+		{
+			// 회전 관련 (Yaw)
+			FRotator Rot = GetActorRotation();
+			float CurrentYaw = Rot.Yaw;
+
+			FVector TargetDir = (CurrentPosition - Loc).GetSafeNormal2D();
+			float TargetYaw = TargetDir.Rotation().Yaw;
+
+			Angle = TargetYaw - CurrentYaw;
+			if (Angle > 180)
+			{
+				Angle -= 360;
+			}
+			else if (Angle < -180)
+			{
+				Angle += 360;
+			}
+		}
+		else if (Dot < 0)
+		{
+			Angle = HeadDir.Yaw - GetActorRotation().Yaw;
+		}
+
+
 		break;
 	}
 
@@ -311,6 +325,21 @@ void AWHAircraft::CalculateDist()
 				MaxSpeed = InitMaxSpeed * 0.6f;
 			}
 		}
+
+		FRotator Rot = GetActorRotation();
+		float CurrentYaw = Rot.Yaw;
+		float AircraftsYaw = HeadDir.Yaw;
+
+		Angle = AircraftsYaw - CurrentYaw;
+		if (Angle > 180)
+		{
+			Angle -= 360;
+		}
+		else if (Angle < -180)
+		{
+			Angle += 360;
+		}
+
 		break;
 	}
 

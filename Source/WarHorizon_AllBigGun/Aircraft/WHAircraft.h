@@ -60,6 +60,10 @@ public:
 	float LandingTime;
 
 	float Dist;
+	UPROPERTY(VisibleAnywhere)
+	float RotationTime;
+	UPROPERTY(VisibleAnywhere)
+	int Angle;
 
 
 	UPROPERTY(VisibleAnywhere)

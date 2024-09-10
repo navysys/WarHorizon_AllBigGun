@@ -1,11 +1,9 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Game/WHGameSingleton.h"
+#include "Game/WHGameInstance.h"
 
-DEFINE_LOG_CATEGORY(LogBattleShipSingleton);
-
-UWHGameSingleton::UWHGameSingleton()
+UWHGameInstance::UWHGameInstance()
 {
 	static ConstructorHelpers::FObjectFinder<UDataTable> BattleShipDataRef(TEXT("/Game/DataTable/DT_BattleShipData"));
 	if (nullptr != BattleShipDataRef.Object)
@@ -27,16 +25,4 @@ UWHGameSingleton::UWHGameSingleton()
 		AircraftDataTable = AircraftDataRef.Object;
 		check(AircraftDataTable->GetRowMap().Num() > 0);
 	}
-}
-
-UWHGameSingleton& UWHGameSingleton::Get()
-{
-	UWHGameSingleton* Singleton = CastChecked<UWHGameSingleton>(GEngine->GameSingleton);
-	if (Singleton)
-	{
-		return *Singleton;
-	}
-
-	UE_LOG(LogBattleShipSingleton, Error, TEXT("Invalid Game Singleton"));
-	return *NewObject<UWHGameSingleton>();
 }

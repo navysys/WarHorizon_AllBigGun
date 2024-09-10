@@ -9,7 +9,7 @@
 
 UBTTask_SpawnAircraft::UBTTask_SpawnAircraft()
 {
-	bNotifyTick = true;
+
 }
 
 EBTNodeResult::Type UBTTask_SpawnAircraft::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
@@ -48,20 +48,9 @@ EBTNodeResult::Type UBTTask_SpawnAircraft::ExecuteTask(UBehaviorTreeComponent& O
 				OwnerComp.GetBlackboardComponent()->SetValueAsBool(BBKEY_ISSPAWNEND, true);
 			}
 			AircraftsPawn->SpawnAircraft(MotherShipActor->GetActorLocation());
-			return EBTNodeResult::InProgress;
+			return EBTNodeResult::Failed;
 		}
 	}
 	
 	return EBTNodeResult::Succeeded;
-}
-
-void UBTTask_SpawnAircraft::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds)
-{
-	Time += DeltaSeconds;
-	float SpawnTime = OwnerComp.GetBlackboardComponent()->GetValueAsFloat(BBKEY_SPAWNTIME);
-	if (Time > SpawnTime)
-	{
-		Time = 0.0f;
-		FinishLatentTask(OwnerComp, EBTNodeResult::Failed);
-	}
 }

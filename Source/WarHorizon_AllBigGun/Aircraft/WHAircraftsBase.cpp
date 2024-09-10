@@ -5,7 +5,7 @@
 #include "Aircraft/WHAircraft.h"
 #include "Component/WHCAircraftsMovement.h"
 #include "Controller/WHAircraftsAIController.h"
-#include "Game/WHGameSingleton.h"
+#include "Game/WHGameInstance.h"
 
 // Sets default values
 AWHAircraftsBase::AWHAircraftsBase()
@@ -57,7 +57,7 @@ void AWHAircraftsBase::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 void AWHAircraftsBase::InitToDataTable(int Id)
 {
 	FName IDName = FName(FString::FromInt(Id));
-	UDataTable* AircraftData = UWHGameSingleton::Get().GetAircraftDataTable();
+	UDataTable* AircraftData = Cast<UWHGameInstance>(GetGameInstance())->GetAircraftDataTable();
 	FAircraftDataTable* Table = AircraftData->FindRow<FAircraftDataTable>(IDName, "");
 
 	if (Table)

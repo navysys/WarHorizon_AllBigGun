@@ -3,26 +3,22 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "UObject/NoExportTypes.h"
+#include "Engine/GameInstance.h"
 #include "DataTable/BattleShipDataTable.h"
 #include "DataTable/TurretDataTable.h"
 #include "DataTable/AircraftDataTable.h"
-#include "WHGameSingleton.generated.h"
-
-
-DECLARE_LOG_CATEGORY_EXTERN(LogBattleShipSingleton, Error, All);
+#include "WHGameInstance.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class WARHORIZON_ALLBIGGUN_API UWHGameSingleton : public UObject
+class WARHORIZON_ALLBIGGUN_API UWHGameInstance : public UGameInstance
 {
 	GENERATED_BODY()
 	
 public:
-	UWHGameSingleton();
-	static UWHGameSingleton& Get();
+	UWHGameInstance();
 
 public:
 	FORCEINLINE UDataTable* GetBattleShipDataTable() { return BattleShipDataTable; }

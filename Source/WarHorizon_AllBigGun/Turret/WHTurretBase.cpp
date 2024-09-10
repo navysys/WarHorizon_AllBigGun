@@ -2,8 +2,7 @@
 
 
 #include "Turret/WHTurretBase.h"
-#include "DataTable/TurretDataTable.h"
-#include "Game/WHGameSingleton.h"
+#include "Game/WHGameInstance.h"
 #include "NiagaraActor.h"
 #include "NiagaraComponent.h"
 
@@ -114,7 +113,7 @@ void AWHTurretBase::Fire()
 
 void AWHTurretBase::LoadDataTableToName(FName Name)
 {
-	UDataTable* TurretData = UWHGameSingleton::Get().GetTurretDataTable();
+	UDataTable* TurretData = Cast<UWHGameInstance>(GetGameInstance())->GetTurretDataTable();
 	FTurretDataTable* Table = TurretData->FindRow<FTurretDataTable>(Name, "");
 
 	if (Table)

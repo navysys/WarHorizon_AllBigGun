@@ -2,7 +2,7 @@
 
 
 #include "BattleShip/WHBattleShip.h"
-#include "Game/WHGameSingleton.h"
+#include "Game/WHGameInstance.h"
 #include "Controller/WHPlayerController.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "Engine/SkeletalMeshSocket.h"
@@ -215,17 +215,17 @@ void AWHBattleShip::SpawnAircrafts(int Index)
 
 void AWHBattleShip::LoadSingletonData()
 {
-	UE_LOG(LogTemp, Warning, TEXT("Load Singleton Data"));
-	PlayerName = UWHGameSingleton::Get().GetPlayerName();
-	BattleShipName = UWHGameSingleton::Get().GetBattleShipName();
-	TeamInt = UWHGameSingleton::Get().GetTeamInt();
+	UE_LOG(LogTemp, Warning, TEXT("Load GameInstance Data"));
+	PlayerName = Cast<UWHGameInstance>(GetGameInstance())->GetPlayerName();
+	BattleShipName = Cast<UWHGameInstance>(GetGameInstance())->GetBattleShipName();
+	TeamInt = Cast<UWHGameInstance>(GetGameInstance())->GetTeamInt();
 }
 
 /*			데이터 관련 함수			*/
 void AWHBattleShip::LoadDataTableToName(FName Name)
 {
 	UE_LOG(LogTemp, Warning, TEXT("Load DataTable Data"));
-	UDataTable* BattleShipData = UWHGameSingleton::Get().GetBattleShipDataTable();
+	UDataTable* BattleShipData = Cast<UWHGameInstance>(GetGameInstance())->GetBattleShipDataTable();
 	FBattleShipDataTable* Table = BattleShipData->FindRow<FBattleShipDataTable>(Name, "");
 
 	if (Table)

@@ -125,7 +125,23 @@ void AWHAircraft::Tick(float DeltaTime)
 			MaxSpeed = InitMaxSpeed;
 			FVector Loc = GetActorLocation();
 			FVector ForwardXY = GetActorForwardVector().GetSafeNormal2D();
+			FVector RightVec = GetActorRightVector();
+			RightVec.Z = 0;
 			
+			FVector Dir = (CurrentPosition - Loc).GetSafeNormal2D();
+			float DotProduct = FVector::DotProduct(RightVec, Dir);
+			
+			FVector CorrectionY;
+
+			if (DotProduct < 0) // 왼쪽
+			{
+				CorrectionY = RightVec * -1.0f;
+			}
+			else if (DotProduct > 0)
+			{
+				CorrectionY = RightVec;
+			}
+
 			if (MaxSpeed > MoveSpeed)
 			{
 				MoveSpeed += MaxSpeed * DeltaTime;
@@ -163,7 +179,7 @@ void AWHAircraft::Tick(float DeltaTime)
 			}
 			Loc.Z = CurrentHeight;
 
-			FVector NextPos = Loc + ForwardXY * MoveSpeed * DeltaTime;
+			FVector NextPos = Loc + ForwardXY * MoveSpeed * DeltaTime; // CorrectionY 추가해야함
 			SetActorLocation(NextPos);
 
 			// 회전 관련 (Yaw)

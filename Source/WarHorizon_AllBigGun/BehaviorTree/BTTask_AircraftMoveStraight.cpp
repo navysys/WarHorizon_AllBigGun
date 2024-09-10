@@ -8,14 +8,14 @@
 
 UBTTask_AircraftMoveStraight::UBTTask_AircraftMoveStraight()
 {
-	bNotifyTick = true;
+
 }
 
 EBTNodeResult::Type UBTTask_AircraftMoveStraight::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
 {
 	Super::ExecuteTask(OwnerComp, NodeMemory);
 
-	return EBTNodeResult::InProgress;
+	return EBTNodeResult::Succeeded;
 }
 
 void UBTTask_AircraftMoveStraight::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds)

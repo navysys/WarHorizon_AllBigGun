@@ -2,8 +2,6 @@
 
 
 #include "Turret/WHTurret.h"
-#include "DataTable/TurretDataTable.h"
-#include "Game/WHGameSingleton.h"
 #include "Controller/WHTurretAIController.h"
 #include "Kismet/GameplayStatics.h"
 #include "WHShell.h"
@@ -71,6 +69,8 @@ void AWHTurret::Fire()
 	{
 		PlayerController = Cast<AWHPlayerController>(GetInstigatorController());
 	}
+
+	// 나중에 소켓에 스포너 어태치해서 스포너 호출하도록 변경
 
 	FVector MuzzleLocation = GetActorRotation().RotateVector(Muzzles[0]->RelativeLocation);
 	FVector TurretLocation = GetActorLocation();

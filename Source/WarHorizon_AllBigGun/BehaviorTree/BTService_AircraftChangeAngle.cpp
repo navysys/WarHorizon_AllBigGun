@@ -90,23 +90,23 @@ void UBTService_AircraftChangeAngle::TickNode(UBehaviorTreeComponent& OwnerComp,
 
 		case EAircraftsState::Wait:
 		{
-			float WaitAngle = OwnerComp.GetBlackboardComponent()->GetValueAsFloat(BBKEY_WAITANGLE);
-			FVector Center = OwnerComp.GetBlackboardComponent()->GetValueAsVector(BBKEY_WAITINGPOSITION); // 원의 중심
-			FVector CurrentLocation = ControllingPawn->GetActorLocation();
-			float RotationSpeed = 30.0f; // 초기 회전 속도 (도 단위)
+			//float WaitAngle = OwnerComp.GetBlackboardComponent()->GetValueAsFloat(BBKEY_WAITANGLE);
+			//FVector Center = OwnerComp.GetBlackboardComponent()->GetValueAsVector(BBKEY_WAITINGPOSITION); // 원의 중심
+			//FVector CurrentLocation = ControllingPawn->GetActorLocation();
+			//float RotationSpeed = 30.0f; // 초기 회전 속도 (도 단위)
 
 
-			WaitAngle += RotationSpeed * DeltaSeconds;
-			if (WaitAngle >= 180.0f)
-			{
-				RotationSpeed = 15.0f;	// 현재 속도 1500 기준 15도로 회전하면 원형으로 제자리 회전
-			}
+			//WaitAngle += RotationSpeed * DeltaSeconds;
+			//if (WaitAngle >= 180.0f)
+			//{
+			//	RotationSpeed = 15.0f;	// 현재 속도 1500 기준 15도로 회전하면 원형으로 제자리 회전
+			//}
 
-			FRotator Rot = ControllingPawn->GetActorRotation();
-			Rot.Yaw += RotationSpeed * DeltaSeconds;
+			//FRotator Rot = ControllingPawn->GetActorRotation();
+			//Rot.Yaw += RotationSpeed * DeltaSeconds;
 
-			ControllingPawn->SetActorRotation(Rot);
-			break;
+			//ControllingPawn->SetActorRotation(Rot);
+			//break;
 		}
 
 

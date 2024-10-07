@@ -39,16 +39,16 @@ AWHPlayerController::AWHPlayerController()
 		MoveOrTargetingAction = IA_MoveOrTargeting.Object;
 	}
 
-	static ConstructorHelpers::FObjectFinder<UInputAction>IA_FastFire(TEXT("/Game/Input/IA_FastFire"));
-	if (IA_FastFire.Succeeded())
+	static ConstructorHelpers::FObjectFinder<UInputAction>IA_RapidAttack(TEXT("/Game/Input/IA_RapidAttack"));
+	if (IA_RapidAttack.Succeeded())
 	{
-		FastFireAction = IA_FastFire.Object;
+		RapidAttackAction = IA_RapidAttack.Object;
 	}
 
-	static ConstructorHelpers::FObjectFinder<UInputAction>IA_Attack(TEXT("/Game/Input/IA_Attack"));
-	if (IA_Attack.Succeeded())
+	static ConstructorHelpers::FObjectFinder<UInputAction>IA_TargetAttack(TEXT("/Game/Input/IA_TargetAttack"));
+	if (IA_TargetAttack.Succeeded())
 	{
-		AttackAction = IA_Attack.Object;
+		TargetAttackAction = IA_TargetAttack.Object;
 	}
 
 	static ConstructorHelpers::FObjectFinder<UInputAction>IA_SpinTurret(TEXT("/Game/Input/IA_SpinTurret"));
@@ -94,7 +94,7 @@ void AWHPlayerController::BeginPlay()
 
 	if (UEnhancedInputLocalPlayerSubsystem* SubSystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer()))
 	{
-		SubSystem->AddMappingContext(DefaultContext, 0);
+		SubSystem->AddMappingContext(DefaultContext, 1);
 		
 	}
 }
@@ -112,8 +112,8 @@ void AWHPlayerController::SetupInputComponent()
 	if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(InputComponent))
 	{
 		EnhancedInputComponent->BindAction(MoveOrTargetingAction, ETriggerEvent::Triggered, this, &AWHPlayerController::MoveOrTargeting);
-		EnhancedInputComponent->BindAction(FastFireAction, ETriggerEvent::Triggered, this, &AWHPlayerController::FastFire);
-		EnhancedInputComponent->BindAction(AttackAction, ETriggerEvent::Triggered, this, &AWHPlayerController::Attack);
+		EnhancedInputComponent->BindAction(RapidAttackAction, ETriggerEvent::Triggered, this, &AWHPlayerController::RapidAttack);
+		EnhancedInputComponent->BindAction(TargetAttackAction, ETriggerEvent::Triggered, this, &AWHPlayerController::TargetAttack);
 		EnhancedInputComponent->BindAction(SpinTurretAction, ETriggerEvent::Triggered, this, &AWHPlayerController::SpinTurret);
 		EnhancedInputComponent->BindAction(AccelerationAction, ETriggerEvent::Triggered, this, &AWHPlayerController::Acceleration);
 		EnhancedInputComponent->BindAction(DecelerationAction, ETriggerEvent::Triggered, this, &AWHPlayerController::Deceleration);
@@ -121,25 +121,21 @@ void AWHPlayerController::SetupInputComponent()
 	}
 }
 
-void AWHPlayerController::SetControllerMappingType(EControllerMappingType NewControllerMappingType = EControllerMappingType::Default)
+void AWHPlayerController::ChangeWaitingAttackMappingContext()
 {
 
 	if (UEnhancedInputLocalPlayerSubsystem* SubSystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer()))
 	{
-		SubSystem->ClearAllMappings();
-
-		UInputMappingContext* NewMappingContext = DefaultContext;
-		if (NewControllerMappingType == EControllerMappingType::Default)
+		if (CurrentControllerMappingType == EControllerMappingType::Default)
 		{
-			NewMappingContext = DefaultContext;
+			CurrentControllerMappingType = EControllerMappingType::WaitingAttack;
+			SubSystem->AddMappingContext(WaitingAttackContext, 0);
 		}
-		else if (NewControllerMappingType == EControllerMappingType::WaitingAttack)
+		else if (CurrentControllerMappingType == EControllerMappingType::WaitingAttack)
 		{
-			NewMappingContext = WaitingAttackContext;
+			CurrentControllerMappingType = EControllerMappingType::Default;
+			SubSystem->RemoveMappingContext(WaitingAttackContext);
 		}
-
-		SubSystem->AddMappingContext(NewMappingContext, 0);
-		CurrentControllerMappingType = NewControllerMappingType;
 	}
 }
 
@@ -171,22 +167,22 @@ void AWHPlayerController::MoveOrTargeting(const FInputActionValue& Value)
 	}
 }
 
-void AWHPlayerController::FastFire(const FInputActionValue& Value)
+void AWHPlayerController::RapidAttack(const FInputActionValue& Value)
 {
 	if (BattleShipPawn != nullptr)
 	{
-		BattleShipPawn->UserFastFire();
+		BattleShipPawn->RapidAttack();
 
 		// 디폴트 상태로 전환
 		if (CurrentControllerMappingType == EControllerMappingType::WaitingAttack)
 		{
-			SetControllerMappingType(EControllerMappingType::Default);
+			ChangeWaitingAttackMappingContext();
 		}
 	}
 
 }
 
-void AWHPlayerController::Attack(const FInputActionValue& Value)
+void AWHPlayerController::TargetAttack(const FInputActionValue& Value)
 {
 	if (BattleShipPawn != nullptr)
 	{
@@ -200,12 +196,12 @@ void AWHPlayerController::Attack(const FInputActionValue& Value)
 			APawn* TargetShip = Cast<APawn>(Hit.GetActor());
 			BattleShipPawn->UserSpinTurretsToPawn(TargetShip);
 
-			BattleShipPawn->UserAttack();
+			BattleShipPawn->NormalAttack();
 
 			// 디폴트 상태로 전환
 			if (CurrentControllerMappingType == EControllerMappingType::WaitingAttack)
 			{
-				SetControllerMappingType(EControllerMappingType::Default);
+				ChangeWaitingAttackMappingContext();
 			}
 		}
 	}
@@ -261,16 +257,7 @@ void AWHPlayerController::Deceleration(const FInputActionValue& Value)
 
 void AWHPlayerController::ChangeContext(const FInputActionValue& Value)
 {
-	UE_LOG(LogTemp, Warning, TEXT("ChangeContext Called!"));
-
-	if (CurrentControllerMappingType == EControllerMappingType::Default)
-	{
-		SetControllerMappingType(EControllerMappingType::WaitingAttack);
-	}
-	else if (CurrentControllerMappingType == EControllerMappingType::WaitingAttack)
-	{
-		SetControllerMappingType(EControllerMappingType::Default);
-	}
+	ChangeWaitingAttackMappingContext();
 }
 
 FBattleShipDataStruct AWHPlayerController::GetBattleShipData()

@@ -43,7 +43,7 @@ private:
 protected:
 	EControllerMappingType CurrentControllerMappingType;
 
-	void SetControllerMappingType(EControllerMappingType NewControllerMappingType);
+	void ChangeWaitingAttackMappingContext();
 
 	// IM
 	UPROPERTY(EditAnywhere, Category = Input)
@@ -57,10 +57,10 @@ protected:
 	TObjectPtr<class UInputAction> MoveOrTargetingAction;
 
 	UPROPERTY(EditAnywhere, Category = Input)
-	TObjectPtr<class UInputAction> FastFireAction;
+	TObjectPtr<class UInputAction> RapidAttackAction;
 
 	UPROPERTY(EditAnywhere, Category = Input)
-	TObjectPtr<class UInputAction> AttackAction;
+	TObjectPtr<class UInputAction> TargetAttackAction;
 
 	UPROPERTY(EditAnywhere, Category = Input)
 	TObjectPtr<class UInputAction> SpinTurretAction;
@@ -78,9 +78,9 @@ protected:
 	// 
 	void MoveOrTargeting(const FInputActionValue& Value);
 
-	void FastFire(const FInputActionValue& Value);
+	void RapidAttack(const FInputActionValue& Value);
 
-	void Attack(const FInputActionValue& Value);
+	void TargetAttack(const FInputActionValue& Value);
 
 	void SpinTurret(const FInputActionValue& Value);
 

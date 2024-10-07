@@ -41,13 +41,12 @@ public:
 
 
 	// 인터페이스 관련 함수
-	virtual void UserFastFire() override;
-	virtual void UserAttack() override;
-	virtual void UserAttackCancel() override;
+	virtual void RapidAttack() override;
+	virtual void NormalAttack() override;
 	virtual void UserSpinTurrets(float Angle, float Distance) override;
 	virtual void UserSpinTurretsToPawn(APawn* Target) override;
 	virtual void UserSpinTurretsToHitPoint(FVector HitPoint) override;
-	virtual void UserSkill(char Key) override;
+	virtual void UseSkill(char Key) override;
 	virtual void CalculateRotationToHitPoint(FVector HitPoint) override;
 	virtual void IncreaseMoveSpeed() override;
 	virtual void DecreaseMoveSpeed() override;

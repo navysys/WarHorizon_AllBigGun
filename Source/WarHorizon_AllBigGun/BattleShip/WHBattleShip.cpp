@@ -24,8 +24,6 @@ AWHBattleShip::AWHBattleShip()
 	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
 	Tags.Add(FName("BattleShip"));
 
-	//RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
-
 	// 스켈레탈 매시
 	SkeletalMeshComp = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("SkeletalMesh"));
 	SkeletalMeshComp->SetCollisionProfileName(TEXT("TeamABattleShipPreset"));
@@ -102,19 +100,15 @@ void AWHBattleShip::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 
 }
 
-void AWHBattleShip::UserFastFire()
+void AWHBattleShip::RapidAttack()
 {
 	TargetSelectorComp->CommandTurretsFire(ETurretType::Main);
 }
 
-void AWHBattleShip::UserAttack()
+void AWHBattleShip::NormalAttack()
 {
 	// 현재는 fastfire 와 같지만 이후에는 조준 완료 시에만 발사하고 조준이 안된 함포 회전하는 것 까지
 	TargetSelectorComp->CommandTurretsFire(ETurretType::Main);
-}
-
-void AWHBattleShip::UserAttackCancel()
-{
 }
 
 void AWHBattleShip::UserSpinTurrets(float Angle, float Distance)
@@ -144,7 +138,7 @@ void AWHBattleShip::UserSpinTurretsToHitPoint(FVector HitPoint)
 
 
 
-void AWHBattleShip::UserSkill(char Key)
+void AWHBattleShip::UseSkill(char Key)
 {
 
 }

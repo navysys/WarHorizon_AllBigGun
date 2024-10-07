@@ -22,13 +22,12 @@ class WARHORIZON_ALLBIGGUN_API IBattleShipInterface
 
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
-	virtual void UserFastFire() = 0;
-	virtual void UserAttack() = 0;
-	virtual void UserAttackCancel() = 0;
+	virtual void RapidAttack() = 0;
+	virtual void NormalAttack() = 0;
 	virtual void UserSpinTurrets(float Angle, float Distance) = 0;
 	virtual void UserSpinTurretsToPawn(APawn* Target) = 0;
 	virtual void UserSpinTurretsToHitPoint(FVector HitPoint) = 0;
-	virtual void UserSkill(char Key) = 0;
+	virtual void UseSkill(char Key) = 0;
 	virtual void CalculateRotationToHitPoint(FVector HitPoint) = 0;
 	virtual void IncreaseMoveSpeed() = 0;
 	virtual void DecreaseMoveSpeed() = 0;

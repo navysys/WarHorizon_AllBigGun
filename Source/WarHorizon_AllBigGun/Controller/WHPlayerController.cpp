@@ -89,13 +89,10 @@ void AWHPlayerController::BeginPlay()
 	//		UE_LOG(LogTemp, Error, TEXT("Invalid Player BattleShip Pawn"));
 	//	}
 	//}
-	
-	Possess(GetPawn());
 
 	if (UEnhancedInputLocalPlayerSubsystem* SubSystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer()))
 	{
 		SubSystem->AddMappingContext(DefaultContext, 1);
-		
 	}
 }
 
@@ -151,7 +148,7 @@ void AWHPlayerController::MoveOrTargeting(const FInputActionValue& Value)
 			// 이동에 대한 명령
 			if (Hit.GetActor()->ActorHasTag(TEXT("Plane")))
 			{
-				BattleShipPawn->CalculateRotationToHitPoint(Hit.Location);
+				BattleShipPawn->SpinBattleShip(Hit.Location);
 
 				DrawDebugLine(GetWorld(), FVector(Hit.Location.X, Hit.Location.Y, 30000.0f), Hit.Location, FColor::Green, false, 3, 0, 200);
 			}
@@ -160,7 +157,7 @@ void AWHPlayerController::MoveOrTargeting(const FInputActionValue& Value)
 			{
 				APawn* TargetShip = Cast<APawn>(Hit.GetActor());
 				DrawDebugCircle(GetWorld(), FVector(TargetShip->GetActorLocation().X, TargetShip->GetActorLocation().Y, 100.0f), 8000.0f, 100, FColor::White, true, -1.f, 0, 50, FVector(1, 0, 0), FVector(0, 1, 0), true);
-				BattleShipPawn->UserSpinTurretsToPawn(TargetShip);
+				BattleShipPawn->SpinTurrets(TargetShip);
 				// 타겟이 되면 포탑이 이동속도에 비례해서 위치를 보정하고 서브 터렛이 해당 타겟을 조준하도록 해야함
 			}
 		}
@@ -194,7 +191,7 @@ void AWHPlayerController::TargetAttack(const FInputActionValue& Value)
 		if (Hit.bBlockingHit && Hit.GetActor()->ActorHasTag(TEXT("BattleShip")))
 		{
 			APawn* TargetShip = Cast<APawn>(Hit.GetActor());
-			BattleShipPawn->UserSpinTurretsToPawn(TargetShip);
+			BattleShipPawn->SpinTurrets(TargetShip);
 
 			BattleShipPawn->NormalAttack();
 
@@ -233,7 +230,7 @@ void AWHPlayerController::SpinTurret(const FInputActionValue& Value)
 			// Hit 과 함선 사이의 거리
 			float Distance = FVector::Distance(Pos, HitPoint);
 
-			BattleShipPawn->UserSpinTurrets(Angle, Distance);
+			BattleShipPawn->SpinTurrets(Angle, Distance);
 			DrawDebugLine(GetWorld(), FVector(Hit.Location.X, Hit.Location.Y, 30000.0f), Hit.Location, FColor::Red, false, 3, 0, 200);
 		}
 	}

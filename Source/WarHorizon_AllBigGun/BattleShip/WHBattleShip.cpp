@@ -111,7 +111,7 @@ void AWHBattleShip::NormalAttack()
 	TargetSelectorComp->CommandTurretsFire(ETurretType::Main);
 }
 
-void AWHBattleShip::UserSpinTurrets(float Angle, float Distance)
+void AWHBattleShip::SpinTurrets(float Angle, float Distance)
 {
 	bIsMouseTarget = false;
 	TargetSelectorComp->SetTurretsAttackType(ETurretType::Main, ETurretAttackType::AngleAttack);
@@ -119,7 +119,7 @@ void AWHBattleShip::UserSpinTurrets(float Angle, float Distance)
 	TargetSelectorComp->SetTurretsTargetDistance(ETurretType::Main, Distance);
 }
 
-void AWHBattleShip::UserSpinTurretsToPawn(APawn* Target)
+void AWHBattleShip::SpinTurrets(APawn* Target)
 {
 	TargetSelectorComp->SetTurretsAttackType(ETurretType::Main, ETurretAttackType::AngleAttack);
 	bIsMouseTarget = true; // Tick 에서 타겟인 적을 적과의 거리를 지속적으로 계산
@@ -131,7 +131,7 @@ void AWHBattleShip::UserSpinTurretsToPawn(APawn* Target)
 	}
 }
 
-void AWHBattleShip::UserSpinTurretsToHitPoint(FVector HitPoint)
+void AWHBattleShip::SpinTurrets(FVector HitPoint)
 {
 
 }
@@ -162,7 +162,7 @@ float AWHBattleShip::TakeDamage(float DamageAmount, FDamageEvent const& DamageEv
 
 
 
-void AWHBattleShip::CalculateRotationToHitPoint(FVector HitPoint)
+void AWHBattleShip::SpinBattleShip(FVector HitPoint)
 {
 	if (BattleShipMovementComp)
 	{

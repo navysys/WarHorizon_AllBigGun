@@ -43,11 +43,11 @@ public:
 	// 인터페이스 관련 함수
 	virtual void RapidAttack() override;
 	virtual void NormalAttack() override;
-	virtual void UserSpinTurrets(float Angle, float Distance) override;
-	virtual void UserSpinTurretsToPawn(APawn* Target) override;
-	virtual void UserSpinTurretsToHitPoint(FVector HitPoint) override;
+	virtual void SpinTurrets(float Angle, float Distance) override;
+	virtual void SpinTurrets(APawn* Target) override;
+	virtual void SpinTurrets(FVector HitPoint) override;
 	virtual void UseSkill(char Key) override;
-	virtual void CalculateRotationToHitPoint(FVector HitPoint) override;
+	virtual void SpinBattleShip(FVector HitPoint) override;
 	virtual void IncreaseMoveSpeed() override;
 	virtual void DecreaseMoveSpeed() override;
 	virtual void SpawnAircrafts(int Index) override;

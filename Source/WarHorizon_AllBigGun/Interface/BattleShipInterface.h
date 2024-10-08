@@ -24,11 +24,11 @@ class WARHORIZON_ALLBIGGUN_API IBattleShipInterface
 public:
 	virtual void RapidAttack() = 0;
 	virtual void NormalAttack() = 0;
-	virtual void UserSpinTurrets(float Angle, float Distance) = 0;
-	virtual void UserSpinTurretsToPawn(APawn* Target) = 0;
-	virtual void UserSpinTurretsToHitPoint(FVector HitPoint) = 0;
+	virtual void SpinTurrets(float Angle, float Distance) = 0;
+	virtual void SpinTurrets(APawn* Target) = 0;
+	virtual void SpinTurrets(FVector HitPoint) = 0;
 	virtual void UseSkill(char Key) = 0;
-	virtual void CalculateRotationToHitPoint(FVector HitPoint) = 0;
+	virtual void SpinBattleShip(FVector HitPoint) = 0;
 	virtual void IncreaseMoveSpeed() = 0;
 	virtual void DecreaseMoveSpeed() = 0;
 	virtual void SpawnAircrafts(int Index) = 0;

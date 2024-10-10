@@ -81,6 +81,8 @@ void AWHPlayerController::BeginPlay()
 	Super::BeginPlay();
 
 	CameraPawn = Cast<AWHCameraPawn>(GetPawn());
+
+	
 	//if (CameraPawn != nullptr)
 	//{
 	//	BattleShipPawn = Cast<IBattleShipInterface>(CameraPawn->GetPlayerBattleShip());
@@ -183,8 +185,6 @@ void AWHPlayerController::TargetAttack(const FInputActionValue& Value)
 {
 	if (BattleShipPawn != nullptr)
 	{
-		//UE_LOG(LogTemp, Warning, TEXT("Attack Called!"));
-
 		FHitResult Hit;
 		GetHitResultUnderCursor(ECC_Visibility, false, Hit);
 

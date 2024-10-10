@@ -12,6 +12,8 @@
  *
  */
 
+class UInputMappingContext;
+class UInputAction;
 
 UENUM()
 enum class EControllerMappingType : uint8
@@ -47,32 +49,32 @@ protected:
 
 	// IM
 	UPROPERTY(EditAnywhere, Category = Input)
-	TObjectPtr<class UInputMappingContext> DefaultContext;
+	TObjectPtr<UInputMappingContext> DefaultContext;
 
 	UPROPERTY(EditAnywhere, Category = Input)
-	TObjectPtr<class UInputMappingContext> WaitingAttackContext;
+	TObjectPtr<UInputMappingContext> WaitingAttackContext;
 
 	// IA
 	UPROPERTY(EditAnywhere, Category = Input)
-	TObjectPtr<class UInputAction> MoveOrTargetingAction;
+	TObjectPtr<UInputAction> MoveOrTargetingAction;
 
 	UPROPERTY(EditAnywhere, Category = Input)
-	TObjectPtr<class UInputAction> RapidAttackAction;
+	TObjectPtr<UInputAction> RapidAttackAction;
 
 	UPROPERTY(EditAnywhere, Category = Input)
-	TObjectPtr<class UInputAction> TargetAttackAction;
+	TObjectPtr<UInputAction> TargetAttackAction;
 
 	UPROPERTY(EditAnywhere, Category = Input)
-	TObjectPtr<class UInputAction> SpinTurretAction;
+	TObjectPtr<UInputAction> SpinTurretAction;
 
 	UPROPERTY(EditAnywhere, Category = Input)
-	TObjectPtr<class UInputAction> AccelerationAction;
+	TObjectPtr<UInputAction> AccelerationAction;
 
 	UPROPERTY(EditAnywhere, Category = Input)
-	TObjectPtr<class UInputAction> DecelerationAction;
+	TObjectPtr<UInputAction> DecelerationAction;
 
 	UPROPERTY(EditAnywhere, Category = Input)
-	TObjectPtr<class UInputAction> ChangeContextAction;
+	TObjectPtr<UInputAction> ChangeContextAction;
 
 
 	// 

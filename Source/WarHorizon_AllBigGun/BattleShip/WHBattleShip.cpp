@@ -53,7 +53,7 @@ void AWHBattleShip::PostInitializeComponents()
 		AWHPlayerController* OwnerController = Cast<AWHPlayerController>(OwnerPawn->GetController());
 		if (OwnerController != nullptr)
 		{
-			BattleShipName = OwnerController->GetBattleShipData().BattleShipName;
+			BattleShipName = TEXT("Yamato");  //OwnerController->GetBattleShipData().BattleShipName; 현재 테스트용
 		}
 	}
 
@@ -200,6 +200,7 @@ void AWHBattleShip::SpawnAircrafts(int Index)
 
 	if (Val != 0)
 	{
+		// 소켓 위치에서 스폰되게 이후 변경해야 함
 		AWHAircraftsBase* SpawnedAircrafts = GetWorld()->SpawnActor<AWHAircraftsBase>(GetActorLocation(), FRotator::ZeroRotator, SpawnParams);
 		SpawnedAircrafts->InitToDataTable(AircraftIDs[Index]);
 		AllAircraftsArray.Emplace(SpawnedAircrafts);
@@ -210,7 +211,6 @@ void AWHBattleShip::SpawnAircrafts(int Index)
 void AWHBattleShip::LoadSingletonData()
 {
 	UE_LOG(LogTemp, Warning, TEXT("Load GameInstance Data"));
-	PlayerName = Cast<UWHGameInstance>(GetGameInstance())->GetPlayerName();
 	BattleShipName = Cast<UWHGameInstance>(GetGameInstance())->GetBattleShipName();
 	TeamInt = Cast<UWHGameInstance>(GetGameInstance())->GetTeamInt();
 }
@@ -228,9 +228,6 @@ void AWHBattleShip::LoadDataTableToName(FName Name)
 		BattleShipName = Table->Name;
 		BattleShipType = Table->Type;
 		BaseMesh = Table->BaseMesh;
-
-		InitMaxHP = Table->MaxHP;
-		InitMaxMP = Table->MaxMP;
 
 		InitMaxMoveSpeed = Table->MoveSpeed;
 		InitAcceleration = Table->Acceleration;
@@ -546,6 +543,8 @@ void AWHBattleShip::CreateTurretToMeshCompSocket(USkeletalMeshComponent* MeshCom
 
 void AWHBattleShip::CalculateAngleToSpinTurret()
 {
+	// 클라이언트에서만 실행할 함수
+	// 타겟 셀렉터 안으로 넣어버리는 것 고려중
 	if (IsValid(MouseTarget))
 	{
 		FVector Pos = FVector(GetActorLocation().X, GetActorLocation().Y, 0.0f);

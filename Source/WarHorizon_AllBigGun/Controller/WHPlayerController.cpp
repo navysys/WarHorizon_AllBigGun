@@ -18,9 +18,6 @@ AWHPlayerController::AWHPlayerController()
 
 	CurrentControllerMappingType = EControllerMappingType::Default;
 
-	// 임시 이름 나중에 서버에서 들고오기
-	BattleShipData.BattleShipName = TEXT("Yamato");
-
 	static ConstructorHelpers::FObjectFinder<UInputMappingContext>IM_DEFAULT(TEXT("/Game/Input/IM_Default"));
 	if (IM_DEFAULT.Succeeded())
 	{
@@ -80,17 +77,9 @@ void AWHPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
 
-	CameraPawn = Cast<AWHCameraPawn>(GetPawn());
-
-	
-	//if (CameraPawn != nullptr)
-	//{
-	//	BattleShipPawn = Cast<IBattleShipInterface>(CameraPawn->GetPlayerBattleShip());
-	//	if (BattleShipPawn == nullptr)
-	//	{
-	//		UE_LOG(LogTemp, Error, TEXT("Invalid Player BattleShip Pawn"));
-	//	}
-	//}
+	//CameraPawn = Cast<AWHCameraPawn>(GetPawn());
+	//나중에 서버로 바꾸면 빙의 할 때 설정하도록 변경
+	BattleShipPawn = Cast<IBattleShipInterface>(GetPawn());
 
 	if (UEnhancedInputLocalPlayerSubsystem* SubSystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer()))
 	{
@@ -255,14 +244,4 @@ void AWHPlayerController::Deceleration(const FInputActionValue& Value)
 void AWHPlayerController::ChangeContext(const FInputActionValue& Value)
 {
 	ChangeWaitingAttackMappingContext();
-}
-
-FBattleShipDataStruct AWHPlayerController::GetBattleShipData()
-{
-	return BattleShipData;
-}
-
-void AWHPlayerController::SetBattleShipPawn(IBattleShipInterface* BattleShipInterface)
-{
-	BattleShipPawn = BattleShipInterface;
 }

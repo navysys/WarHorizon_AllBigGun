@@ -60,13 +60,13 @@ protected:
 	TArray<AWHTurretBase*> RightAttackAirTurrets;
 
 	UPROPERTY(VisibleAnywhere)
-	float CurrentFowardAngle = 999.0f;
+	float CurrentFowardAngle = 99999.0f;
 	UPROPERTY(VisibleAnywhere)
-	float CurrentBackAngle = 999.0f;
+	float CurrentBackAngle = 99999.0f;
 	UPROPERTY(VisibleAnywhere)
-	float CurrentLeftAngle = 999.0f;
+	float CurrentLeftAngle = 99999.0f;
 	UPROPERTY(VisibleAnywhere)
-	float CurrentRightAngle = 999.0f;
+	float CurrentRightAngle = 99999.0f;
 
 	FTimerHandle DirectionTimerHandle;
 	float DirectionTimerInterval = 0.5f;

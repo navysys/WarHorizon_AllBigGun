@@ -91,8 +91,8 @@ void AWHCameraPawn::SpawnBattleShip()
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 	// 컨트롤러에서 정보를 불러와 스폰
 	// 컨트롤러에서는 서버와 동기화 후 정보 전달 받아 생성하도록 해야함
-	PlayerBattleShip = GetWorld()->SpawnActor<AWHBattleShip>(BPBattleShip->GeneratedClass, GetActorLocation(), FRotator::ZeroRotator, SpawnParams);
-	PlayerController->SetBattleShipPawn(PlayerBattleShip);
+	//PlayerBattleShip = GetWorld()->SpawnActor<AWHBattleShip>(BPBattleShip->GeneratedClass, GetActorLocation(), FRotator::ZeroRotator, SpawnParams);
+	//PlayerController->SetBattleShipPawn(PlayerBattleShip);
 }
 
 AWHBattleShip* AWHCameraPawn::GetPlayerBattleShip()

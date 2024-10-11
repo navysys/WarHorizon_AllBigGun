@@ -14,6 +14,7 @@
 
 class UInputMappingContext;
 class UInputAction;
+class IBattleShipInterface;
 
 UENUM()
 enum class EControllerMappingType : uint8
@@ -38,9 +39,7 @@ protected:
 	virtual void SetupInputComponent() override;
 
 private:
-	class IBattleShipInterface* BattleShipPawn;
-	class AWHCameraPawn* CameraPawn;
-
+	IBattleShipInterface* BattleShipPawn;
 
 protected:
 	EControllerMappingType CurrentControllerMappingType;
@@ -93,19 +92,5 @@ protected:
 	void ChangeContext(const FInputActionValue& Value);
 
 public:
-
-	FBattleShipDataStruct GetBattleShipData();
-
-	void SetBattleShipPawn(class IBattleShipInterface* BattleShipPawn);
-
-public:
-	UPROPERTY(EditAnywhere)
-	FPlayerDataStruct PlayerData;
-	UPROPERTY(EditAnywhere)
-	FBattleShipDataStruct BattleShipData;
-	UPROPERTY(EditAnywhere)
-	FTurretDataStruct TurretData;
-	
-
 	float ShellSpeed;
 };

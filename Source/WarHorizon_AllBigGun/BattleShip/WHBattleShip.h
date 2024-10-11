@@ -55,53 +55,36 @@ public:
 protected:
 	UPROPERTY(VisibleAnywhere, Category = "BattleShip | ID")
 	uint32 ID = 0;
-	UPROPERTY(VisibleAnywhere, Category = "BattleShip | ID")
-	FString PlayerName;
-	UPROPERTY(VisibleAnywhere, Category = "BattleShip | ID")
-	FString BattleShipName;
-	UPROPERTY(VisibleAnywhere, Category = "BattleShip | ID")
+	UPROPERTY(EditAnywhere, Category = "BattleShip | ID")
+	FString BattleShipName = TEXT("Yamato");
+	UPROPERTY(EditAnywhere, Category = "BattleShip | ID")
 	EBattleShipType BattleShipType = EBattleShipType::Invalid;
 	UPROPERTY(VisibleAnywhere, Category = "BattleShip | ID")
 	uint8 TeamInt = 1;
 
 
-	// Stat
-protected:
-	UPROPERTY(EditAnywhere, Category = "BattleShip | Stat")
-	float InitMaxHP;
-
-	UPROPERTY(EditAnywhere, Category = "BattleShip | Stat")
-	float HP;
-
-	UPROPERTY(EditAnywhere, Category = "BattleShip | Stat")
-	float InitMaxMP;
-
-	UPROPERTY(EditAnywhere, Category = "BattleShip | Stat")
-	float MP;
-
-
 	// 움직임, 회전 관련 변수
 protected:
-	UPROPERTY(EditAnywhere, Category = "BattleShip | Movement")
+	UPROPERTY(VisibleAnywhere, Category = "BattleShip | Movement")
 	float InitMaxMoveSpeed;
 
-	UPROPERTY(EditAnywhere, Category = "BattleShip | Movement")
+	UPROPERTY(VisibleAnywhere, Category = "BattleShip | Movement")
 	float InitAcceleration;
 
-	UPROPERTY(EditAnywhere, Category = "BattleShip | Movement")
+	UPROPERTY(VisibleAnywhere, Category = "BattleShip | Movement")
 	float InitDeceleration;
 
-	UPROPERTY(EditAnywhere, Category = "BattleShip | Rotation")
+	UPROPERTY(VisibleAnywhere, Category = "BattleShip | Rotation")
 	float InitMaxRotationSpeed;
 
-	UPROPERTY(EditAnywhere, Category = "BattleShip | Rotation")
+	UPROPERTY(VisibleAnywhere, Category = "BattleShip | Rotation")
 	float InitRotationAcceleration;
 
-	UPROPERTY(EditAnywhere, Category = "BattleShip | Rotation")
+	UPROPERTY(VisibleAnywhere, Category = "BattleShip | Rotation")
 	float InitRotationAccelerationIncrease;
 
 protected:
-	UPROPERTY(EditAnywhere, Category = "BattleShip | Aircraft")
+	UPROPERTY(VisibleAnywhere, Category = "BattleShip | Aircraft")
 	TArray<int> AircraftIDs;
 
 protected:
@@ -142,17 +125,17 @@ protected:
 
 protected:
 	// 모든 터렛을 저장
-	UPROPERTY(EditAnywhere, Category = "BattleShip | Turrets")
+	UPROPERTY(VisibleAnywhere, Category = "BattleShip | Turrets")
 	TArray<FTurretArray> AllTurretArray;
 
 	// 모든 항공기를 저장
-	UPROPERTY(EditAnywhere, Category = "BattleShip | Aircraft")
+	UPROPERTY(VisibleAnywhere, Category = "BattleShip | Aircraft")
 	TArray<class AWHAircraftsBase*> AllAircraftsArray;
 
 protected:
-	UPROPERTY(EditAnywhere, Category = "BattleShip | Target")
+	UPROPERTY(VisibleAnywhere, Category = "BattleShip | Target")
 	TArray<APawn*> EnemyBattleShips;
 
-	UPROPERTY(EditAnywhere, Category = "BattleShip | Target")
+	UPROPERTY(VisibleAnywhere, Category = "BattleShip | Target")
 	TArray<APawn*> EnemyAircrafts;
 };

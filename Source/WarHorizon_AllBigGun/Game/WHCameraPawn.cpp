@@ -5,7 +5,7 @@
 #include "Controller/WHPlayerController.h"
 #include "Camera/CameraComponent.h"
 #include "GameFramework/SpringArmComponent.h"
-#include "BattleShip/WHBattleShip.h"
+#include "BattleShip/WHBattleShipBase.h"
 
 // Sets default values
 AWHCameraPawn::AWHCameraPawn()
@@ -95,8 +95,4 @@ void AWHCameraPawn::SpawnBattleShip()
 	//PlayerController->SetBattleShipPawn(PlayerBattleShip);
 }
 
-AWHBattleShip* AWHCameraPawn::GetPlayerBattleShip()
-{
-	return PlayerBattleShip;
-}
 

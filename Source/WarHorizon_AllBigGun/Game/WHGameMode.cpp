@@ -6,10 +6,10 @@
 AWHGameMode::AWHGameMode()
 {
 	// 헤더 최소화를 위한 레퍼런스 전달
-	static ConstructorHelpers::FClassFinder<APawn> WHCameraPawnClassRef(TEXT("/Game/Blueprint/BP_CameraPawn"));
-	if (WHCameraPawnClassRef.Class)
+	static ConstructorHelpers::FClassFinder<APawn> WHBattleShipBaseClassRef(TEXT("/Game/Blueprint/BP_BattleShipBase"));
+	if (WHBattleShipBaseClassRef.Class)
 	{
-		DefaultPawnClass = WHCameraPawnClassRef.Class;
+		DefaultPawnClass = WHBattleShipBaseClassRef.Class;
 	}
 
 	static ConstructorHelpers::FClassFinder<APlayerController> PlayerControllerClassRef(TEXT("/Script/WarHorizon_AllBigGun.WHPlayerController"));

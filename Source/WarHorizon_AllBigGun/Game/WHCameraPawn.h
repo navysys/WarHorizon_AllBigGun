@@ -6,6 +6,9 @@
 #include "GameFramework/Pawn.h"
 #include "WHCameraPawn.generated.h"
 
+class AWHBattleShipBase;
+
+
 UCLASS()
 class WARHORIZON_ALLBIGGUN_API AWHCameraPawn : public APawn
 {
@@ -23,12 +26,12 @@ protected:
 
 public:
 	void SpawnBattleShip();
-	class AWHBattleShip* GetPlayerBattleShip();
+
 protected:
 	UPROPERTY()
 	TObjectPtr<class AWHPlayerController> PlayerController;
 	UPROPERTY()
-	TObjectPtr<class AWHBattleShip> PlayerBattleShip;
+	TObjectPtr<AWHBattleShipBase> PlayerBattleShip;
 
 	UPROPERTY()
 	TObjectPtr<UBlueprint> BPBattleShip;

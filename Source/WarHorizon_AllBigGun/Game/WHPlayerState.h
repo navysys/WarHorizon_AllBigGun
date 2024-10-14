@@ -17,32 +17,67 @@ class WARHORIZON_ALLBIGGUN_API AWHPlayerState : public APlayerState
 	
 	// Stat
 protected:
-	// UI 변경은 state 변수 기준
-	UPROPERTY(VisibleAnywhere, Category = "BattleShip | ID")
+	// UI 변경은 state 변수 기준 바인드
+	UPROPERTY(VisibleAnywhere, Category = "Player")
 	FString PlayerName;
 
-	UPROPERTY(VisibleAnywhere, Category = "BattleShip | ID")
+	UPROPERTY(VisibleAnywhere, Category = "Player")
 	FString BattleShipName;
 
-	UPROPERTY(VisibleAnywhere, Category = "BattleShip | ID")
+	UPROPERTY(VisibleAnywhere, Category = "Player")
 	EBattleShipType BattleShipType = EBattleShipType::Invalid;
 
-	UPROPERTY(VisibleAnywhere, Category = "BattleShip | ID")
+	UPROPERTY(VisibleAnywhere, Category = "Player")
 	uint8 TeamInt = 1;
 
 
-	UPROPERTY(EditAnywhere, Category = "BattleShip | Stat")
-	float InitMaxHP;
+	UPROPERTY(EditAnywhere, Category = "Stat")
+	uint32 MaxHP = 100;
 
-	UPROPERTY(EditAnywhere, Category = "BattleShip | Stat")
-	float HP;
+	UPROPERTY(EditAnywhere, Category = "Stat")
+	uint32 HP = 100;
 
-	UPROPERTY(EditAnywhere, Category = "BattleShip | Stat")
-	float InitMaxMP;
+	UPROPERTY(EditAnywhere, Category = "Stat")
+	uint32 MaxMP = 100;
 
-	UPROPERTY(EditAnywhere, Category = "BattleShip | Stat")
-	float MP;
+	UPROPERTY(EditAnywhere, Category = "Stat")
+	uint32 MP = 0;
 
+	UPROPERTY(EditAnywhere, Category = "Stat")
+	uint16 Defense = 0;
+
+	UPROPERTY(EditAnywhere, Category = "Stat | Attack")
+	uint16 AttackPower = 100;
+
+	UPROPERTY(EditAnywhere, Category = "Stat | Attack")
+	uint8 AttackRange = 100;
+
+	UPROPERTY(EditAnywhere, Category = "Stat | Attack")
+	uint8 AttakReload = 100;
+
+	UPROPERTY(EditAnywhere, Category = "Stat | Attack")
+	uint8 DefenseIgnore = 0;
+
+	UPROPERTY(EditAnywhere, Category = "Stat | Attack")
+	uint8 CriticalValue = 0;
+
+	UPROPERTY(EditAnywhere, Category = "Stat | Attack")
+	uint16 CriticalCoefficient = 100;
+
+	UPROPERTY(EditAnywhere, Category = "Stat | Attack")
+	uint8 SkillCooldown = 100;
+
+	UPROPERTY(EditAnywhere, Category = "Stat | Movement")
+	float MoveSpeed = 1;
+
+	UPROPERTY(EditAnywhere, Category = "Stat | Movement")
+	float MoveAcceleration = 1;
+
+	UPROPERTY(EditAnywhere, Category = "Stat | Movement")
+	float RotationSpeed = 1;
+
+	UPROPERTY(EditAnywhere, Category = "Stat | Movement")
+	float RotationAcceleration = 1;
 
 
 };

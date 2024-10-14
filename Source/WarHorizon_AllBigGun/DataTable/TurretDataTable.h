@@ -26,14 +26,14 @@ struct WARHORIZON_ALLBIGGUN_API FTurretDataTable : public FTableRowBase
 	UStaticMesh* TurretMesh;
 
 	UPROPERTY(EditAnywhere)
-	float ReloadTime;
+	float TurretReloadTime;
 	UPROPERTY(EditAnywhere)
-	float Range;
+	float TurretRange;
 
 	UPROPERTY(EditAnywhere)
-	float HorizontalAngle;
+	float TurretHorizontalAngle;
 	UPROPERTY(EditAnywhere)
-	float VerticalAngle;
+	float TurretVerticalAngle;
 	UPROPERTY(EditAnywhere)
-	float RotationSpeed;
+	float TurretRotationSpeed;
 };

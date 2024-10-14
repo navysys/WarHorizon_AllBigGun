@@ -76,11 +76,12 @@ AWHShell::AWHShell()
 
 void AWHShell::PreInitializeComponents()
 {
-	
+	Super::PreInitializeComponents();
+
 	AController* InstigatorController = GetInstigatorController();
 	if (InstigatorController != nullptr)
 	{
-		AWHPlayerController* PlayerController = Cast<AWHPlayerController>(InstigatorController);
+		AWHPlayerController* PlayerController = Cast<AWHPlayerController>(InstigatorController); // 테스트용 코드
 		ProjectileMovementComp->InitialSpeed = PlayerController->ShellSpeed;
 	}
 	else

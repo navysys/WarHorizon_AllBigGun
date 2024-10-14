@@ -6,6 +6,11 @@
 #include "GameFramework/Actor.h"
 #include "WHShell.generated.h"
 
+class UCapsuleComponent;
+class UProjectileMovementComponent;
+class UNiagaraComponent;
+class UNiagaraSystem;
+
 UCLASS()
 class WARHORIZON_ALLBIGGUN_API AWHShell : public AActor
 {
@@ -37,18 +42,18 @@ public:
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UStaticMeshComponent> StaticMeshComp;
 	UPROPERTY(VisibleAnywhere)
-	TObjectPtr<class UCapsuleComponent> CapsuleComp;
+	TObjectPtr<UCapsuleComponent> CapsuleComp;
 	UPROPERTY(VisibleAnywhere)
-	TObjectPtr<class UProjectileMovementComponent> ProjectileMovementComp;
+	TObjectPtr<UProjectileMovementComponent> ProjectileMovementComp;
 	UPROPERTY(VisibleAnywhere)
-	TObjectPtr<class UNiagaraComponent> TailNiagaraComp;
+	TObjectPtr<UNiagaraComponent> TailNiagaraComp;
 
 	UPROPERTY(VisibleAnywhere)
-	TObjectPtr<class UNiagaraSystem> TailEffect;
+	TObjectPtr<UNiagaraSystem> TailEffect;
 	UPROPERTY(VisibleAnywhere)
-	TObjectPtr<class UNiagaraSystem> HitEffect;
+	TObjectPtr<UNiagaraSystem> HitEffect;
 	UPROPERTY(VisibleAnywhere)
-	TObjectPtr<class UNiagaraSystem> WaterHitEffect;
+	TObjectPtr<UNiagaraSystem> WaterHitEffect;
 
 
 	UPROPERTY(VisibleAnywhere)

@@ -113,28 +113,35 @@ void AWHTurretBase::Fire()
 
 void AWHTurretBase::LoadDataTableToName(FName Name)
 {
-	UDataTable* TurretData = Cast<UWHGameInstance>(GetGameInstance())->GetTurretDataTable();
-	FTurretDataTable* Table = TurretData->FindRow<FTurretDataTable>(Name, "");
-
-	if (Table)
+	UWHGameInstance* GI = Cast<UWHGameInstance>(GetGameInstance());
+	if (GI)
 	{
-		TurretID = Table->TurretID;
-		TurretName = Table->TurretName;
-		TurretType = Table->TurretType;
-		TurretMesh = Table->TurretMesh;
-
-		ReloadTime = Table->ReloadTime;
-		Range = Table->Range;
-
-		MaxHorizontalAngle = Table->HorizontalAngle;
-		MaxVerticalAngle = Table->VerticalAngle;
-		RotationSpeed = Table->RotationSpeed;
-
-		if (StaticMeshComp != nullptr)
+		UDataTable* TurretData = GI->GetTurretDataTable();
+		if (TurretData)
 		{
-			StaticMeshComp->SetStaticMesh(TurretMesh);
-			Muzzles = StaticMeshComp->GetStaticMesh()->Sockets;
-		}
+			FTurretDataTable* Table = TurretData->FindRow<FTurretDataTable>(Name, "");
 
+			if (Table)
+			{
+				TurretID = Table->TurretID;
+				TurretName = Table->TurretName;
+				TurretType = Table->TurretType;
+				TurretMesh = Table->TurretMesh;
+
+				ReloadTime = Table->TurretReloadTime;
+				Range = Table->TurretRange;
+
+				MaxHorizontalAngle = Table->TurretHorizontalAngle;
+				MaxVerticalAngle = Table->TurretVerticalAngle;
+				RotationSpeed = Table->TurretRotationSpeed;
+
+				if (StaticMeshComp != nullptr)
+				{
+					StaticMeshComp->SetStaticMesh(TurretMesh);
+					Muzzles = StaticMeshComp->GetStaticMesh()->Sockets;
+				}
+
+			}
+		}
 	}
 }

@@ -110,9 +110,11 @@ float AWHBattleShipBase::TakeDamage(float DamageAmount, FDamageEvent const& Dama
 
 void AWHBattleShipBase::LoadDataTableToName(FName Name)
 {
-	if (UWHGameInstance* GI = Cast<UWHGameInstance>(GetGameInstance()))
+	UWHGameInstance* GI = Cast<UWHGameInstance>(GetGameInstance());
+	if (GI)
 	{
-		if (UDataTable* BattleShipData = GI->GetBattleShipDataTable())
+		UDataTable* BattleShipData = GI->GetBattleShipDataTable();
+		if (BattleShipData)
 		{
 			FBattleShipDataTable* Table = BattleShipData->FindRow<FBattleShipDataTable>(Name, "");
 

@@ -16,24 +16,24 @@ struct WARHORIZON_ALLBIGGUN_API FTurretDataTable : public FTableRowBase
 	GENERATED_BODY()
 	
 	UPROPERTY(EditAnywhere)
-	uint16 TurretID;
+	uint16 TurretID = 0.0f;
 	UPROPERTY(EditAnywhere)
-	FString TurretName;
+	FString TurretName = TEXT("None");
 	UPROPERTY(EditAnywhere)
-	ETurretType TurretType;
+	ETurretType TurretType = ETurretType::Invalid;
 
 	UPROPERTY(EditAnywhere)
-	UStaticMesh* TurretMesh;
+	UStaticMesh* TurretMesh = nullptr;
 
 	UPROPERTY(EditAnywhere)
-	float TurretReloadTime;
+	float TurretReloadTime = 9999.9999f;
 	UPROPERTY(EditAnywhere)
-	float TurretRange;
+	float TurretRange = 9999.9999f;
 
 	UPROPERTY(EditAnywhere)
-	float TurretHorizontalAngle;
+	float TurretHorizontalAngle = 0.0f;
 	UPROPERTY(EditAnywhere)
-	float TurretVerticalAngle;
+	float TurretVerticalAngle = 0.0f;
 	UPROPERTY(EditAnywhere)
-	float TurretRotationSpeed;
+	float TurretRotationSpeed = 0.0f;
 };

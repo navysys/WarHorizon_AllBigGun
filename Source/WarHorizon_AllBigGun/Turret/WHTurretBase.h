@@ -8,6 +8,9 @@
 #include "Engine/StaticMeshSocket.h"
 #include "WHTurretBase.generated.h"
 
+class UNiagaraSystem;
+class UStaticMesh;
+
 UCLASS()
 class WARHORIZON_ALLBIGGUN_API AWHTurretBase : public APawn
 {
@@ -43,7 +46,7 @@ protected:
 	TArray<UStaticMeshSocket*> Muzzles;
 
 	UPROPERTY(VisibleAnywhere)
-	TObjectPtr<class UNiagaraSystem> GunFireEffect;
+	TObjectPtr<UNiagaraSystem> GunFireEffect;
 
 	UPROPERTY(VisibleAnywhere)
 	uint16 TurretID;
@@ -53,7 +56,7 @@ protected:
 	ETurretType TurretType;
 
 	UPROPERTY(EditAnywhere)
-	class UStaticMesh* TurretMesh;
+	UStaticMesh* TurretMesh;
 
 	// 포탑의 정면을 LRFB 로 구분
 	char FrontDirection;

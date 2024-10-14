@@ -16,22 +16,22 @@ struct WARHORIZON_ALLBIGGUN_API FAircraftDataTable : public FTableRowBase
 	GENERATED_BODY()
 	
 	UPROPERTY(EditAnywhere)
-	FString AircraftName;
+	FString AircraftName = TEXT("None");
 	UPROPERTY(EditAnywhere)
-	EAircraftsType AircraftsType;
+	EAircraftsType AircraftsType = EAircraftsType::Invalid;
 
 	UPROPERTY(EditAnywhere)
-	UStaticMesh* AircraftMesh;
+	UStaticMesh* AircraftMesh = nullptr;
 
 	UPROPERTY(EditAnywhere)
-	float ReloadTime;
+	float AircraftReloadTime = 9999.9999f;
 	UPROPERTY(EditAnywhere)
-	float Range;
+	float AircraftRange = 9999.9999f;
 
 	UPROPERTY(EditAnywhere)
-	float HorizontalAngle;
+	float HorizontalAngle = 0.0f;
 	UPROPERTY(EditAnywhere)
-	float VerticalAngle;
+	float VerticalAngle = 0.0f;
 	UPROPERTY(EditAnywhere)
-	float RotationSpeed;
+	float RotationSpeed = 0.0f;
 };

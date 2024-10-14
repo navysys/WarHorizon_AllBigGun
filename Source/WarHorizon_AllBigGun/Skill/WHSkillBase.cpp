@@ -2,14 +2,14 @@
 
 
 #include "Skill/WHSkillBase.h"
-#include "BattleShip/WHBattleShip.h"
+#include "BattleShip/WHBattleShipBase.h"
 
 UWHSkillBase::UWHSkillBase()
 {
 	BaseBattleShip = nullptr;
 }
 
-UWHSkillBase::UWHSkillBase(AWHBattleShip* BaseShip)
+UWHSkillBase::UWHSkillBase(AWHBattleShipBase* BaseShip)
 {
 	BaseBattleShip = BaseShip;
 }

@@ -18,52 +18,52 @@ struct WARHORIZON_ALLBIGGUN_API FBattleShipDataTable : public FTableRowBase
 	
 	// 함선 식별 번호
 	UPROPERTY(EditAnywhere)
-	uint16 ID;
+	uint16 ID = 0;
 	// 함선 이름
 	UPROPERTY(EditAnywhere)
-	FString Name;
+	FString Name = TEXT("None");
 	// 함종 구분
 	UPROPERTY(EditAnywhere)
-	EBattleShipType Type;
+	EBattleShipType Type = EBattleShipType::Invalid;
 
 	// 소켓을 포함하는 함체 매시
 	UPROPERTY(EditAnywhere)
-	USkeletalMesh* BaseMesh;
+	USkeletalMesh* BaseMesh = nullptr;
 
 	UPROPERTY(EditAnywhere)
-	TSoftObjectPtr<UObject> SkillQ;
+	TSoftObjectPtr<UObject> SkillQ = nullptr;
 	UPROPERTY(EditAnywhere)
-	TSoftObjectPtr<UObject> SkillW;
+	TSoftObjectPtr<UObject> SkillW = nullptr;
 	UPROPERTY(EditAnywhere)
-	TSoftObjectPtr<UObject> SkillE;
+	TSoftObjectPtr<UObject> SkillE = nullptr;
 	UPROPERTY(EditAnywhere)
-	TSoftObjectPtr<UObject> SkillR;
+	TSoftObjectPtr<UObject> SkillR = nullptr;
 
 	UPROPERTY(EditAnywhere)
-	float HP;
+	float HP = 9999.9999f;
 	UPROPERTY(EditAnywhere)
-	float MaxHP;
+	float MaxHP = 9999.9999f;
 	UPROPERTY(EditAnywhere)
-	float MP;
+	float MP = 0.0f;
 	UPROPERTY(EditAnywhere)
-	float MaxMP;
+	float MaxMP = 0.0f;
 
 	// 최대 이동속도
 	UPROPERTY(EditAnywhere)
-	float MoveSpeed;
+	float MoveSpeed = 0.0f;
 	// 가속도
 	UPROPERTY(EditAnywhere)
-	float Acceleration;
+	float Acceleration = 0.0f;
 
 	// 최대 회전속도
 	UPROPERTY(EditAnywhere)
-	float RotationSpeed;
+	float RotationSpeed = 0.0f;
 	// 회전 가속도
 	UPROPERTY(EditAnywhere)
-	float RotationAcceleration;
+	float RotationAcceleration = 0.0f;
 	// 회전가속 증가량
 	UPROPERTY(EditAnywhere)
-	float RotationAccelerationIncrease;
+	float RotationAccelerationIncrease = 0.0f;
 
 	UPROPERTY(EditAnywhere)
 	int AircraftsID = 0;

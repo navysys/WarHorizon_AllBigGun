@@ -33,19 +33,19 @@ void UWHCTargetSelector::TickComponent(float DeltaTime, ELevelTick TickType, FAc
 
 	if (IsActiveAirTurrets)
 	{
-		if (CurrentFowardAngle != 99999.0f)
+		if (CurrentFowardAngle != 9999.9999f)
 		{
 			ChangeAirTurretRotation(FowardAttackAirTurrets, CurrentFowardAngle, DeltaTime);
 		}
-		if (CurrentBackAngle != 99999.0f)
+		if (CurrentBackAngle != 9999.9999f)
 		{
 			ChangeAirTurretRotation(BackAttackAirTurrets, CurrentBackAngle, DeltaTime);
 		}
-		if (CurrentLeftAngle != 99999.0f)
+		if (CurrentLeftAngle != 9999.9999f)
 		{
 			ChangeAirTurretRotation(LeftAttackAirTurrets, CurrentLeftAngle, DeltaTime);
 		}
-		if (CurrentRightAngle != 99999.0f)
+		if (CurrentRightAngle != 9999.9999f)
 		{
 			ChangeAirTurretRotation(RightAttackAirTurrets, CurrentRightAngle, DeltaTime);
 		}

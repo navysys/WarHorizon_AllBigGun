@@ -8,7 +8,7 @@
 /**
  * 
  */
-class AWHBattleShip;
+class AWHBattleShipBase;
 
 UCLASS(BlueprintType)
 class WARHORIZON_ALLBIGGUN_API UWHSkillBase : public UObject
@@ -17,7 +17,7 @@ class WARHORIZON_ALLBIGGUN_API UWHSkillBase : public UObject
 	
 public:
 	UWHSkillBase();
-	UWHSkillBase(AWHBattleShip* BaseShip);
+	UWHSkillBase(AWHBattleShipBase* BaseShip);
 
 	// 나중에 여기서 쿨타임 적용, 코스트 변경에 따른 UI 변경
 	virtual void Effect();
@@ -31,7 +31,7 @@ protected:
 	void AECoolDownAll(float Time);
 
 private:
-	AWHBattleShip* BaseBattleShip;
+	AWHBattleShipBase* BaseBattleShip;
 
 public:
 	float Value;

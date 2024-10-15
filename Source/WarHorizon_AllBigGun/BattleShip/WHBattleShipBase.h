@@ -21,7 +21,7 @@ class USkeletalMesh;
 class AWHTurretBase;
 class AWHAircraftsBase;
 class UWHSkillBase;
-
+class UWHCCameraBodyComponent;
 
 UCLASS()
 class WARHORIZON_ALLBIGGUN_API AWHBattleShipBase : public APawn, public IBattleShipInterface
@@ -111,6 +111,8 @@ protected:
 	TObjectPtr<UCapsuleComponent> CapsuleComp;
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<USkeletalMeshComponent> SkeletalMeshComp;
+	UPROPERTY(VisibleAnywhere)
+	TObjectPtr<UWHCCameraBodyComponent> CameraBodyComp;
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UCameraComponent> CameraComp;
 	UPROPERTY(VisibleAnywhere)

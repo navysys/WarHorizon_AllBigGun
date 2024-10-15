@@ -31,9 +31,9 @@ EBTNodeResult::Type UBTTask_GetAttackType::ExecuteTask(UBehaviorTreeComponent& O
 	{
 		OwnerComp.GetBlackboardComponent()->SetValueAsInt(BBKEY_ATTACKTYPE, TurretPawn->GetAttackType());
 		OwnerComp.GetBlackboardComponent()->SetValueAsFloat(BBKEY_RELOADTIME, TurretPawn->GetReloadTime());
-		OwnerComp.GetBlackboardComponent()->SetValueAsFloat(BBKEY_MAXANGLE, TurretPawn->GetMaxHorizontalAngle());
-		OwnerComp.GetBlackboardComponent()->SetValueAsFloat(BBKEY_ROTATIONSPEED, TurretPawn->GetRotationSpeed());
-		OwnerComp.GetBlackboardComponent()->SetValueAsFloat(BBKEY_BATTLESHIPANGLE, TurretPawn->GetBaseBattleShip()->GetActorRotation().Yaw);
+		//OwnerComp.GetBlackboardComponent()->SetValueAsFloat(BBKEY_MAXANGLE, TurretPawn->GetMaxHorizontalAngle());
+		//OwnerComp.GetBlackboardComponent()->SetValueAsFloat(BBKEY_ROTATIONSPEED, TurretPawn->GetRotationSpeed());
+		//OwnerComp.GetBlackboardComponent()->SetValueAsFloat(BBKEY_BATTLESHIPANGLE, TurretPawn->GetBaseBattleShip()->GetActorRotation().Yaw);
 
 		float InitRotationYaw = OwnerComp.GetBlackboardComponent()->GetValueAsFloat(BBKEY_INITROTATION);
 		if (InitRotationYaw == 9999.9f)
@@ -52,11 +52,11 @@ EBTNodeResult::Type UBTTask_GetAttackType::ExecuteTask(UBehaviorTreeComponent& O
 		OwnerComp.GetBlackboardComponent()->SetValueAsInt(BBKEY_ATTACKTYPE, AttackType);
 		if (AttackType == 1)
 		{
-			OwnerComp.GetBlackboardComponent()->SetValueAsFloat(BBKEY_TARGETANGLE, TurretPawn->GetTurretTargetAngle());
+			//OwnerComp.GetBlackboardComponent()->SetValueAsFloat(BBKEY_TARGETANGLE, TurretPawn->GetTurretTargetAngle());
 		}
 		else if (AttackType == 2)
 		{
-			OwnerComp.GetBlackboardComponent()->SetValueAsVector(BBKEY_POINTANGLE, TurretPawn->GetTurretTargetPoint());
+			//OwnerComp.GetBlackboardComponent()->SetValueAsVector(BBKEY_POINTANGLE, TurretPawn->GetTurretTargetPoint());
 		}
 		else if (AttackType == 3)
 		{
@@ -73,7 +73,7 @@ EBTNodeResult::Type UBTTask_GetAttackType::ExecuteTask(UBehaviorTreeComponent& O
 	{
 		if (AttackType == 1)
 		{
-			OwnerComp.GetBlackboardComponent()->SetValueAsFloat(BBKEY_MOUSEANGLE, TurretPawn->GetTurretTargetAngle());
+			//OwnerComp.GetBlackboardComponent()->SetValueAsFloat(BBKEY_MOUSEANGLE, TurretPawn->GetTurretTargetAngle());
 		}
 		else if (AttackType == 2)
 		{

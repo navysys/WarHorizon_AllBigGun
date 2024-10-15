@@ -34,13 +34,6 @@ void AWHTurret::BeginPlay()
 void AWHTurret::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
-
-	AController* InstigatorController = GetInstigatorController();
-	if (InstigatorController != nullptr)
-	{
-		PlayerController = Cast<AWHPlayerController>(InstigatorController);
-	}
-
 	
 }
 
@@ -55,11 +48,6 @@ void AWHTurret::Tick(float DeltaTime)
 void AWHTurret::Fire()
 {
 	Super::Fire();
-
-	if (PlayerController == nullptr)
-	{
-		PlayerController = Cast<AWHPlayerController>(GetInstigatorController());
-	}
 
 	// 나중에 소켓에 스포너 어태치해서 스포너 호출하도록 변경
 
@@ -82,14 +70,6 @@ void AWHTurret::Fire()
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
 	ShellVelocity = ShellVelocityVector.Size();
-	if (PlayerController != nullptr)
-	{
-		PlayerController->ShellSpeed = ShellVelocity;
-	}
-	else
-	{
-		UE_LOG(LogTemp, Warning, TEXT("PlayerController Nullptr"));
-	}
 
 	// 분산도 관련 코드
 	int MuzzleInt = Muzzles.Num();
@@ -117,50 +97,24 @@ void AWHTurret::Fire()
 	for (int i = 0; i < MuzzleInt; i++)
 	{
 		AWHShell* SpawnShell = GetWorld()->SpawnActor<AWHShell>(GetActorLocation() + GetActorRotation().RotateVector(Muzzles[i]->RelativeLocation), Rot + FRotator(0.0f, Dispersion[i], 0.0f), SpawnParams);
-		
-		// Shell->Init(BaseBattleShip, this, 0, ShellVelocity);
 	}
 
 	// 발사 이펙트 관련
 
 }
 
-float AWHTurret::GetMaxHorizontalAngle()
-{
-	return MaxHorizontalAngle;
-}
-
-APawn* AWHTurret::GetBaseBattleShip()
-{
-	return BaseBattleShip;
-}
 
 uint8 AWHTurret::GetAttackType()
 {
 	return static_cast<uint8>(AttackType);
 }
 
-float AWHTurret::GetTurretTargetAngle()
-{
-	return TargetAngle;
-}
-
-APawn* AWHTurret::GetTurretTargetPawn()
-{
-	return TargetPawn;
-}
-
-FVector AWHTurret::GetTurretTargetPoint()
-{
-	return TargetPoint;
-}
-
-float AWHTurret::GetRotationSpeed()
-{
-	return RotationSpeed;
-}
-
 float AWHTurret::GetReloadTime()
 {
 	return ReloadTime;
+}
+
+bool AWHTurret::GetCanFire()
+{
+	return false;
 }

@@ -2,7 +2,6 @@
 
 
 #include "Controller/WHPlayerController.h"
-#include "Game/WHCameraPawn.h"
 #include "EnhancedInputComponent.h"
 #include "InputMappingContext.h"
 #include "InputAction.h"
@@ -18,59 +17,7 @@ AWHPlayerController::AWHPlayerController()
 
 	CurrentControllerMappingType = EControllerMappingType::Default;
 
-	static ConstructorHelpers::FObjectFinder<UInputMappingContext>IM_DEFAULT(TEXT("/Game/Input/IM_Default"));
-	if (IM_DEFAULT.Succeeded())
-	{
-		DefaultContext = IM_DEFAULT.Object;
-	}
 
-	static ConstructorHelpers::FObjectFinder<UInputMappingContext>IM_WaitingAttack(TEXT("/Game/Input/IM_WaitingAttack"));
-	if (IM_WaitingAttack.Succeeded())
-	{
-		WaitingAttackContext = IM_WaitingAttack.Object;
-	}
-
-	static ConstructorHelpers::FObjectFinder<UInputAction>IA_MoveOrTargeting(TEXT("/Game/Input/IA_MoveOrTargeting"));
-	if (IA_MoveOrTargeting.Succeeded())
-	{
-		MoveOrTargetingAction = IA_MoveOrTargeting.Object;
-	}
-
-	static ConstructorHelpers::FObjectFinder<UInputAction>IA_RapidAttack(TEXT("/Game/Input/IA_RapidAttack"));
-	if (IA_RapidAttack.Succeeded())
-	{
-		RapidAttackAction = IA_RapidAttack.Object;
-	}
-
-	static ConstructorHelpers::FObjectFinder<UInputAction>IA_TargetAttack(TEXT("/Game/Input/IA_TargetAttack"));
-	if (IA_TargetAttack.Succeeded())
-	{
-		TargetAttackAction = IA_TargetAttack.Object;
-	}
-
-	static ConstructorHelpers::FObjectFinder<UInputAction>IA_SpinTurret(TEXT("/Game/Input/IA_SpinTurret"));
-	if (IA_SpinTurret.Succeeded())
-	{
-		SpinTurretAction = IA_SpinTurret.Object;
-	}
-
-	static ConstructorHelpers::FObjectFinder<UInputAction>IA_Acceleration(TEXT("/Game/Input/IA_Acceleration"));
-	if (IA_Acceleration.Succeeded())
-	{
-		AccelerationAction = IA_Acceleration.Object;
-	}
-
-	static ConstructorHelpers::FObjectFinder<UInputAction>IA_Deceleration(TEXT("/Game/Input/IA_Deceleration"));
-	if (IA_Deceleration.Succeeded())
-	{
-		DecelerationAction = IA_Deceleration.Object;
-	}
-
-	static ConstructorHelpers::FObjectFinder<UInputAction>IA_ChangeContext(TEXT("/Game/Input/IA_ChangeContext"));
-	if (IA_ChangeContext.Succeeded())
-	{
-		ChangeContextAction = IA_ChangeContext.Object;
-	}
 }
 
 void AWHPlayerController::BeginPlay()
@@ -90,7 +37,6 @@ void AWHPlayerController::BeginPlay()
 void AWHPlayerController::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
 }
 
 void AWHPlayerController::SetupInputComponent()

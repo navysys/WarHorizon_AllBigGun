@@ -18,6 +18,7 @@
 #include "Enum/ETurretAttackType.h"
 #include "Containers/Array.h"
 #include "Skill/WHSkillBase.h"
+#include "Component/WHCCameraBodyComponent.h"
 
 // Sets default values
 AWHBattleShipBase::AWHBattleShipBase()
@@ -27,6 +28,8 @@ AWHBattleShipBase::AWHBattleShipBase()
 	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
 	Tags.Add(FName("BattleShip"));
 
+	
+
 	// ½ºÄÌ·¹Å» ¸Å½Ã
 	CapsuleComp = CreateDefaultSubobject<UCapsuleComponent>(TEXT("RootComp"));
 	RootComponent = CapsuleComp;
@@ -35,6 +38,9 @@ AWHBattleShipBase::AWHBattleShipBase()
 	//SkeletalMeshComp->SetCollisionProfileName(TEXT("TeamABattleShipPreset"));
 	SkeletalMeshComp->SetupAttachment(CapsuleComp);
 
+	CameraBodyComp = CreateDefaultSubobject<UWHCCameraBodyComponent>(TEXT("CameraBody"));
+
+
 	SpringArmComp = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArmComponent"));
 	SpringArmComp->SetRelativeRotation(FRotator(-50.0f, 90.0f, 0.0f));
 	SpringArmComp->TargetArmLength = 50000.0f;
@@ -42,7 +48,7 @@ AWHBattleShipBase::AWHBattleShipBase()
 	SpringArmComp->bInheritPitch = false;
 	SpringArmComp->bInheritYaw = false;
 	SpringArmComp->bInheritRoll = false;
-	SpringArmComp->SetupAttachment(RootComponent);
+	SpringArmComp->SetupAttachment(CameraBodyComp);
 
 	CameraComp = CreateDefaultSubobject<UCameraComponent>(TEXT("CameraComponent"));
 	CameraComp->SetupAttachment(SpringArmComp);
@@ -58,6 +64,8 @@ void AWHBattleShipBase::BeginPlay()
 {
 	Super::BeginPlay();
 	
+	
+
 	//test
 	SpawnAircrafts(0);
 }
@@ -101,6 +109,10 @@ void AWHBattleShipBase::Tick(float DeltaTime)
 	{
 		CalculateAngleToSpinTurret();
 	}
+
+
+
+
 }
 
 float AWHBattleShipBase::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)

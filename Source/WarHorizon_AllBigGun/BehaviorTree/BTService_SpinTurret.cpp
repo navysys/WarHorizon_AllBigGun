@@ -31,7 +31,7 @@ void UBTService_SpinTurret::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* N
 	float MinYaw = -MaxAngle / 2;
 
 	float InitBattleShipAngle = OwnerComp.GetBlackboardComponent()->GetValueAsFloat(BBKEY_BATTLESHIPANGLE);
-	float CurrentBattleShipAngle = TurretPawn->GetBaseBattleShip()->GetActorRotation().Yaw;
+	float CurrentBattleShipAngle = 0.0f; //TurretPawn->GetBaseBattleShip()->GetActorRotation().Yaw;
 	float BattleShipAngle = CurrentBattleShipAngle - InitBattleShipAngle;
 
 	float InitRotationYaw = OwnerComp.GetBlackboardComponent()->GetValueAsFloat(BBKEY_INITROTATION);
@@ -68,7 +68,7 @@ void UBTService_SpinTurret::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* N
 	}
 
 
-	float ParentYaw = TurretPawn->GetBaseBattleShip()->GetActorRotation().Yaw;
+	float ParentYaw = 0.0f; //TurretPawn->GetBaseBattleShip()->GetActorRotation().Yaw;
 	if (ParentYaw < 0)
 	{
 		ParentYaw += 360;

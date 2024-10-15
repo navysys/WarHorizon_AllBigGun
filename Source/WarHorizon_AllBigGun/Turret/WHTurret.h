@@ -26,27 +26,14 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	
-
 	void SetAttackType(ETurretAttackType Type) { AttackType = Type; }
-	void SetTargetAngle(float Angle) { TargetAngle = Angle; }
-	void SetTargetPoint(FVector Point) { TargetPoint = Point; }
-	void SetTargetPawn(APawn* Pawn) { TargetPawn = Pawn; }
 	void SetTargetDistance(float Dist) { TargetDistance = Dist; }
 
-	virtual float GetMaxHorizontalAngle() override;
-	virtual APawn* GetBaseBattleShip() override;
+
 	virtual uint8 GetAttackType() override;
-	virtual float GetTurretTargetAngle() override;
-	virtual APawn* GetTurretTargetPawn() override;
-	virtual FVector GetTurretTargetPoint() override;
-	virtual float GetRotationSpeed() override;
 	virtual float GetReloadTime() override;
+	virtual bool GetCanFire() override;
 	virtual void Fire() override;
-
-public:
-	class AWHPlayerController* PlayerController;
-
 protected:
 	UPROPERTY(EditAnywhere)
 	TArray<float> Dispersion;

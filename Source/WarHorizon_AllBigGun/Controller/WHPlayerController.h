@@ -93,4 +93,6 @@ protected:
 
 public:
 	float ShellSpeed;
+
+
 };

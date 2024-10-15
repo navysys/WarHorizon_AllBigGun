@@ -104,7 +104,7 @@ void UWHCTargetSelector::SetTurretsAttackType(ETurretType TurretType, ETurretAtt
 		{
 			for (AWHTurretBase* Turret : TArray.Turrets)
 			{
-				Cast<AWHTurret>(Turret)->SetAttackType(Type);
+				//Cast<AWHTurret>(Turret)->SetAttackType(Type);
 			}
 		}
 	}
@@ -118,7 +118,7 @@ void UWHCTargetSelector::SetTurretsTargetDistance(ETurretType TurretType, float 
 		{
 			for (AWHTurretBase* Turret : TArray.Turrets)
 			{
-				Cast<AWHTurret>(Turret)->SetTargetDistance(Dist);
+				//Cast<AWHTurret>(Turret)->SetTargetDistance(Dist);
 			}
 		}
 	}
@@ -132,7 +132,7 @@ void UWHCTargetSelector::SetTurretsTarget(ETurretType TurretType, APawn* Pawn)
 		{
 			for (AWHTurretBase* Turret : TArray.Turrets)
 			{
-				Cast<AWHTurret>(Turret)->SetTargetPawn(Pawn);
+				//Cast<AWHTurret>(Turret)->SetTargetPawn(Pawn);
 			}
 		}
 	}
@@ -146,7 +146,7 @@ void UWHCTargetSelector::SetTurretsTarget(ETurretType TurretType, FVector Point)
 		{
 			for (AWHTurretBase* Turret : TArray.Turrets)
 			{
-				Cast<AWHTurret>(Turret)->SetTargetPoint(Point);
+				//Cast<AWHTurret>(Turret)->SetTargetPoint(Point);
 			}
 		}
 	}
@@ -160,7 +160,7 @@ void UWHCTargetSelector::SetTurretsTarget(ETurretType TurretType, float Angle)
 		{
 			for (AWHTurretBase* Turret : TArray.Turrets)
 			{
-				Cast<AWHTurret>(Turret)->SetTargetAngle(Angle);
+				//Cast<AWHTurret>(Turret)->SetTargetAngle(Angle);
 			}
 		}
 	}
@@ -174,7 +174,7 @@ void UWHCTargetSelector::CommandTurretsFire(ETurretType TurretType)
 		{
 			for (AWHTurretBase* Turret : TArray.Turrets)
 			{
-				Cast<AWHTurret>(Turret)->Fire();
+				//Cast<AWHTurret>(Turret)->Fire();
 			}
 		}
 	}

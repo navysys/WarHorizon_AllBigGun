@@ -58,8 +58,6 @@ protected:
 	ETurretAttackType AttackType = ETurretAttackType::Wait;
 
 	UPROPERTY(VisibleAnywhere)
-	float TargetAngle;
-	UPROPERTY(VisibleAnywhere)
 	APawn* TargetPawn;
 	UPROPERTY(VisibleAnywhere)
 	FVector TargetPoint;

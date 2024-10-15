@@ -3,16 +3,17 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/Pawn.h"
+#include "GameFramework/Actor.h"
 #include "Enum/ETurretType.h"
 #include "Engine/StaticMeshSocket.h"
 #include "WHTurretBase.generated.h"
 
 class UNiagaraSystem;
 class UStaticMesh;
+class AWHShell;
 
 UCLASS()
-class WARHORIZON_ALLBIGGUN_API AWHTurretBase : public APawn
+class WARHORIZON_ALLBIGGUN_API AWHTurretBase : public AActor
 {
 	GENERATED_BODY()
 	
@@ -28,16 +29,20 @@ protected:
 public:	
 	void SetFrontDirection(char Dir);
 	char GetFrontDirection() { return FrontDirection; }
-	void SetupTurret(APawn* BaseShip, FName Name);
 	void Fire();
 protected:
 	void LoadDataTableToName(FName Name);
+	void DebugTurretForward();
+	bool SpinToTargetAngle();
 
 public:
 
 protected:
 	UPROPERTY(VisibleAnywhere)
 	APawn* BaseBattleShip;
+
+	UPROPERTY(VisibleAnywhere)
+	TObjectPtr<USceneComponent> RootComp;
 
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UStaticMeshComponent> StaticMeshComp;
@@ -76,4 +81,13 @@ protected:
 	UPROPERTY(EditAnywhere)
 	float RotationSpeed;
 
+	UPROPERTY(EditAnywhere)
+	float TargetAngle = 0.0f;
+
+	UPROPERTY(EditAnywhere)
+	bool bIsLookTarget = true;
+
+public:
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<AWHShell> Shell;
 };

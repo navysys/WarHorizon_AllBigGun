@@ -13,9 +13,6 @@ AWHTurret::AWHTurret()
 {
 	PrimaryActorTick.bCanEverTick = true;
 
-	AIControllerClass = AWHTurretAIController::StaticClass();
-	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
-
 	static ConstructorHelpers::FObjectFinder<UNiagaraSystem> GunFireEffectRef(TEXT("NiagaraSystem'/Game/Resource/Niagara/NS_GunFire'"));
 	if (GunFireEffectRef.Succeeded())
 	{
@@ -37,12 +34,6 @@ void AWHTurret::BeginPlay()
 void AWHTurret::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
-
-	AAIController* AIController = Cast<AWHTurretAIController>(GetController());
-	if (AIController)
-	{
-		AIController->AttachToActor(this, FAttachmentTransformRules::KeepRelativeTransform);
-	}
 
 	AController* InstigatorController = GetInstigatorController();
 	if (InstigatorController != nullptr)
@@ -125,7 +116,7 @@ void AWHTurret::Fire()
 	FRotator Rot = GetActorRotation() + FRotator(ShellLaunchAngle, 0.0f, 0.0f);
 	for (int i = 0; i < MuzzleInt; i++)
 	{
-		AWHShell* Shell = GetWorld()->SpawnActor<AWHShell>(GetActorLocation() + GetActorRotation().RotateVector(Muzzles[i]->RelativeLocation), Rot + FRotator(0.0f, Dispersion[i], 0.0f), SpawnParams);
+		AWHShell* SpawnShell = GetWorld()->SpawnActor<AWHShell>(GetActorLocation() + GetActorRotation().RotateVector(Muzzles[i]->RelativeLocation), Rot + FRotator(0.0f, Dispersion[i], 0.0f), SpawnParams);
 		
 		// Shell->Init(BaseBattleShip, this, 0, ShellVelocity);
 	}

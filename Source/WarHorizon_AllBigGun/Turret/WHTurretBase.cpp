@@ -5,6 +5,7 @@
 #include "Game/WHGameInstance.h"
 #include "NiagaraActor.h"
 #include "NiagaraComponent.h"
+#include "Turret/WHShell.h"
 
 
 // Sets default values
@@ -13,13 +14,12 @@ AWHTurretBase::AWHTurretBase()
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
-	AutoPossessAI = EAutoPossessAI::Disabled;
+	RootComp = CreateDefaultSubobject<USceneComponent>(TEXT("RootComp"));
+	RootComponent = RootComp;
 
 	StaticMeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMesh"));
-	RootComponent = StaticMeshComp;
+	StaticMeshComp->SetupAttachment(RootComponent);
 	StaticMeshComp->SetCollisionProfileName(TEXT("NoCollision"));
-
-
 }
 
 // Called when the game starts or when spawned
@@ -34,39 +34,8 @@ void AWHTurretBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	FVector TurretLocation = GetActorLocation();
-	FVector ForwardVector = GetActorForwardVector();
-	FVector RightVector = GetActorRightVector();
-	FVector LineEnd = GetActorLocation();
-	FColor Color = FColor::Yellow;
-	float Thickness = 10.0f;
-
-	if (TurretType == ETurretType::Main)
-	{
-		LineEnd = TurretLocation + ForwardVector * Range;
-		Color = FColor::Red;
-		Thickness = 100.0f;
-	}
-	else if (TurretType == ETurretType::Sub)
-	{
-		LineEnd = TurretLocation + ForwardVector * Range;
-		Color = FColor::Yellow;
-		Thickness = 50.0f;
-	}
-	else if (TurretType == ETurretType::Air)
-	{
-		LineEnd = TurretLocation + ForwardVector * Range;
-		Color = FColor::Blue;
-		Thickness = 20.0f;
-	}
-	else if (TurretType == ETurretType::DualPurpose)
-	{
-		LineEnd = TurretLocation + ForwardVector * Range;
-		Color = FColor::Green;
-		Thickness = 50.0f;
-	}
-
-	DrawDebugLine(GetWorld(), TurretLocation, LineEnd, Color, false, -1.f, 0, Thickness);
+	DebugTurretForward();
+	SpinToTargetAngle();
 }
 
 void AWHTurretBase::SetFrontDirection(char Dir)
@@ -88,12 +57,6 @@ void AWHTurretBase::SetFrontDirection(char Dir)
 	{
 		SocketYaw = 180.0f;
 	}
-}
-
-void AWHTurretBase::SetupTurret(APawn* BaseShip, FName Name)
-{
-	BaseBattleShip = BaseShip;
-	LoadDataTableToName(Name);
 }
 
 void AWHTurretBase::Fire()
@@ -144,4 +107,55 @@ void AWHTurretBase::LoadDataTableToName(FName Name)
 			}
 		}
 	}
+}
+
+void AWHTurretBase::DebugTurretForward()
+{
+	FVector TurretLocation = GetActorLocation();
+	FVector ForwardVector = GetActorForwardVector();
+	FVector RightVector = GetActorRightVector();
+	FVector LineEnd = GetActorLocation();
+	FColor Color = FColor::Yellow;
+	float Thickness = 10.0f;
+
+	if (TurretType == ETurretType::Main)
+	{
+		LineEnd = TurretLocation + ForwardVector * Range;
+		Color = FColor::Red;
+		Thickness = 100.0f;
+	}
+	else if (TurretType == ETurretType::Sub)
+	{
+		LineEnd = TurretLocation + ForwardVector * Range;
+		Color = FColor::Yellow;
+		Thickness = 50.0f;
+	}
+	else if (TurretType == ETurretType::Air)
+	{
+		LineEnd = TurretLocation + ForwardVector * Range;
+		Color = FColor::Blue;
+		Thickness = 20.0f;
+	}
+	else if (TurretType == ETurretType::DualPurpose)
+	{
+		LineEnd = TurretLocation + ForwardVector * Range;
+		Color = FColor::Green;
+		Thickness = 50.0f;
+	}
+
+	DrawDebugLine(GetWorld(), TurretLocation, LineEnd, Color, false, -1.f, 0, Thickness);
+}
+
+bool AWHTurretBase::SpinToTargetAngle()
+{
+	if (StaticMeshComp)
+	{
+		//FRotator Rot = StaticMeshComp->GetRelativeRotation();
+		//StaticMeshComp->AddLocalRotation(FRotator(0, 1, 0));
+
+		//UE_LOG(LogTemp, Warning, TEXT("%s"), *Rot.ToString());
+	}
+
+
+	return false;
 }

@@ -18,6 +18,9 @@ class UWHCDetectEnemy;
 class UWHCSkillHandler;
 class UWHCTargetSelector;
 class USkeletalMesh;
+class AWHTurretBase;
+class AWHAircraftsBase;
+class UWHSkillBase;
 
 
 UCLASS()
@@ -42,7 +45,7 @@ protected:
 
 	// 데이터 로드 및 초기화 함수
 	void LoadDataTableToName(FName Name);
-	void CreateTurretToMeshCompSocket(USkeletalMeshComponent* MeshComp, FName BattleShipName);
+	void CreateTurretToMeshCompSocket(USkeletalMeshComponent* MeshComp);
 
 	// 적 탐지 관련 함수
 	void CalculateAngleToSpinTurret();
@@ -145,7 +148,7 @@ protected:
 
 	// 모든 항공기를 저장
 	UPROPERTY(VisibleAnywhere, Category = "BattleShip | Aircraft")
-	TArray<class AWHAircraftsBase*> AllAircraftsArray;
+	TArray<AWHAircraftsBase*> AllAircraftsArray;
 
 protected:
 	UPROPERTY(VisibleAnywhere, Category = "BattleShip | Target")
@@ -154,4 +157,21 @@ protected:
 	UPROPERTY(VisibleAnywhere, Category = "BattleShip | Target")
 	TArray<APawn*> EnemyAircrafts;
 
+public:
+	UPROPERTY(EditAnywhere, Category = "BattleShip | Turret")
+	TSubclassOf<AWHTurretBase> MainTurret;
+	UPROPERTY(EditAnywhere, Category = "BattleShip | Turret")
+	TSubclassOf<AWHTurretBase> SubTurret1;
+	UPROPERTY(EditAnywhere, Category = "BattleShip | Turret")
+	TSubclassOf<AWHTurretBase> SubTurret2;
+	UPROPERTY(EditAnywhere, Category = "BattleShip | Turret")
+	TSubclassOf<AWHTurretBase> AirTurret1;
+	UPROPERTY(EditAnywhere, Category = "BattleShip | Turret")
+	TSubclassOf<AWHTurretBase> AirTurret2;
+	UPROPERTY(EditAnywhere, Category = "BattleShip | Turret")
+	TSubclassOf<AWHTurretBase> DualTurret1;
+	UPROPERTY(EditAnywhere, Category = "BattleShip | Turret")
+	TSubclassOf<AWHTurretBase> DualTurret2;
+	UPROPERTY(EditAnywhere, Category = "BattleShip | Turret")
+	TSubclassOf<AWHTurretBase> TorpedoLauncher;
 };

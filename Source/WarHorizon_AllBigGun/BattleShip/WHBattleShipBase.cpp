@@ -17,6 +17,7 @@
 #include "Aircraft/WHAircraftsBase.h"
 #include "Enum/ETurretAttackType.h"
 #include "Containers/Array.h"
+#include "Skill/WHSkillBase.h"
 
 // Sets default values
 AWHBattleShipBase::AWHBattleShipBase()
@@ -66,7 +67,7 @@ void AWHBattleShipBase::PostInitializeComponents()
 	Super::PostInitializeComponents();
 
 	LoadDataTableToName(FName(BattleShipName));
-	CreateTurretToMeshCompSocket(SkeletalMeshComp, FName(BattleShipName));
+	CreateTurretToMeshCompSocket(SkeletalMeshComp);
 
 	if (BattleShipMovementComp != nullptr)
 	{
@@ -123,7 +124,6 @@ void AWHBattleShipBase::LoadDataTableToName(FName Name)
 				ID = Table->ID;
 				BattleShipName = Table->Name;
 				BattleShipType = Table->Type;
-				BaseMesh = Table->BaseMesh;
 
 				InitMaxMoveSpeed = Table->MoveSpeed;
 				InitAcceleration = Table->Acceleration;
@@ -141,297 +141,174 @@ void AWHBattleShipBase::LoadDataTableToName(FName Name)
 				AircraftIDs.Emplace(Table->AircraftsID2);
 				AircraftIDs.Emplace(Table->AircraftsID3);
 				AircraftIDs.Emplace(Table->AircraftsID4);
-
-				SkeletalMeshComp->SetSkeletalMesh(BaseMesh);
 			}
 		}
 	}
 }
 
-void AWHBattleShipBase::CreateTurretToMeshCompSocket(USkeletalMeshComponent* MeshComp, FName ShipName)
+void AWHBattleShipBase::CreateTurretToMeshCompSocket(USkeletalMeshComponent* MeshComp)
 {
-	FString BSName = ShipName.ToString();
 	FActorSpawnParameters SpawnParams;
 	SpawnParams.Owner = this;
 	SpawnParams.Instigator = this;
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
-	TArray<FName> MTSocketNames1;
-	TArray<FName> MTSocketNames2;
-	TArray<FName> DLSocketNames1;
-	TArray<FName> DLSocketNames2;
-	TArray<FName> STSocketNames1;
-	TArray<FName> STSocketNames2;
-	TArray<FName> ATSocketNames1;
-	TArray<FName> ATSocketNames2;
-	TArray<FName> DTSocketNames1;
-	TArray<FName> DTSocketNames2;
-
-	// 家南 盒幅
 	TArray<FName> SocketNames = SkeletalMeshComp->GetAllSocketNames();
-	for (int i = 0; i < SocketNames.Num(); i++)
-	{
-		FName SocketName = SocketNames[i];
-		FString StringName = SocketNames[i].ToString();
-
-		if (StringName.Contains(TEXT("MT")))
-		{
-			if (StringName[3] == TCHAR('1'))
-			{
-				MTSocketNames1.AddUnique(SocketName);
-			}
-			else
-			{
-				MTSocketNames2.AddUnique(SocketName);
-			}
-		}
-		else if (StringName.Contains(TEXT("ST")))
-		{
-			if (StringName[3] == TCHAR('1'))
-			{
-				STSocketNames1.AddUnique(SocketName);
-			}
-			else
-			{
-				STSocketNames2.AddUnique(SocketName);
-			}
-		}
-		else if (StringName.Contains(TEXT("AT")))
-		{
-			if (StringName[3] == TCHAR('1'))
-			{
-				ATSocketNames1.AddUnique(SocketName);
-			}
-			else
-			{
-				ATSocketNames2.AddUnique(SocketName);
-			}
-		}
-		else if (StringName.Contains(TEXT("DT")))
-		{
-			if (StringName[3] == TCHAR('1'))
-			{
-				DTSocketNames1.AddUnique(SocketName);
-			}
-			else
-			{
-				DTSocketNames2.AddUnique(SocketName);
-			}
-		}
-		else if (StringName.Contains(TEXT("DL")))
-		{
-			if (StringName[3] == TCHAR('1'))
-			{
-				DLSocketNames1.AddUnique(SocketName);
-			}
-			else
-			{
-				DLSocketNames2.AddUnique(SocketName);
-			}
-		}
-	}
 
 	// 家南俊 器啪 积己 棺 何馒
-	if (MTSocketNames1.Num() > 0)
+	if (SocketNames.Num() > 0)
 	{
-		FString TurretDataName = BSName + TEXT("_MT_1");
-		FTurretArray MainTurrets1;
-		for (int i = 0; i < MTSocketNames1.Num(); i++)
-		{
-			const USkeletalMeshSocket* Sock = SkeletalMeshComp->GetSocketByName(MTSocketNames1[i]);
-			if (Sock != nullptr)
-			{
-				AWHTurret* SpawnedTurret = GetWorld()->SpawnActor<AWHTurret>(Sock->GetSocketLocation(SkeletalMeshComp), FRotator::ZeroRotator, SpawnParams);
-				SpawnedTurret->SetupTurret(this, FName(TurretDataName));
-				SpawnedTurret->AttachToComponent(SkeletalMeshComp, FAttachmentTransformRules::SnapToTargetNotIncludingScale, Sock->SocketName);
-				SpawnedTurret->SetFrontDirection(MTSocketNames1[i].ToString()[8]);
-
-				MainTurrets1.Turrets.Emplace(SpawnedTurret);
-			}
-		}
-		MainTurrets1.TurretsType = ETurretType::Main;
-		AllTurretArray.Emplace(MainTurrets1);
-	}
-	if (MTSocketNames2.Num() > 0)
-	{
-		FString TurretDataName = BSName + TEXT("_MT_2");
-		FTurretArray MainTurrets2;
-		for (int i = 0; i < MTSocketNames2.Num(); i++)
-		{
-			const USkeletalMeshSocket* Sock = SkeletalMeshComp->GetSocketByName(MTSocketNames2[i]);
-			if (Sock != nullptr)
-			{
-				AWHTurret* SpawnedTurret = GetWorld()->SpawnActor<AWHTurret>(Sock->GetSocketLocation(SkeletalMeshComp), FRotator::ZeroRotator, SpawnParams);
-				SpawnedTurret->SetupTurret(this, FName(TurretDataName));
-				SpawnedTurret->AttachToComponent(SkeletalMeshComp, FAttachmentTransformRules::SnapToTargetNotIncludingScale, Sock->SocketName);
-				SpawnedTurret->SetFrontDirection(MTSocketNames2[i].ToString()[8]);
-
-				MainTurrets2.Turrets.Emplace(SpawnedTurret);
-
-			}
-		}
-		MainTurrets2.TurretsType = ETurretType::Main;
-		AllTurretArray.Emplace(MainTurrets2);
-	}
-	if (STSocketNames1.Num() > 0)
-	{
-		FString TurretDataName = BSName + TEXT("_ST_1");
+		FTurretArray MainTurrets;
 		FTurretArray SubTurrets1;
-		for (int i = 0; i < STSocketNames1.Num(); i++)
-		{
-			const USkeletalMeshSocket* Sock = SkeletalMeshComp->GetSocketByName(STSocketNames1[i]);
-			if (Sock != nullptr)
-			{
-				AWHTurret* SpawnedTurret = GetWorld()->SpawnActor<AWHTurret>(Sock->GetSocketLocation(SkeletalMeshComp), FRotator::ZeroRotator, SpawnParams);
-				SpawnedTurret->SetupTurret(this, FName(TurretDataName));
-				SpawnedTurret->AttachToComponent(SkeletalMeshComp, FAttachmentTransformRules::SnapToTargetNotIncludingScale, Sock->SocketName);
-				SpawnedTurret->SetFrontDirection(STSocketNames1[i].ToString()[8]);
-
-				SubTurrets1.Turrets.Emplace(SpawnedTurret);
-			}
-		}
-		SubTurrets1.TurretsType = ETurretType::Sub;
-		AllTurretArray.Emplace(SubTurrets1);
-	}
-	if (STSocketNames2.Num() > 0)
-	{
-		FString TurretDataName = BSName + TEXT("_ST_2");
 		FTurretArray SubTurrets2;
-		for (int i = 0; i < STSocketNames2.Num(); i++)
-		{
-			const USkeletalMeshSocket* Sock = SkeletalMeshComp->GetSocketByName(STSocketNames2[i]);
-			if (Sock != nullptr)
-			{
-				AWHTurret* SpawnedTurret = GetWorld()->SpawnActor<AWHTurret>(Sock->GetSocketLocation(SkeletalMeshComp), FRotator::ZeroRotator, SpawnParams);
-				SpawnedTurret->SetupTurret(this, FName(TurretDataName));
-				SpawnedTurret->AttachToComponent(SkeletalMeshComp, FAttachmentTransformRules::SnapToTargetNotIncludingScale, Sock->SocketName);
-				SpawnedTurret->SetFrontDirection(STSocketNames2[i].ToString()[8]);
-
-				SubTurrets2.Turrets.Emplace(SpawnedTurret);
-			}
-		}
-		SubTurrets2.TurretsType = ETurretType::Sub;
-		AllTurretArray.Emplace(SubTurrets2);
-	}
-	if (ATSocketNames1.Num() > 0)
-	{
-		FString TurretDataName = BSName + TEXT("_AT_1");
 		FTurretArray AirTurrets1;
-		for (int i = 0; i < ATSocketNames1.Num(); i++)
-		{
-			const USkeletalMeshSocket* Sock = SkeletalMeshComp->GetSocketByName(ATSocketNames1[i]);
-			if (Sock != nullptr)
-			{
-				AWHTurretBase* SpawnedTurret = GetWorld()->SpawnActor<AWHTurretBase>(Sock->GetSocketLocation(SkeletalMeshComp), FRotator::ZeroRotator, SpawnParams);
-				SpawnedTurret->SetupTurret(this, FName(TurretDataName));
-				SpawnedTurret->AttachToComponent(SkeletalMeshComp, FAttachmentTransformRules::SnapToTargetNotIncludingScale, Sock->SocketName);
-				SpawnedTurret->SetFrontDirection(ATSocketNames1[i].ToString()[8]);
-
-				AirTurrets1.Turrets.Emplace(SpawnedTurret);
-			}
-		}
-		AirTurrets1.TurretsType = ETurretType::Air;
-		AllTurretArray.Emplace(AirTurrets1);
-	}
-	if (ATSocketNames2.Num() > 0)
-	{
-		FString TurretDataName = BSName + TEXT("_AT_2");
 		FTurretArray AirTurrets2;
-		for (int i = 0; i < ATSocketNames2.Num(); i++)
-		{
-			const USkeletalMeshSocket* Sock = SkeletalMeshComp->GetSocketByName(ATSocketNames2[i]);
-			if (Sock != nullptr)
-			{
-				AWHTurretBase* SpawnedTurret = GetWorld()->SpawnActor<AWHTurretBase>(Sock->GetSocketLocation(SkeletalMeshComp), FRotator::ZeroRotator, SpawnParams);
-				SpawnedTurret->SetupTurret(this, FName(TurretDataName));
-				SpawnedTurret->AttachToComponent(SkeletalMeshComp, FAttachmentTransformRules::SnapToTargetNotIncludingScale, Sock->SocketName);
-				SpawnedTurret->SetFrontDirection(ATSocketNames2[i].ToString()[8]);
-
-				AirTurrets2.Turrets.Emplace(SpawnedTurret);
-			}
-		}
-		AirTurrets2.TurretsType = ETurretType::Air;
-		AllTurretArray.Emplace(AirTurrets2);
-	}
-	if (DTSocketNames1.Num() > 0)
-	{
-		FString TurretDataName = BSName + TEXT("_DT_1");
 		FTurretArray DualTurrets1;
-		for (int i = 0; i < DTSocketNames1.Num(); i++)
-		{
-			const USkeletalMeshSocket* Sock = SkeletalMeshComp->GetSocketByName(DTSocketNames1[i]);
-			if (Sock != nullptr)
-			{
-				AWHTurret* SpawnedTurret = GetWorld()->SpawnActor<AWHTurret>(Sock->GetSocketLocation(SkeletalMeshComp), FRotator::ZeroRotator, SpawnParams);
-				SpawnedTurret->SetupTurret(this, FName(TurretDataName));
-				SpawnedTurret->AttachToComponent(SkeletalMeshComp, FAttachmentTransformRules::SnapToTargetNotIncludingScale, Sock->SocketName);
-				SpawnedTurret->SetFrontDirection(DTSocketNames1[i].ToString()[8]);
-
-				DualTurrets1.Turrets.Emplace(SpawnedTurret);
-			}
-		}
-		DualTurrets1.TurretsType = ETurretType::DualPurpose;
-		AllTurretArray.Emplace(DualTurrets1);
-	}
-	if (DTSocketNames2.Num() > 0)
-	{
-		FString TurretDataName = BSName + TEXT("_DT_2");
 		FTurretArray DualTurrets2;
-		for (int i = 0; i < DTSocketNames2.Num(); i++)
-		{
-			const USkeletalMeshSocket* Sock = SkeletalMeshComp->GetSocketByName(DTSocketNames2[i]);
-			if (Sock != nullptr)
-			{
-				AWHTurret* SpawnedTurret = GetWorld()->SpawnActor<AWHTurret>(Sock->GetSocketLocation(SkeletalMeshComp), FRotator::ZeroRotator, SpawnParams);
-				SpawnedTurret->SetupTurret(this, FName(TurretDataName));
-				SpawnedTurret->AttachToComponent(SkeletalMeshComp, FAttachmentTransformRules::SnapToTargetNotIncludingScale, Sock->SocketName);
-				SpawnedTurret->SetFrontDirection(DTSocketNames2[i].ToString()[8]);
+		FTurretArray TorpedoLaunchers;
 
-				DualTurrets2.Turrets.Emplace(SpawnedTurret);
+		for (int i = 0; i < SocketNames.Num(); i++)
+		{
+			FName SocketName = SocketNames[i];
+			FString StringName = SocketNames[i].ToString();
+			if (StringName.Contains(TEXT("MT")))
+			{
+				if (MainTurret != nullptr)
+				{
+					const USkeletalMeshSocket* Sock = SkeletalMeshComp->GetSocketByName(SocketNames[i]);
+					if (Sock != nullptr)
+					{
+						AWHTurretBase* SpawnedTurret = GetWorld()->SpawnActor<AWHTurretBase>(MainTurret, Sock->GetSocketLocation(SkeletalMeshComp), FRotator::ZeroRotator, SpawnParams);
+						SpawnedTurret->AttachToComponent(SkeletalMeshComp, FAttachmentTransformRules::SnapToTargetNotIncludingScale, Sock->SocketName);
+						SpawnedTurret->SetFrontDirection(SocketNames[i].ToString()[8]);
+
+						MainTurrets.Turrets.Emplace(SpawnedTurret);
+					}
+				}
 			}
+			else if (StringName.Contains(TEXT("ST_1")))
+			{
+				if (SubTurret1 != nullptr)
+				{
+					const USkeletalMeshSocket* Sock = SkeletalMeshComp->GetSocketByName(SocketNames[i]);
+					if (Sock != nullptr)
+					{
+						AWHTurretBase* SpawnedTurret = GetWorld()->SpawnActor<AWHTurretBase>(SubTurret1, Sock->GetSocketLocation(SkeletalMeshComp), FRotator::ZeroRotator, SpawnParams);
+						SpawnedTurret->AttachToComponent(SkeletalMeshComp, FAttachmentTransformRules::SnapToTargetNotIncludingScale, Sock->SocketName);
+						SpawnedTurret->SetFrontDirection(SocketNames[i].ToString()[8]);
+
+						SubTurrets1.Turrets.Emplace(SpawnedTurret);
+					}
+				}
+			}
+			else if (StringName.Contains(TEXT("ST_2")))
+			{
+				if (SubTurret2 != nullptr)
+				{
+					const USkeletalMeshSocket* Sock = SkeletalMeshComp->GetSocketByName(SocketNames[i]);
+					if (Sock != nullptr)
+					{
+						AWHTurretBase* SpawnedTurret = GetWorld()->SpawnActor<AWHTurretBase>(SubTurret2, Sock->GetSocketLocation(SkeletalMeshComp), FRotator::ZeroRotator, SpawnParams);
+						SpawnedTurret->AttachToComponent(SkeletalMeshComp, FAttachmentTransformRules::SnapToTargetNotIncludingScale, Sock->SocketName);
+						SpawnedTurret->SetFrontDirection(SocketNames[i].ToString()[8]);
+
+						SubTurrets2.Turrets.Emplace(SpawnedTurret);
+					}
+				}
+			}
+			else if (StringName.Contains(TEXT("AT_1")))
+			{
+				if (AirTurret1 != nullptr)
+				{
+					const USkeletalMeshSocket* Sock = SkeletalMeshComp->GetSocketByName(SocketNames[i]);
+					if (Sock != nullptr)
+					{
+						AWHTurretBase* SpawnedTurret = GetWorld()->SpawnActor<AWHTurretBase>(AirTurret1, Sock->GetSocketLocation(SkeletalMeshComp), FRotator::ZeroRotator, SpawnParams);
+						SpawnedTurret->AttachToComponent(SkeletalMeshComp, FAttachmentTransformRules::SnapToTargetNotIncludingScale, Sock->SocketName);
+						SpawnedTurret->SetFrontDirection(SocketNames[i].ToString()[8]);
+
+						AirTurrets1.Turrets.Emplace(SpawnedTurret);
+					}
+				}
+			}
+			else if (StringName.Contains(TEXT("AT_2")))
+			{
+				if (AirTurret2 != nullptr)
+				{
+					const USkeletalMeshSocket* Sock = SkeletalMeshComp->GetSocketByName(SocketNames[i]);
+					if (Sock != nullptr)
+					{
+						AWHTurretBase* SpawnedTurret = GetWorld()->SpawnActor<AWHTurretBase>(AirTurret2, Sock->GetSocketLocation(SkeletalMeshComp), FRotator::ZeroRotator, SpawnParams);
+						SpawnedTurret->AttachToComponent(SkeletalMeshComp, FAttachmentTransformRules::SnapToTargetNotIncludingScale, Sock->SocketName);
+						SpawnedTurret->SetFrontDirection(SocketNames[i].ToString()[8]);
+
+						AirTurrets2.Turrets.Emplace(SpawnedTurret);
+					}
+				}
+			}
+			else if (StringName.Contains(TEXT("DT_1")))
+			{
+				if (DualTurret1 != nullptr)
+				{
+					const USkeletalMeshSocket* Sock = SkeletalMeshComp->GetSocketByName(SocketNames[i]);
+					if (Sock != nullptr)
+					{
+						AWHTurretBase* SpawnedTurret = GetWorld()->SpawnActor<AWHTurretBase>(DualTurret1, Sock->GetSocketLocation(SkeletalMeshComp), FRotator::ZeroRotator, SpawnParams);
+						SpawnedTurret->AttachToComponent(SkeletalMeshComp, FAttachmentTransformRules::SnapToTargetNotIncludingScale, Sock->SocketName);
+						SpawnedTurret->SetFrontDirection(SocketNames[i].ToString()[8]);
+
+						DualTurrets1.Turrets.Emplace(SpawnedTurret);
+					}
+				}
+			}
+			else if (StringName.Contains(TEXT("DT_2")))
+			{
+				if (DualTurret2 != nullptr)
+				{
+					const USkeletalMeshSocket* Sock = SkeletalMeshComp->GetSocketByName(SocketNames[i]);
+					if (Sock != nullptr)
+					{
+						AWHTurretBase* SpawnedTurret = GetWorld()->SpawnActor<AWHTurretBase>(DualTurret2, Sock->GetSocketLocation(SkeletalMeshComp), FRotator::ZeroRotator, SpawnParams);
+						SpawnedTurret->AttachToComponent(SkeletalMeshComp, FAttachmentTransformRules::SnapToTargetNotIncludingScale, Sock->SocketName);
+						SpawnedTurret->SetFrontDirection(SocketNames[i].ToString()[8]);
+
+						DualTurrets2.Turrets.Emplace(SpawnedTurret);
+					}
+				}
+			}
+			else if (StringName.Contains(TEXT("DL")))
+			{
+				if (TorpedoLauncher != nullptr)
+				{
+					const USkeletalMeshSocket* Sock = SkeletalMeshComp->GetSocketByName(SocketNames[i]);
+					if (Sock != nullptr)
+					{
+						AWHTurretBase* SpawnedTurret = GetWorld()->SpawnActor<AWHTurretBase>(TorpedoLauncher, Sock->GetSocketLocation(SkeletalMeshComp), FRotator::ZeroRotator, SpawnParams);
+						SpawnedTurret->AttachToComponent(SkeletalMeshComp, FAttachmentTransformRules::SnapToTargetNotIncludingScale, Sock->SocketName);
+						SpawnedTurret->SetFrontDirection(SocketNames[i].ToString()[8]);
+
+						TorpedoLaunchers.Turrets.Emplace(SpawnedTurret);
+					}
+				}
+			}	
 		}
+		MainTurrets.TurretsType = ETurretType::Main;
+		SubTurrets1.TurretsType = ETurretType::Sub;
+		SubTurrets2.TurretsType = ETurretType::Sub;
+		AirTurrets1.TurretsType = ETurretType::Air;
+		AirTurrets2.TurretsType = ETurretType::Air;
+		DualTurrets1.TurretsType = ETurretType::DualPurpose;
 		DualTurrets2.TurretsType = ETurretType::DualPurpose;
+		TorpedoLaunchers.TurretsType = ETurretType::Torpedo;
+
+		AllTurretArray.Emplace(MainTurrets);
+		AllTurretArray.Emplace(SubTurrets1);
+		AllTurretArray.Emplace(SubTurrets2);
+		AllTurretArray.Emplace(AirTurrets1);
+		AllTurretArray.Emplace(AirTurrets2);
+		AllTurretArray.Emplace(DualTurrets1);
 		AllTurretArray.Emplace(DualTurrets2);
-	}
-	if (DLSocketNames1.Num() > 0)
-	{
-		FString TurretDataName = BSName + TEXT("_DL_1");
-		FTurretArray TorpedoLaunchers1;
-		for (int i = 0; i < DLSocketNames1.Num(); i++)
-		{
-			const USkeletalMeshSocket* Sock = SkeletalMeshComp->GetSocketByName(DLSocketNames1[i]);
-			if (Sock != nullptr)
-			{
-				AWHTurret* SpawnedTurret = GetWorld()->SpawnActor<AWHTurret>(Sock->GetSocketLocation(SkeletalMeshComp), FRotator::ZeroRotator, SpawnParams);
-				SpawnedTurret->SetupTurret(this, FName(TurretDataName));
-				SpawnedTurret->AttachToComponent(SkeletalMeshComp, FAttachmentTransformRules::SnapToTargetNotIncludingScale, Sock->SocketName);
-				SpawnedTurret->SetFrontDirection(DLSocketNames1[i].ToString()[8]);
-
-				TorpedoLaunchers1.Turrets.Emplace(SpawnedTurret);
-			}
-		}
-		TorpedoLaunchers1.TurretsType = ETurretType::Torpedo;
-		AllTurretArray.Emplace(TorpedoLaunchers1);
-	}
-	if (DLSocketNames2.Num() > 0)
-	{
-		FString TurretDataName = BSName + TEXT("_DL_2");
-		FTurretArray TorpedoLaunchers2;
-		for (int i = 0; i < DLSocketNames2.Num(); i++)
-		{
-			const USkeletalMeshSocket* Sock = SkeletalMeshComp->GetSocketByName(DLSocketNames2[i]);
-			if (Sock != nullptr)
-			{
-				AWHTurret* SpawnedTurret = GetWorld()->SpawnActor<AWHTurret>(Sock->GetSocketLocation(SkeletalMeshComp), FRotator::ZeroRotator, SpawnParams);
-				SpawnedTurret->SetupTurret(this, FName(TurretDataName));
-				SpawnedTurret->AttachToComponent(SkeletalMeshComp, FAttachmentTransformRules::SnapToTargetNotIncludingScale, Sock->SocketName);
-				SpawnedTurret->SetFrontDirection(DLSocketNames2[i].ToString()[8]);
-
-				TorpedoLaunchers2.Turrets.Emplace(SpawnedTurret);
-			}
-		}
-		TorpedoLaunchers2.TurretsType = ETurretType::Torpedo;
-		AllTurretArray.Emplace(TorpedoLaunchers2);
+		AllTurretArray.Emplace(TorpedoLaunchers);
 	}
 }
 

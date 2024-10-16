@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "UObject/NoExportTypes.h"
 #include "Enum/ETurretType.h"
+#include "Enum/ETurretAttackType.h"
 #include "WHCustomStructs.generated.h"
 
 /**
@@ -25,5 +26,9 @@ struct FTurretArray
 	UPROPERTY(EditAnywhere)
 	ETurretType TurretsType = ETurretType::Invalid;
 	UPROPERTY(EditAnywhere)
+	ETurretAttackType TurretAttackType = ETurretAttackType::Invalid;
+	UPROPERTY(EditAnywhere)
 	TArray<class AWHTurretBase*> Turrets;
+	UPROPERTY(EditAnywhere)
+	AActor* Target = nullptr;
 };

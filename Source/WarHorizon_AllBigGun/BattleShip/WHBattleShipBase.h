@@ -55,8 +55,7 @@ protected:
 	// 인터페이스 관련 함수
 	virtual void RapidAttack() override;
 	virtual void NormalAttack() override;
-	virtual void SpinTurrets(float Angle, float Distance) override;
-	virtual void SpinTurrets(APawn* Target) override;
+	virtual void SpinTurrets(AActor* Target) override;
 	virtual void SpinTurrets(FVector HitPoint) override;
 	virtual void UseSkill(char Key) override;
 	virtual void SpinBattleShip(FVector HitPoint) override;
@@ -101,7 +100,7 @@ protected:
 
 protected:
 	bool bIsMouseTarget;
-	APawn* MouseTarget;
+	AActor* MouseTarget;
 	float MouseTargetDistance;
 
 
@@ -125,14 +124,7 @@ protected:
 	TObjectPtr<UWHCSkillHandler> SkillHandlerComp;
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UWHCTargetSelector> TargetSelectorComp;
-
-
-	// HP UI
 protected:
-
-	// 소켓을 포함하는 선체 매시
-	UPROPERTY(EditAnywhere, Category = "BattleShip | Mesh")
-	TObjectPtr<USkeletalMesh> BaseMesh;
 
 	UPROPERTY(EditAnywhere, Category = "BattleShip | Skill")
 	TSoftObjectPtr<UObject> SkillPtrQ;

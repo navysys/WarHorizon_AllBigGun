@@ -13,7 +13,7 @@
 #include "Component/WHCDetectEnemy.h"
 #include "Component/WHCSkillHandler.h"
 #include "Component/WHCTargetSelector.h"
-#include "Turret/WHTurret.h"
+#include "Turret/WHTurretBase.h"
 #include "Aircraft/WHAircraftsBase.h"
 #include "Enum/ETurretAttackType.h"
 #include "Containers/Array.h"
@@ -328,22 +328,7 @@ void AWHBattleShipBase::CalculateAngleToSpinTurret()
 {
 	// 클라이언트에서만 실행할 함수
 // 타겟 셀렉터 안으로 넣어버리는 것 고려중
-	if (IsValid(MouseTarget))
-	{
-		FVector Pos = FVector(GetActorLocation().X, GetActorLocation().Y, 0.0f);
-		FVector TargetPos = FVector(MouseTarget->GetActorLocation().X, MouseTarget->GetActorLocation().Y, 0.0f);
-		FVector Direction = (TargetPos - Pos).GetSafeNormal();
-		float Angle = FRotationMatrix::MakeFromX(Direction).Rotator().Yaw;
-		if (Angle < 0)
-		{
-			Angle += 360.0f;
-		}
 
-		MouseTargetDistance = FVector::Distance(Pos, TargetPos);
-
-		TargetSelectorComp->SetTurretsTarget(ETurretType::Main, Angle);
-		TargetSelectorComp->SetTurretsTargetDistance(ETurretType::Main, MouseTargetDistance);
-	}
 }
 
 void AWHBattleShipBase::RapidAttack()
@@ -357,24 +342,11 @@ void AWHBattleShipBase::NormalAttack()
 	TargetSelectorComp->CommandTurretsFire(ETurretType::Main);
 }
 
-void AWHBattleShipBase::SpinTurrets(float Angle, float Distance)
-{
-	bIsMouseTarget = false;
-	TargetSelectorComp->SetTurretsAttackType(ETurretType::Main, ETurretAttackType::AngleAttack);
-	TargetSelectorComp->SetTurretsTarget(ETurretType::Main, Angle);
-	TargetSelectorComp->SetTurretsTargetDistance(ETurretType::Main, Distance);
-}
 
-void AWHBattleShipBase::SpinTurrets(APawn* Target)
+void AWHBattleShipBase::SpinTurrets(AActor* Target)
 {
-	TargetSelectorComp->SetTurretsAttackType(ETurretType::Main, ETurretAttackType::AngleAttack);
-	bIsMouseTarget = true; // Tick 에서 타겟인 적을 적과의 거리를 지속적으로 계산
-
-	if (IsValid(Target))
-	{
-		MouseTarget = Target;
-		CalculateAngleToSpinTurret(); // Tick 호출 이전에도 계산
-	}
+	TargetSelectorComp->ChangeAttackType(ETurretType::Main, ETurretAttackType::TargetAttack);
+	TargetSelectorComp->SetMainTurretTarget(Target);
 }
 
 void AWHBattleShipBase::SpinTurrets(FVector HitPoint)

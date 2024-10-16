@@ -5,7 +5,6 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "Enum/ETurretType.h"
-#include "Engine/StaticMeshSocket.h"
 #include "WHTurretBase.generated.h"
 
 class UNiagaraSystem;
@@ -25,17 +24,21 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaTime) override;
+	virtual void PostInitializeComponents() override;
 
 public:	
 	void SetFrontDirection(char Dir);
 	char GetFrontDirection() { return FrontDirection; }
-	void Fire();
+	virtual void Fire();
 protected:
 	void LoadDataTableToName(FName Name);
 	void DebugTurretForward();
 	bool SpinToTargetAngle();
 
 public:
+	void SetTargetDistance(float Distance);
+	void SetTargetAngle(float Angle);
+
 
 protected:
 	UPROPERTY(VisibleAnywhere)
@@ -47,8 +50,7 @@ protected:
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UStaticMeshComponent> StaticMeshComp;
 
-	UPROPERTY(VisibleAnywhere)
-	TArray<UStaticMeshSocket*> Muzzles;
+	TArray<USceneComponent*> MuzzleComps;
 
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UNiagaraSystem> GunFireEffect;
@@ -59,9 +61,6 @@ protected:
 	FString TurretName;
 	UPROPERTY(VisibleAnywhere)
 	ETurretType TurretType;
-
-	UPROPERTY(EditAnywhere)
-	UStaticMesh* TurretMesh;
 
 	// 포탑의 정면을 LRFB 로 구분
 	char FrontDirection;
@@ -90,4 +89,21 @@ protected:
 public:
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<AWHShell> Shell;
+
+	UPROPERTY(VisibleAnywhere)
+	float TargetDistance;
+
+	UPROPERTY(EditAnywhere)
+	TArray<float> Dispersion;
+
+	// 포탄 날아가는 각도를 위한 변수
+	// Air 와 Torpedo 터렛에서는 사용 x
+	UPROPERTY(VisibleAnywhere)
+	FVector ShellVelocityVector = FVector::ZeroVector;
+
+	UPROPERTY(VisibleAnywhere)
+	float ShellVelocity = 0.0f;
+
+	UPROPERTY(EditAnywhere)
+	float ShellLaunchAngle;
 };

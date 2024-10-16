@@ -6,6 +6,7 @@
 #include "NiagaraActor.h"
 #include "NiagaraComponent.h"
 #include "Turret/WHShell.h"
+#include "Engine/StaticMeshSocket.h"
 
 
 // Sets default values
@@ -20,6 +21,15 @@ AWHTurretBase::AWHTurretBase()
 	StaticMeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMesh"));
 	StaticMeshComp->SetupAttachment(RootComponent);
 	StaticMeshComp->SetCollisionProfileName(TEXT("NoCollision"));
+
+	for (int i = 0; i < 4; i++)
+	{
+		FName CompName = FName(TEXT("Muzzle"),i+1);
+		USceneComponent* Muzzle = CreateDefaultSubobject<USceneComponent>(CompName);
+		Muzzle->SetupAttachment(StaticMeshComp);
+		MuzzleComps.Emplace(Muzzle);
+	}
+	
 }
 
 // Called when the game starts or when spawned
@@ -27,6 +37,7 @@ void AWHTurretBase::BeginPlay()
 {
 	Super::BeginPlay();
 	
+
 }
 
 // Called every frame
@@ -36,6 +47,50 @@ void AWHTurretBase::Tick(float DeltaTime)
 
 	DebugTurretForward();
 	SpinToTargetAngle();
+}
+
+void AWHTurretBase::PostInitializeComponents()
+{
+	Super::PostInitializeComponents();
+
+	if (StaticMeshComp != nullptr)
+	{
+		TArray<UStaticMeshSocket*> Muzzles = StaticMeshComp->GetStaticMesh()->Sockets;
+
+		for (int i = 0; i < Muzzles.Num(); i++)
+		{
+			MuzzleComps[i]->SetRelativeLocation(Muzzles[i]->RelativeLocation);
+		}
+		if (Muzzles.Num() < MuzzleComps.Num())
+		{
+			int OverNum = MuzzleComps.Num() - Muzzles.Num();
+			for (int j = 0; j < OverNum; j++)
+			{
+				MuzzleComps.Pop()->DestroyComponent();
+			}
+		}
+
+		// 분산도 관련 코드 나중에는 계수 곱해주도록 수정
+		int MuzzleInt = MuzzleComps.Num();
+		float DispersionAngle = 0.0f;
+		if (MuzzleInt == 4)
+		{
+			DispersionAngle = 7.5f;
+		}
+		else if (MuzzleInt == 3)
+		{
+			DispersionAngle = 5.0f;
+		}
+		else if (MuzzleInt == 2)
+		{
+			DispersionAngle = 2.5f;
+		}
+
+		for (int i = 1; i <= MuzzleInt; i++)
+		{
+			Dispersion.Emplace((DispersionAngle / (MuzzleInt - 1)) * (i - ((MuzzleInt + 1) / 2)));
+		}
+	}
 }
 
 void AWHTurretBase::SetFrontDirection(char Dir)
@@ -63,9 +118,9 @@ void AWHTurretBase::Fire()
 {
 	if (GunFireEffect)
 	{
-		float Num = Muzzles.Num() / 2;
+		float Num = MuzzleComps.Num() / 2;
 		int Center = FMath::CeilToInt(Num);
-		ANiagaraActor* NiagaraActor = GetWorld()->SpawnActor<ANiagaraActor>(ANiagaraActor::StaticClass(), GetActorLocation() + GetActorRotation().RotateVector(Muzzles[Center - 1]->RelativeLocation), GetActorRotation());
+		ANiagaraActor* NiagaraActor = GetWorld()->SpawnActor<ANiagaraActor>(ANiagaraActor::StaticClass(), MuzzleComps[Center]->GetComponentLocation(), StaticMeshComp->GetRelativeRotation());
 		if (NiagaraActor)
 		{
 			NiagaraActor->GetNiagaraComponent()->SetAsset(GunFireEffect);
@@ -89,7 +144,6 @@ void AWHTurretBase::LoadDataTableToName(FName Name)
 				TurretID = Table->TurretID;
 				TurretName = Table->TurretName;
 				TurretType = Table->TurretType;
-				TurretMesh = Table->TurretMesh;
 
 				ReloadTime = Table->TurretReloadTime;
 				Range = Table->TurretRange;
@@ -97,13 +151,6 @@ void AWHTurretBase::LoadDataTableToName(FName Name)
 				MaxHorizontalAngle = Table->TurretHorizontalAngle;
 				MaxVerticalAngle = Table->TurretVerticalAngle;
 				RotationSpeed = Table->TurretRotationSpeed;
-
-				if (StaticMeshComp != nullptr)
-				{
-					StaticMeshComp->SetStaticMesh(TurretMesh);
-					Muzzles = StaticMeshComp->GetStaticMesh()->Sockets;
-				}
-
 			}
 		}
 	}
@@ -150,6 +197,7 @@ bool AWHTurretBase::SpinToTargetAngle()
 {
 	if (StaticMeshComp)
 	{
+		UE_LOG(LogTemp, Warning, TEXT("%f"), TargetAngle);
 		//FRotator Rot = StaticMeshComp->GetRelativeRotation();
 		//StaticMeshComp->AddLocalRotation(FRotator(0, 1, 0));
 
@@ -158,4 +206,14 @@ bool AWHTurretBase::SpinToTargetAngle()
 
 
 	return false;
+}
+
+void AWHTurretBase::SetTargetDistance(float Distance)
+{
+	TargetDistance = Distance;
+}
+
+void AWHTurretBase::SetTargetAngle(float Angle)
+{
+	TargetAngle = Angle;
 }

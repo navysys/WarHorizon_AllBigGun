@@ -25,26 +25,35 @@ protected:
 	virtual void BeginPlay() override;
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
+protected:
+	void CalculateToTargetInfo();
+
 public:
 	void InitTargetSelectorComponent(const TArray<FTurretArray> AllArray, TArray<APawn*> BattleShips, TArray<APawn*> Aircrafts);
 	void SetTargetBattleShips(const TArray<APawn*>* BattleShips) { BSTargetArray = *BattleShips; }
 	void SetTargetAircreafts(const TArray<APawn*>* Aircrafts) { ACTargetArray = *Aircrafts; }
 
-	void SetTurretsAttackType(ETurretType TurretType, ETurretAttackType Type);
 	void SetTurretsTargetDistance(ETurretType TurretType, float Dist);
-	void SetTurretsTarget(ETurretType TurretType, APawn* Pawn);
-	void SetTurretsTarget(ETurretType TurretType, FVector Point);
-	void SetTurretsTarget(ETurretType TurretType, float Angle);
+	void SetTurretsTargetAngle(ETurretType TurretType, float Angle);
 
 	//테스트 함수
 	void SetCurrentLeftAngle(float Left) { CurrentLeftAngle = Left; }
 
+	void SetMainTurretTarget(AActor* Target);
+	void SetMainTurretAngleAndDistance(FVector Point);
 	void CommandTurretsFire(ETurretType TurretType);
+	void ChangeAttackType(ETurretType TurretType, ETurretAttackType TurretAttackType);
+	void UpdateTargetInfo(ETurretType TurretType, APawn* TargetPawn);
+	void UpdateTargetInfo(ETurretType TurretType, FVector Point);
 protected:
 	void CalculateAirTurretRotation();
 	void ChangeAirTurretRotation(TArray<AWHTurretBase*> TurretDir, float CurrentAngle, float DeltaTime);
 
 protected:
+	AActor* Owner;
+	bool bIsTracingTarget;
+	AActor* MainTarget;
+
 	// 타겟
 	TArray<APawn*> BSTargetArray;
 	TArray<APawn*> ACTargetArray;

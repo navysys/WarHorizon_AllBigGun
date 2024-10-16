@@ -33,30 +33,33 @@ void UWHCCameraBodyComponent::TickComponent(float DeltaTime, ELevelTick TickType
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	FVector2D CurrentMoveSpeed = CurrentInputMoveSpeed;
-	FVector2D MousePosition;
-	PlayerController->GetMousePosition(MousePosition.X, MousePosition.Y);
-	if (CurrentInputMoveSpeed.X == 0 && CurrentInputMoveSpeed.Y == 0)
+	if (IsValid(PlayerController))
 	{
-		int32 ViewportWidth, ViewportHeight;
-		PlayerController->GetViewportSize(ViewportWidth, ViewportHeight);
+		FVector2D CurrentMoveSpeed = CurrentInputMoveSpeed;
+		FVector2D MousePosition;
 
-		const float X = (MousePosition.X <= ScreenEdgePadding.X) | -(MousePosition.X >= ViewportWidth - ScreenEdgePadding.X);
-		const float Y = (MousePosition.Y <= ScreenEdgePadding.Y) | -(MousePosition.Y >= ViewportHeight - ScreenEdgePadding.Y);
+		PlayerController->GetMousePosition(MousePosition.X, MousePosition.Y);
+		if (CurrentInputMoveSpeed.X == 0 && CurrentInputMoveSpeed.Y == 0)
+		{
+			int32 ViewportWidth, ViewportHeight;
+			PlayerController->GetViewportSize(ViewportWidth, ViewportHeight);
 
-		CurrentMoveSpeed = FVector2D(X, Y);
+			const float X = (MousePosition.X <= ScreenEdgePadding.X) | -(MousePosition.X >= ViewportWidth - ScreenEdgePadding.X);
+			const float Y = (MousePosition.Y <= ScreenEdgePadding.Y) | -(MousePosition.Y >= ViewportHeight - ScreenEdgePadding.Y);
+
+			CurrentMoveSpeed = FVector2D(X, Y);
+		}
+
+		// Move Camera
+		FVector ForwardVector = GetForwardVector();
+		//ForwardVector.Normalize();
+
+		FVector Forward = ForwardVector * CurrentMoveSpeed.X * MoveSpeed.X * DeltaTime;
+		FVector Sideways = GetRightVector() * CurrentMoveSpeed.Y * MoveSpeed.Y * DeltaTime;
+
+		FVector NextLocation = GetRelativeLocation() + Forward + Sideways;
+		SetRelativeLocation(NextLocation);
 	}
-
-	
-	// Move Camera
-	FVector ForwardVector = GetForwardVector();
-	//ForwardVector.Normalize();
-
-	FVector Forward = ForwardVector * CurrentMoveSpeed.X * MoveSpeed.X * DeltaTime;
-	FVector Sideways = GetRightVector() * CurrentMoveSpeed.Y * MoveSpeed.Y * DeltaTime;
-
-	FVector NextLocation = GetRelativeLocation() + Forward + Sideways;
-	SetRelativeLocation(NextLocation);
 }
 
 void UWHCCameraBodyComponent::ResetLocation()

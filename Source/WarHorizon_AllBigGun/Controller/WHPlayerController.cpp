@@ -92,7 +92,7 @@ void AWHPlayerController::MoveOrTargeting(const FInputActionValue& Value)
 			// 타겟 지정
 			else if (Hit.GetActor()->ActorHasTag(TEXT("BattleShip")))
 			{
-				APawn* TargetShip = Cast<APawn>(Hit.GetActor());
+				AActor* TargetShip = Hit.GetActor();
 				DrawDebugCircle(GetWorld(), FVector(TargetShip->GetActorLocation().X, TargetShip->GetActorLocation().Y, 100.0f), 8000.0f, 100, FColor::White, true, -1.f, 0, 50, FVector(1, 0, 0), FVector(0, 1, 0), true);
 				BattleShipPawn->SpinTurrets(TargetShip);
 				// 타겟이 되면 포탑이 이동속도에 비례해서 위치를 보정하고 서브 터렛이 해당 타겟을 조준하도록 해야함
@@ -123,6 +123,7 @@ void AWHPlayerController::TargetAttack(const FInputActionValue& Value)
 		FHitResult Hit;
 		GetHitResultUnderCursor(ECC_Visibility, false, Hit);
 
+		// A 누른 뒤 함선을 클릭 했을 경우
 		if (Hit.bBlockingHit && Hit.GetActor()->ActorHasTag(TEXT("BattleShip")))
 		{
 			APawn* TargetShip = Cast<APawn>(Hit.GetActor());
@@ -136,6 +137,10 @@ void AWHPlayerController::TargetAttack(const FInputActionValue& Value)
 				ChangeWaitingAttackMappingContext();
 			}
 		}
+		// A 누른 뒤 바닥을 왼클릭 했을 경우
+		// 가까운 함선 탐색 후 SpinTurrets(TargetShip) 으로 actor 전달해야 함
+
+
 	}
 }
 
@@ -165,7 +170,7 @@ void AWHPlayerController::SpinTurret(const FInputActionValue& Value)
 			// Hit 과 함선 사이의 거리
 			float Distance = FVector::Distance(Pos, HitPoint);
 
-			BattleShipPawn->SpinTurrets(Angle, Distance);
+			BattleShipPawn->SpinTurrets(HitPoint);
 			DrawDebugLine(GetWorld(), FVector(Hit.Location.X, Hit.Location.Y, 30000.0f), Hit.Location, FColor::Red, false, 3, 0, 200);
 		}
 	}

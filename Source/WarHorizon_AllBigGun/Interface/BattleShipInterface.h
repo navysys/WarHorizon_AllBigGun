@@ -24,8 +24,7 @@ class WARHORIZON_ALLBIGGUN_API IBattleShipInterface
 public:
 	virtual void RapidAttack() = 0;
 	virtual void NormalAttack() = 0;
-	virtual void SpinTurrets(float Angle, float Distance) = 0;
-	virtual void SpinTurrets(APawn* Target) = 0;
+	virtual void SpinTurrets(AActor* Target) = 0;
 	virtual void SpinTurrets(FVector HitPoint) = 0;
 	virtual void UseSkill(char Key) = 0;
 	virtual void SpinBattleShip(FVector HitPoint) = 0;

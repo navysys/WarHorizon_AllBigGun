@@ -24,7 +24,6 @@ void AWHPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
 
-	//CameraPawn = Cast<AWHCameraPawn>(GetPawn());
 	//나중에 서버로 바꾸면 빙의 할 때 설정하도록 변경
 	BattleShipPawn = Cast<IBattleShipInterface>(GetPawn());
 
@@ -80,6 +79,8 @@ void AWHPlayerController::MoveOrTargeting(const FInputActionValue& Value)
 		FHitResult Hit;
 		GetHitResultUnderCursor(ECC_Visibility, false, Hit);
 
+		//UE_LOG(LogTemp, Warning, TEXT("%i"), Hit.);
+
 		if (Hit.bBlockingHit)
 		{
 			// 이동에 대한 명령
@@ -92,8 +93,9 @@ void AWHPlayerController::MoveOrTargeting(const FInputActionValue& Value)
 			// 타겟 지정
 			else if (Hit.GetActor()->ActorHasTag(TEXT("BattleShip")))
 			{
+				UE_LOG(LogTemp, Warning, TEXT("Hit Called"));
 				AActor* TargetShip = Hit.GetActor();
-				DrawDebugCircle(GetWorld(), FVector(TargetShip->GetActorLocation().X, TargetShip->GetActorLocation().Y, 100.0f), 8000.0f, 100, FColor::White, true, -1.f, 0, 50, FVector(1, 0, 0), FVector(0, 1, 0), true);
+				DrawDebugCircle(GetWorld(), FVector(TargetShip->GetActorLocation().X, TargetShip->GetActorLocation().Y, 800.0f), 8000.0f, 100, FColor::White, true, -1.f, 0, 50, FVector(1, 0, 0), FVector(0, 1, 0), true);
 				BattleShipPawn->SpinTurrets(TargetShip);
 				// 타겟이 되면 포탑이 이동속도에 비례해서 위치를 보정하고 서브 터렛이 해당 타겟을 조준하도록 해야함
 			}
@@ -150,6 +152,7 @@ void AWHPlayerController::SpinTurret(const FInputActionValue& Value)
 	{
 		FHitResult Hit;
 		GetHitResultUnderCursor(ECC_Visibility, false, Hit);
+		
 
 		if (Hit.bBlockingHit)
 		{

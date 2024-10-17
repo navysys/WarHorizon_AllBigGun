@@ -120,17 +120,6 @@ void AWHAircraftsBase::SpawnAircraft(FVector StartPos)
 	SetInitAircraftPosition();
 }
 
-//TArray<AActor*> AWHAircraftsBase::GetArrayAircrafts()
-//{
-//	TArray<AActor*> ArrayAirs;
-//	for (AWHAircraft* air : ArrayAircrafts)
-//	{
-//		ArrayAirs.Emplace(air);
-//	}
-//
-//	return ArrayAirs;
-//}
-
 uint8 AWHAircraftsBase::GetAircraftType()
 {
 	return (uint8)AircraftsType;

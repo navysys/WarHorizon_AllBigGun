@@ -106,4 +106,7 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	float ShellLaunchAngle;
+
+	// 비헤이비어 트리 기능
+	// 
 };

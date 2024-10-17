@@ -33,21 +33,16 @@ public:
 	void SetTargetBattleShips(const TArray<APawn*>* BattleShips) { BSTargetArray = *BattleShips; }
 	void SetTargetAircreafts(const TArray<APawn*>* Aircrafts) { ACTargetArray = *Aircrafts; }
 
-	void SetTurretsTargetDistance(ETurretType TurretType, float Dist);
-	void SetTurretsTargetAngle(ETurretType TurretType, float Angle);
-
 	//테스트 함수
 	void SetCurrentLeftAngle(float Left) { CurrentLeftAngle = Left; }
 
 	void SetMainTurretTarget(AActor* Target);
 	void SetMainTurretAngleAndDistance(FVector Point);
 	void CommandTurretsFire(ETurretType TurretType);
-	void ChangeAttackType(ETurretType TurretType, ETurretAttackType TurretAttackType);
 	void UpdateTargetInfo(ETurretType TurretType, APawn* TargetPawn);
 	void UpdateTargetInfo(ETurretType TurretType, FVector Point);
 protected:
 	void CalculateAirTurretRotation();
-	void ChangeAirTurretRotation(TArray<AWHTurretBase*> TurretDir, float CurrentAngle, float DeltaTime);
 
 protected:
 	AActor* Owner;
@@ -61,12 +56,24 @@ protected:
 	TArray<float> ACTargetAngles;
 	// 터렛
 	TArray<FTurretArray> AllTurretArray;
-	TArray<AWHTurretBase*> AirTurretArray;
-	// 방향 별 대공 터렛
-	TArray<AWHTurretBase*> FowardAttackAirTurrets;
-	TArray<AWHTurretBase*> BackAttackAirTurrets;
-	TArray<AWHTurretBase*> LeftAttackAirTurrets;
-	TArray<AWHTurretBase*> RightAttackAirTurrets;
+
+	// 메인 터렛 (어뢰 발사기 가능)
+	TArray<AWHTurretBase*> MainTurrets;
+	// 방향 기준 서브 터렛
+	TArray<AWHTurretBase*> ForwardSTs;
+	TArray<AWHTurretBase*> BackSTs;
+	TArray<AWHTurretBase*> LeftSTs;
+	TArray<AWHTurretBase*> RightSTs;
+	// 방향 기준 대공 터렛
+	TArray<AWHTurretBase*> ForwardATs;
+	TArray<AWHTurretBase*> BackATs;
+	TArray<AWHTurretBase*> LeftATs;
+	TArray<AWHTurretBase*> RightATs;
+	// 방향 기준 양용 터렛
+	TArray<AWHTurretBase*> ForwardDTs;
+	TArray<AWHTurretBase*> BackDTs;
+	TArray<AWHTurretBase*> LeftDTs;
+	TArray<AWHTurretBase*> RightDTs;
 
 	UPROPERTY(VisibleAnywhere)
 	float CurrentFowardAngle = 9999.9999f;
@@ -79,10 +86,4 @@ protected:
 
 	FTimerHandle DirectionTimerHandle;
 	float DirectionTimerInterval = 0.5f;
-
-	int16 AirTurretArrayNum;
-	UPROPERTY(VisibleAnywhere)
-	bool IsActiveAirTurrets;
-
-	float AirTurretRotationSpeed;
 };

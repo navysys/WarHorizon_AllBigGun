@@ -4,7 +4,7 @@
 #include "BattleShip/WHBattleShipBase.h"
 #include "Game/WHGameInstance.h"
 #include "Controller/WHPlayerController.h"
-#include "Components/CapsuleComponent.h"
+#include "Components/BoxComponent.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "Engine/SkeletalMeshSocket.h"
 #include "Camera/CameraComponent.h"
@@ -31,12 +31,15 @@ AWHBattleShipBase::AWHBattleShipBase()
 	
 
 	// 스켈레탈 매시
-	CapsuleComp = CreateDefaultSubobject<UCapsuleComponent>(TEXT("RootComp"));
-	RootComponent = CapsuleComp;
+	BoxComp = CreateDefaultSubobject<UBoxComponent>(TEXT("RootComp"));
+	BoxComp->SetBoxExtent(BoxSize);
+	BoxComp->SetNotifyRigidBodyCollision(true);
+	BoxComp->SetCollisionProfileName(TEXT("TeamABattleShipPreset"));
+	RootComponent = BoxComp;
 
 	SkeletalMeshComp = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("SkeletalMesh"));
-	//SkeletalMeshComp->SetCollisionProfileName(TEXT("TeamABattleShipPreset"));
-	SkeletalMeshComp->SetupAttachment(CapsuleComp);
+	// 스켈레탈 매시의 콜리전 프로파일은 나중에 수정
+	SkeletalMeshComp->SetupAttachment(BoxComp);
 
 	CameraBodyComp = CreateDefaultSubobject<UWHCCameraBodyComponent>(TEXT("CameraBody"));
 
@@ -67,7 +70,7 @@ void AWHBattleShipBase::BeginPlay()
 	
 
 	//test
-	SpawnAircrafts(0);
+	//SpawnAircrafts(0);
 }
 
 void AWHBattleShipBase::PostInitializeComponents()
@@ -104,14 +107,6 @@ void AWHBattleShipBase::PostInitializeComponents()
 void AWHBattleShipBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
-	if (bIsMouseTarget)
-	{
-		CalculateAngleToSpinTurret();
-	}
-
-
-
 
 }
 
@@ -171,12 +166,9 @@ void AWHBattleShipBase::CreateTurretToMeshCompSocket(USkeletalMeshComponent* Mes
 	if (SocketNames.Num() > 0)
 	{
 		FTurretArray MainTurrets;
-		FTurretArray SubTurrets1;
-		FTurretArray SubTurrets2;
-		FTurretArray AirTurrets1;
-		FTurretArray AirTurrets2;
-		FTurretArray DualTurrets1;
-		FTurretArray DualTurrets2;
+		FTurretArray SubTurrets;
+		FTurretArray AirTurrets;
+		FTurretArray DualTurrets;
 		FTurretArray TorpedoLaunchers;
 
 		for (int i = 0; i < SocketNames.Num(); i++)
@@ -209,7 +201,7 @@ void AWHBattleShipBase::CreateTurretToMeshCompSocket(USkeletalMeshComponent* Mes
 						SpawnedTurret->AttachToComponent(SkeletalMeshComp, FAttachmentTransformRules::SnapToTargetNotIncludingScale, Sock->SocketName);
 						SpawnedTurret->SetFrontDirection(SocketNames[i].ToString()[8]);
 
-						SubTurrets1.Turrets.Emplace(SpawnedTurret);
+						SubTurrets.Turrets.Emplace(SpawnedTurret);
 					}
 				}
 			}
@@ -224,7 +216,7 @@ void AWHBattleShipBase::CreateTurretToMeshCompSocket(USkeletalMeshComponent* Mes
 						SpawnedTurret->AttachToComponent(SkeletalMeshComp, FAttachmentTransformRules::SnapToTargetNotIncludingScale, Sock->SocketName);
 						SpawnedTurret->SetFrontDirection(SocketNames[i].ToString()[8]);
 
-						SubTurrets2.Turrets.Emplace(SpawnedTurret);
+						SubTurrets.Turrets.Emplace(SpawnedTurret);
 					}
 				}
 			}
@@ -239,7 +231,7 @@ void AWHBattleShipBase::CreateTurretToMeshCompSocket(USkeletalMeshComponent* Mes
 						SpawnedTurret->AttachToComponent(SkeletalMeshComp, FAttachmentTransformRules::SnapToTargetNotIncludingScale, Sock->SocketName);
 						SpawnedTurret->SetFrontDirection(SocketNames[i].ToString()[8]);
 
-						AirTurrets1.Turrets.Emplace(SpawnedTurret);
+						AirTurrets.Turrets.Emplace(SpawnedTurret);
 					}
 				}
 			}
@@ -254,7 +246,7 @@ void AWHBattleShipBase::CreateTurretToMeshCompSocket(USkeletalMeshComponent* Mes
 						SpawnedTurret->AttachToComponent(SkeletalMeshComp, FAttachmentTransformRules::SnapToTargetNotIncludingScale, Sock->SocketName);
 						SpawnedTurret->SetFrontDirection(SocketNames[i].ToString()[8]);
 
-						AirTurrets2.Turrets.Emplace(SpawnedTurret);
+						AirTurrets.Turrets.Emplace(SpawnedTurret);
 					}
 				}
 			}
@@ -269,7 +261,7 @@ void AWHBattleShipBase::CreateTurretToMeshCompSocket(USkeletalMeshComponent* Mes
 						SpawnedTurret->AttachToComponent(SkeletalMeshComp, FAttachmentTransformRules::SnapToTargetNotIncludingScale, Sock->SocketName);
 						SpawnedTurret->SetFrontDirection(SocketNames[i].ToString()[8]);
 
-						DualTurrets1.Turrets.Emplace(SpawnedTurret);
+						DualTurrets.Turrets.Emplace(SpawnedTurret);
 					}
 				}
 			}
@@ -284,7 +276,7 @@ void AWHBattleShipBase::CreateTurretToMeshCompSocket(USkeletalMeshComponent* Mes
 						SpawnedTurret->AttachToComponent(SkeletalMeshComp, FAttachmentTransformRules::SnapToTargetNotIncludingScale, Sock->SocketName);
 						SpawnedTurret->SetFrontDirection(SocketNames[i].ToString()[8]);
 
-						DualTurrets2.Turrets.Emplace(SpawnedTurret);
+						DualTurrets.Turrets.Emplace(SpawnedTurret);
 					}
 				}
 			}
@@ -305,30 +297,17 @@ void AWHBattleShipBase::CreateTurretToMeshCompSocket(USkeletalMeshComponent* Mes
 			}	
 		}
 		MainTurrets.TurretsType = ETurretType::Main;
-		SubTurrets1.TurretsType = ETurretType::Sub;
-		SubTurrets2.TurretsType = ETurretType::Sub;
-		AirTurrets1.TurretsType = ETurretType::Air;
-		AirTurrets2.TurretsType = ETurretType::Air;
-		DualTurrets1.TurretsType = ETurretType::DualPurpose;
-		DualTurrets2.TurretsType = ETurretType::DualPurpose;
+		SubTurrets.TurretsType = ETurretType::Sub;
+		AirTurrets.TurretsType = ETurretType::Air;
+		DualTurrets.TurretsType = ETurretType::DualPurpose;
 		TorpedoLaunchers.TurretsType = ETurretType::Torpedo;
 
 		AllTurretArray.Emplace(MainTurrets);
-		AllTurretArray.Emplace(SubTurrets1);
-		AllTurretArray.Emplace(SubTurrets2);
-		AllTurretArray.Emplace(AirTurrets1);
-		AllTurretArray.Emplace(AirTurrets2);
-		AllTurretArray.Emplace(DualTurrets1);
-		AllTurretArray.Emplace(DualTurrets2);
+		AllTurretArray.Emplace(SubTurrets);
+		AllTurretArray.Emplace(AirTurrets);
+		AllTurretArray.Emplace(DualTurrets);
 		AllTurretArray.Emplace(TorpedoLaunchers);
 	}
-}
-
-void AWHBattleShipBase::CalculateAngleToSpinTurret()
-{
-	// 클라이언트에서만 실행할 함수
-// 타겟 셀렉터 안으로 넣어버리는 것 고려중
-
 }
 
 void AWHBattleShipBase::RapidAttack()
@@ -345,7 +324,6 @@ void AWHBattleShipBase::NormalAttack()
 
 void AWHBattleShipBase::SpinTurrets(AActor* Target)
 {
-	TargetSelectorComp->ChangeAttackType(ETurretType::Main, ETurretAttackType::TargetAttack);
 	TargetSelectorComp->SetMainTurretTarget(Target);
 }
 

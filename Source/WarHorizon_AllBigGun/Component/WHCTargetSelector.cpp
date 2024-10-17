@@ -8,7 +8,6 @@ UWHCTargetSelector::UWHCTargetSelector()
 {
 	PrimaryComponentTick.bCanEverTick = true;
 
-	AirTurretRotationSpeed = 10.0f;
 }
 
 
@@ -26,24 +25,21 @@ void UWHCTargetSelector::TickComponent(float DeltaTime, ELevelTick TickType, FAc
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	if (IsActiveAirTurrets)
+	if (CurrentFowardAngle != 9999.9999f)
 	{
-		if (CurrentFowardAngle != 9999.9999f)
-		{
-			ChangeAirTurretRotation(FowardAttackAirTurrets, CurrentFowardAngle, DeltaTime);
-		}
-		if (CurrentBackAngle != 9999.9999f)
-		{
-			ChangeAirTurretRotation(BackAttackAirTurrets, CurrentBackAngle, DeltaTime);
-		}
-		if (CurrentLeftAngle != 9999.9999f)
-		{
-			ChangeAirTurretRotation(LeftAttackAirTurrets, CurrentLeftAngle, DeltaTime);
-		}
-		if (CurrentRightAngle != 9999.9999f)
-		{
-			ChangeAirTurretRotation(RightAttackAirTurrets, CurrentRightAngle, DeltaTime);
-		}
+		//ChangeAirTurretRotation(ForwardATs, CurrentFowardAngle, DeltaTime);
+	}
+	if (CurrentBackAngle != 9999.9999f)
+	{
+		//ChangeAirTurretRotation(BackATs, CurrentBackAngle, DeltaTime);
+	}
+	if (CurrentLeftAngle != 9999.9999f)
+	{
+		//ChangeAirTurretRotation(LeftATs, CurrentLeftAngle, DeltaTime);
+	}
+	if (CurrentRightAngle != 9999.9999f)
+	{
+		//ChangeAirTurretRotation(RightATs, CurrentRightAngle, DeltaTime);
 	}
 
 	if (bIsTracingTarget)
@@ -56,14 +52,8 @@ void UWHCTargetSelector::TickComponent(float DeltaTime, ELevelTick TickType, FAc
 
 			float Dist = FVector::Dist2D(Pos, TPos);
 			
-			FVector Dir = (TPos - Pos).GetSafeNormal();
+			FVector Dir = (TPos - Pos).GetSafeNormal2D();
 			float Angle = FRotationMatrix::MakeFromX(Dir).Rotator().Yaw;
-
-			if (Angle < 0)
-			{
-				Angle += 360.0f;
-			}
-
 
 			for (FTurretArray TArray : AllTurretArray)
 			{
@@ -75,7 +65,6 @@ void UWHCTargetSelector::TickComponent(float DeltaTime, ELevelTick TickType, FAc
 						Turret->SetTargetDistance(Dist);
 					}
 				}
-				
 			}
 		}
 	}
@@ -85,43 +74,12 @@ void UWHCTargetSelector::CalculateToTargetInfo()
 {
 	for (FTurretArray TArray : AllTurretArray)
 	{
-		switch (TArray.TurretAttackType)
-		{
-		case ETurretAttackType::Wait:
-			break;
-		case ETurretAttackType::PointAttack:
 
-			break;
-		case ETurretAttackType::TargetAttack:
-
-			break;
-		case ETurretAttackType::Invalid:
-			break;
-		default:
-			break;
-		}
 	}
 	// Main 터렛은 유저 컨트롤러의 인풋을 받아 Point 의 좌표를 조준하거나 Target 을 트래킹하거나 공격할 수 있어야 함
 	// 일정 시간마다 SUB , AIR 터렛은 배열에 있는 적 중에 공격할 수 있는 것을 자동 공격해야함
 	// Dual 터렛은 공격 가능한 함선이 있다면 함선을 공격하고 없다면 Air 터렛처럼 대공을 수행함
 	// Torpedo 런처는 메인터렛과 같이 동작하나 거리값은 없어도 되고 포탄 대신 어뢰를 발사
-
-	//if (IsValid(MouseTarget))
-	//{
-	//	FVector Pos = FVector(GetActorLocation().X, GetActorLocation().Y, 0.0f);
-	//	FVector TargetPos = FVector(MouseTarget->GetActorLocation().X, MouseTarget->GetActorLocation().Y, 0.0f);
-	//	FVector Direction = (TargetPos - Pos).GetSafeNormal();
-	//	float Angle = FRotationMatrix::MakeFromX(Direction).Rotator().Yaw;
-	//	if (Angle < 0)
-	//	{
-	//		Angle += 360.0f;
-	//	}
-
-	//	MouseTargetDistance = FVector::Distance(Pos, TargetPos);
-
-		//TargetSelectorComp->UpdateTargetInfo(ETurretType::Main, Angle);
-		//TargetSelectorComp->SetTurretsTargetDistance(ETurretType::Main, MouseTargetDistance);
-	//}
 }
 
 void UWHCTargetSelector::InitTargetSelectorComponent(const TArray<FTurretArray> AllArray, TArray<APawn*> BattleShips, TArray<APawn*> Aircrafts)
@@ -132,72 +90,91 @@ void UWHCTargetSelector::InitTargetSelectorComponent(const TArray<FTurretArray> 
 
 	for (FTurretArray TArray : AllTurretArray)
 	{
-		if (TArray.TurretsType == ETurretType::Air)
+		if (TArray.TurretsType == ETurretType::Main)
 		{
 			for (AWHTurretBase* Turret : TArray.Turrets)
 			{
-				AirTurretArray.Emplace(Turret);
+				MainTurrets.Emplace(Turret);
 			}
 		}
-	}
-	AirTurretArrayNum = AirTurretArray.Num();
-	IsActiveAirTurrets = true;
-
-	for (AWHTurretBase* Turret : AirTurretArray)
-	{
-		char Dir = Turret->GetFrontDirection();
-		if (Dir == 'L')
-		{
-			LeftAttackAirTurrets.Emplace(Turret);
-		}
-		else if (Dir == 'R')
-		{
-			RightAttackAirTurrets.Emplace(Turret);
-		}
-		else if (Dir == 'F')
-		{
-			FowardAttackAirTurrets.Emplace(Turret);
-		}
-		else if (Dir == 'B')
-		{
-			BackAttackAirTurrets.Emplace(Turret);
-		}
-	}
-}
-
-
-void UWHCTargetSelector::SetTurretsTargetDistance(ETurretType TurretType, float Dist)
-{
-	for (FTurretArray TArray : AllTurretArray)
-	{
-		if (TArray.TurretsType == TurretType)
+		else if (TArray.TurretsType == ETurretType::Sub)
 		{
 			for (AWHTurretBase* Turret : TArray.Turrets)
 			{
-				if (IsValid(Turret))
+				char Dir = Turret->GetFrontDirection();
+				if (Dir == 'L')
 				{
-					Turret->SetTargetDistance(Dist);
+					LeftSTs.Emplace(Turret);
+				}
+				else if (Dir == 'R')
+				{
+					RightSTs.Emplace(Turret);
+				}
+				else if (Dir == 'F')
+				{
+					ForwardSTs.Emplace(Turret);
+				}
+				else if (Dir == 'B')
+				{
+					BackSTs.Emplace(Turret);
 				}
 			}
 		}
-	}
-}
-
-void UWHCTargetSelector::SetTurretsTargetAngle(ETurretType TurretType, float Angle)
-{
-	for (FTurretArray TArray : AllTurretArray)
-	{
-		if (TArray.TurretsType == TurretType)
+		else if (TArray.TurretsType == ETurretType::Air)
 		{
 			for (AWHTurretBase* Turret : TArray.Turrets)
 			{
-				if (IsValid(Turret))
+				char Dir = Turret->GetFrontDirection();
+				if (Dir == 'L')
 				{
-					Turret->SetTargetAngle(Angle);
+					LeftATs.Emplace(Turret);
+				}
+				else if (Dir == 'R')
+				{
+					RightATs.Emplace(Turret);
+				}
+				else if (Dir == 'F')
+				{
+					ForwardATs.Emplace(Turret);
+				}
+				else if (Dir == 'B')
+				{
+					BackATs.Emplace(Turret);
 				}
 			}
 		}
+		else if (TArray.TurretsType == ETurretType::DualPurpose)
+		{
+			for (AWHTurretBase* Turret : TArray.Turrets)
+			{
+				char Dir = Turret->GetFrontDirection();
+				if (Dir == 'L')
+				{
+					LeftDTs.Emplace(Turret);
+				}
+				else if (Dir == 'R')
+				{
+					RightDTs.Emplace(Turret);
+				}
+				else if (Dir == 'F')
+				{
+					ForwardDTs.Emplace(Turret);
+				}
+				else if (Dir == 'B')
+				{
+					BackDTs.Emplace(Turret);
+				}
+			}
+		}
+		else if (TArray.TurretsType == ETurretType::Torpedo)
+		{
+			for (AWHTurretBase* Turret : TArray.Turrets)
+			{
+				MainTurrets.Emplace(Turret);
+			}
+		}
 	}
+
 }
 
 void UWHCTargetSelector::SetMainTurretTarget(AActor* Target)
@@ -221,10 +198,6 @@ void UWHCTargetSelector::CommandTurretsFire(ETurretType TurretType)
 			}
 		}
 	}
-}
-
-void UWHCTargetSelector::ChangeAttackType(ETurretType TurretType, ETurretAttackType TurretAttackType)
-{
 }
 
 void UWHCTargetSelector::UpdateTargetInfo(ETurretType TurretType, APawn* TargetPawn)
@@ -306,26 +279,3 @@ void UWHCTargetSelector::CalculateAirTurretRotation()
 
 	}
 }
-
-void UWHCTargetSelector::ChangeAirTurretRotation(TArray<AWHTurretBase*> TurretDir, float CurrentAngle , float DeltaTime)
-{
-	float TurretAngle = round(TurretDir[0]->GetActorRotation().Yaw);
-	UE_LOG(LogTemp, Warning, TEXT("%f"), TurretAngle);
-	if (CurrentAngle > TurretAngle)
-	{
-		FRotator Rot = FRotator(0.0f, AirTurretRotationSpeed * DeltaTime, 0.0f);
-		for (AWHTurretBase* Turret : TurretDir)
-		{
-			Turret->AddActorLocalRotation(Rot);
-		}
-	}
-	else if (CurrentAngle < TurretAngle)
-	{
-		FRotator Rot = FRotator(0.0f, -AirTurretRotationSpeed * DeltaTime, 0.0f);
-		for (AWHTurretBase* Turret : TurretDir)
-		{
-			Turret->AddActorLocalRotation(Rot);
-		}
-	}
-}
-

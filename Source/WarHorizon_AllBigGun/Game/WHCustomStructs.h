@@ -25,10 +25,7 @@ struct FTurretArray
 
 	UPROPERTY(EditAnywhere)
 	ETurretType TurretsType = ETurretType::Invalid;
-	UPROPERTY(EditAnywhere)
-	ETurretAttackType TurretAttackType = ETurretAttackType::Invalid;
+
 	UPROPERTY(EditAnywhere)
 	TArray<class AWHTurretBase*> Turrets;
-	UPROPERTY(EditAnywhere)
-	AActor* Target = nullptr;
 };

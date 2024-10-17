@@ -9,7 +9,7 @@
 #include "Game/WHCustomStructs.h"
 #include "WHBattleShipBase.generated.h"
 
-class UCapsuleComponent;
+class UBoxComponent;
 class USkeletalMeshComponent;
 class UCameraComponent;
 class USpringArmComponent;
@@ -47,9 +47,6 @@ protected:
 	void LoadDataTableToName(FName Name);
 	void CreateTurretToMeshCompSocket(USkeletalMeshComponent* MeshComp);
 
-	// 적 탐지 관련 함수
-	void CalculateAngleToSpinTurret();
-
 	//void SetDead();
 
 	// 인터페이스 관련 함수
@@ -72,6 +69,9 @@ protected:
 	EBattleShipType BattleShipType = EBattleShipType::Invalid;
 	UPROPERTY(VisibleAnywhere, Category = "BattleShip | ID")
 	uint8 TeamInt = 1;
+
+	UPROPERTY(EditAnywhere, Category = "BattleShip | Collsion")
+	FVector BoxSize = FVector(8500.0f, 1300.0f, 1500.0f);
 
 
 	// 움직임, 회전 관련 변수
@@ -107,7 +107,7 @@ protected:
 
 	// 기본 구성 컴포넌트
 	UPROPERTY(VisibleAnywhere)
-	TObjectPtr<UCapsuleComponent> CapsuleComp;
+	TObjectPtr<UBoxComponent> BoxComp;
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<USkeletalMeshComponent> SkeletalMeshComp;
 	UPROPERTY(VisibleAnywhere)

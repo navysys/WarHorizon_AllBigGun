@@ -197,7 +197,7 @@ bool AWHTurretBase::SpinToTargetAngle()
 {
 	if (StaticMeshComp)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("%f"), TargetAngle);
+		
 		//FRotator Rot = StaticMeshComp->GetRelativeRotation();
 		//StaticMeshComp->AddLocalRotation(FRotator(0, 1, 0));
 

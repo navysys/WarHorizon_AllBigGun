@@ -35,7 +35,7 @@ void UBTService_AircraftChangeAngle::TickNode(UBehaviorTreeComponent& OwnerComp,
 
 	switch (AircraftsState)
 	{
-		case EAircraftsState::MoveStraight:
+		//case EAircraftsState::MoveStraight:
 		{
 			FVector Target = OwnerComp.GetBlackboardComponent()->GetValueAsVector(BBKEY_TARGETPOSITION);
 			FVector Loc = ControllingPawn->GetActorLocation();
@@ -67,7 +67,7 @@ void UBTService_AircraftChangeAngle::TickNode(UBehaviorTreeComponent& OwnerComp,
 			break;
 		}
 
-		case EAircraftsState::MoveNormal:
+		//case EAircraftsState::MoveNormal:
 		{
 			FVector Target = OwnerComp.GetBlackboardComponent()->GetValueAsVector(BBKEY_TARGETPOSITION);
 			FVector Loc = ControllingPawn->GetActorLocation();

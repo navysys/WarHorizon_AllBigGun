@@ -25,22 +25,10 @@ void UWHCTargetSelector::TickComponent(float DeltaTime, ELevelTick TickType, FAc
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	if (CurrentFowardAngle != 9999.9999f)
-	{
-		//ChangeAirTurretRotation(ForwardATs, CurrentFowardAngle, DeltaTime);
-	}
-	if (CurrentBackAngle != 9999.9999f)
-	{
-		//ChangeAirTurretRotation(BackATs, CurrentBackAngle, DeltaTime);
-	}
-	if (CurrentLeftAngle != 9999.9999f)
-	{
-		//ChangeAirTurretRotation(LeftATs, CurrentLeftAngle, DeltaTime);
-	}
-	if (CurrentRightAngle != 9999.9999f)
-	{
-		//ChangeAirTurretRotation(RightATs, CurrentRightAngle, DeltaTime);
-	}
+	// Main 터렛은 유저 컨트롤러의 인풋을 받아 Point 의 좌표를 조준하거나 Target 을 트래킹하거나 공격할 수 있어야 함
+	// 일정 시간마다 SUB , AIR 터렛은 배열에 있는 적 중에 공격할 수 있는 것을 자동 공격해야함
+	// Dual 터렛은 공격 가능한 함선이 있다면 함선을 공격하고 없다면 Air 터렛처럼 대공을 수행함
+	// Torpedo 런처는 메인터렛과 같이 동작하나 거리값은 없어도 되고 포탄 대신 어뢰를 발사
 
 	if (bIsTracingTarget)
 	{
@@ -76,10 +64,7 @@ void UWHCTargetSelector::CalculateToTargetInfo()
 	{
 
 	}
-	// Main 터렛은 유저 컨트롤러의 인풋을 받아 Point 의 좌표를 조준하거나 Target 을 트래킹하거나 공격할 수 있어야 함
-	// 일정 시간마다 SUB , AIR 터렛은 배열에 있는 적 중에 공격할 수 있는 것을 자동 공격해야함
-	// Dual 터렛은 공격 가능한 함선이 있다면 함선을 공격하고 없다면 Air 터렛처럼 대공을 수행함
-	// Torpedo 런처는 메인터렛과 같이 동작하나 거리값은 없어도 되고 포탄 대신 어뢰를 발사
+
 }
 
 void UWHCTargetSelector::InitTargetSelectorComponent(const TArray<FTurretArray> AllArray, TArray<APawn*> BattleShips, TArray<APawn*> Aircrafts)

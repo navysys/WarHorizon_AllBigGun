@@ -39,7 +39,7 @@ void UBTTask_AircraftMoveNormal::TickTask(UBehaviorTreeComponent& OwnerComp, uin
 	}
 
 	EAircraftsState AircraftsState = static_cast<EAircraftsState>(OwnerComp.GetBlackboardComponent()->GetValueAsEnum(BBKEY_AIRCRAFTSSTATE));
-	if (AircraftsState != EAircraftsState::MoveNormal)
+	//if (AircraftsState != EAircraftsState::MoveNormal)
 	{
 		FinishLatentTask(OwnerComp, EBTNodeResult::Failed);
 	}

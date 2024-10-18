@@ -41,7 +41,16 @@ void UWHCTargetSelector::TickComponent(float DeltaTime, ELevelTick TickType, FAc
 			float Dist = FVector::Dist2D(Pos, TPos);
 			
 			FVector Dir = (TPos - Pos).GetSafeNormal2D();
-			float Angle = FRotationMatrix::MakeFromX(Dir).Rotator().Yaw;
+			float Yaw = FRotationMatrix::MakeFromX(Dir).Rotator().Yaw;
+			float Angle = round(Yaw - Owner->GetActorRotation().Yaw);
+			if (Angle > 180.0f)
+			{
+				Angle -= 360.0f;
+			}
+			else if (Angle < -180.0f)
+			{
+				Angle += 360.0f;
+			}
 
 			for (FTurretArray TArray : AllTurretArray)
 			{

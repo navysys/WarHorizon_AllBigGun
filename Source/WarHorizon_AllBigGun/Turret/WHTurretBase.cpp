@@ -37,7 +37,9 @@ void AWHTurretBase::BeginPlay()
 {
 	Super::BeginPlay();
 	
-
+	BaseBattleShip = GetInstigator();
+	
+	GetWorld()->GetTimerManager().SetTimer(RotationTimerHandle, this, &AWHTurretBase::SpinToTargetAngle, RotationDelay, false);
 }
 
 // Called every frame
@@ -46,14 +48,14 @@ void AWHTurretBase::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 	DebugTurretForward();
-	SpinToTargetAngle();
+	//SpinToTargetAngle();
 }
 
 void AWHTurretBase::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
 
-	if (StaticMeshComp != nullptr)
+	if (IsValid(StaticMeshComp))
 	{
 		TArray<UStaticMeshSocket*> Muzzles = StaticMeshComp->GetStaticMesh()->Sockets;
 
@@ -150,7 +152,7 @@ void AWHTurretBase::LoadDataTableToName(FName Name)
 
 				MaxHorizontalAngle = Table->TurretHorizontalAngle;
 				MaxVerticalAngle = Table->TurretVerticalAngle;
-				RotationSpeed = Table->TurretRotationSpeed;
+				RotationDelay = Table->TurretRotationSpeed;
 			}
 		}
 	}
@@ -193,19 +195,110 @@ void AWHTurretBase::DebugTurretForward()
 	DrawDebugLine(GetWorld(), TurretLocation, LineEnd, Color, false, -1.f, 0, Thickness);
 }
 
-bool AWHTurretBase::SpinToTargetAngle()
+void AWHTurretBase::SpinToTargetAngle()
 {
-	if (StaticMeshComp)
+	if (IsValid(StaticMeshComp) && IsValid(BaseBattleShip))
 	{
+		float TurretYaw = StaticMeshComp->GetRelativeRotation().Yaw;
 		
-		//FRotator Rot = StaticMeshComp->GetRelativeRotation();
-		//StaticMeshComp->AddLocalRotation(FRotator(0, 1, 0));
+		if (MaxHorizontalAngle == 360.0f)
+		{
+			float Angle;
+			// 360도 회전 계산용 각도
+			if (TargetAngle == 9999.9999f)
+			{
+				Angle = 0.0f;
+			}
+			else
+			{
+				Angle = TurretYaw + TargetAngle - SocketYaw;
+			}
 
-		//UE_LOG(LogTemp, Warning, TEXT("%s"), *Rot.ToString());
+			if (Angle > 180.0f)
+			{
+				Angle -= 360.0f;
+			}
+			else if (Angle < -180.0f)
+			{
+				Angle += 360.0f;
+			}
+
+			if (Angle > 1.0f)
+			{
+				StaticMeshComp->AddRelativeRotation(FRotator(0, 0.5f, 0));
+			}
+			else if (Angle < -1.0f)
+			{
+				StaticMeshComp->AddRelativeRotation(FRotator(0, -0.5f, 0));
+			}
+		}
+		else
+		{
+			float RelativeAngle;
+			// 제한된 각도 내에서의 회전 각도
+			if (TargetAngle == 9999.9999f)
+			{
+				RelativeAngle = 0.0f;
+			}
+			else
+			{
+				RelativeAngle = round(TargetAngle - SocketYaw);
+			}
+
+			if (RelativeAngle > 180.0f)
+			{
+				RelativeAngle -= 360.0f;
+			}
+			else if (RelativeAngle < -180.0f)
+			{
+				RelativeAngle += 360.0f;
+			}
+
+			if (abs(RelativeAngle) < MaxHorizontalAngle)
+			{
+				if (TurretYaw > RelativeAngle + 1.0f)
+				{
+					StaticMeshComp->AddRelativeRotation(FRotator(0, -0.5f, 0));
+					if (StaticMeshComp->GetRelativeRotation().Yaw < RelativeAngle)
+					{
+						StaticMeshComp->SetRelativeRotation(FRotator(0, RelativeAngle, 0));
+					}
+				}
+				else if (TurretYaw < RelativeAngle - 1.0f)
+				{
+					StaticMeshComp->AddRelativeRotation(FRotator(0, 0.5f, 0));
+					if (StaticMeshComp->GetRelativeRotation().Yaw > RelativeAngle)
+					{
+						StaticMeshComp->SetRelativeRotation(FRotator(0, RelativeAngle, 0));
+					}
+				}
+				else
+				{
+					StaticMeshComp->SetRelativeRotation(FRotator(0, RelativeAngle, 0));
+				}
+			}
+			else
+			{
+				if (abs(TurretYaw) < MaxHorizontalAngle)
+				{
+					if (TurretYaw >= 0)
+					{
+						StaticMeshComp->AddRelativeRotation(FRotator(0, 0.5f, 0));
+					}
+					else
+					{
+						StaticMeshComp->AddRelativeRotation(FRotator(0, -0.5f, 0));
+					}
+				}
+				else
+				{
+					StaticMeshComp->SetRelativeRotation(FRotator(0, MaxHorizontalAngle, 0));
+				}
+			}
+		}
+
+		GetWorld()->GetTimerManager().SetTimer(RotationTimerHandle, this, &AWHTurretBase::SpinToTargetAngle, RotationDelay, false);
 	}
-
-
-	return false;
 }
 
 void AWHTurretBase::SetTargetDistance(float Distance)

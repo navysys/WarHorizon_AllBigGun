@@ -13,12 +13,13 @@
 #include "Component/WHCDetectEnemy.h"
 #include "Component/WHCSkillHandler.h"
 #include "Component/WHCTargetSelector.h"
+#include "Component/WHCCameraBodyComponent.h"
 #include "Turret/WHTurretBase.h"
 #include "Aircraft/WHAircraftsBase.h"
 #include "Enum/ETurretAttackType.h"
 #include "Containers/Array.h"
 #include "Skill/WHSkillBase.h"
-#include "Component/WHCCameraBodyComponent.h"
+
 
 // Sets default values
 AWHBattleShipBase::AWHBattleShipBase()
@@ -38,8 +39,8 @@ AWHBattleShipBase::AWHBattleShipBase()
 	RootComponent = BoxComp;
 
 	SkeletalMeshComp = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("SkeletalMesh"));
-	// 스켈레탈 매시의 콜리전 프로파일은 나중에 수정
 	SkeletalMeshComp->SetupAttachment(BoxComp);
+	// 스켈레탈 매시의 콜리전 프로파일은 나중에 수정
 
 	CameraBodyComp = CreateDefaultSubobject<UWHCCameraBodyComponent>(TEXT("CameraBody"));
 
@@ -80,24 +81,24 @@ void AWHBattleShipBase::PostInitializeComponents()
 	LoadDataTableToName(FName(BattleShipName));
 	CreateTurretToMeshCompSocket(SkeletalMeshComp);
 
-	if (BattleShipMovementComp != nullptr)
+	if (IsValid(BattleShipMovementComp))
 	{
 		BattleShipMovementComp->InitBattleShipMovementComponent(InitMaxMoveSpeed, InitAcceleration, InitDeceleration, InitMaxRotationSpeed, InitRotationAcceleration, InitRotationAccelerationIncrease);
 	}
 
-	if (DetectEnemyComp != nullptr)
+	if (IsValid(DetectEnemyComp))
 	{
 		DetectEnemyComp->InitDetectEnemyComponent(TeamInt);
 		DetectEnemyComp->SetDetectedBattleShips(&EnemyBattleShips);
 		DetectEnemyComp->SetDetectedAircrafts(&EnemyAircrafts);
 	}
 
-	if (SkillHandlerComp != nullptr)
+	if (IsValid(SkillHandlerComp))
 	{
 		SkillHandlerComp->InitSkillHandlerComponent(SkillPtrQ, SkillPtrW, SkillPtrE, SkillPtrR);
 	}
 
-	if (TargetSelectorComp != nullptr)
+	if (IsValid(TargetSelectorComp))
 	{
 		TargetSelectorComp->InitTargetSelectorComponent(AllTurretArray, EnemyBattleShips, EnemyAircrafts);
 	}
@@ -312,19 +313,28 @@ void AWHBattleShipBase::CreateTurretToMeshCompSocket(USkeletalMeshComponent* Mes
 
 void AWHBattleShipBase::RapidAttack()
 {
-	TargetSelectorComp->CommandTurretsFire(ETurretType::Main);
+	if (IsValid(TargetSelectorComp))
+	{
+		TargetSelectorComp->CommandTurretsFire(ETurretType::Main);
+	}
 }
 
 void AWHBattleShipBase::NormalAttack()
 {
 	// 현재는 fastfire 와 같지만 이후에는 조준 완료 시에만 발사하고 조준이 안된 함포 회전하는 것 까지
-	TargetSelectorComp->CommandTurretsFire(ETurretType::Main);
+	if (IsValid(TargetSelectorComp))
+	{
+		TargetSelectorComp->CommandTurretsFire(ETurretType::Main);
+	}
 }
 
 
 void AWHBattleShipBase::SpinTurrets(AActor* Target)
 {
-	TargetSelectorComp->SetMainTurretTarget(Target);
+	if (IsValid(TargetSelectorComp))
+	{
+		TargetSelectorComp->SetMainTurretTarget(Target);
+	}
 }
 
 void AWHBattleShipBase::SpinTurrets(FVector HitPoint)
@@ -339,7 +349,7 @@ void AWHBattleShipBase::UseSkill(char Key)
 
 void AWHBattleShipBase::SpinBattleShip(FVector HitPoint)
 {
-	if (BattleShipMovementComp)
+	if (IsValid(BattleShipMovementComp))
 	{
 		BattleShipMovementComp->CalculateAngle(HitPoint);
 	}
@@ -347,7 +357,7 @@ void AWHBattleShipBase::SpinBattleShip(FVector HitPoint)
 
 void AWHBattleShipBase::IncreaseMoveSpeed()
 {
-	if (BattleShipMovementComp)
+	if (IsValid(BattleShipMovementComp))
 	{
 		BattleShipMovementComp->IncreaseSpeedType();
 	}
@@ -355,7 +365,7 @@ void AWHBattleShipBase::IncreaseMoveSpeed()
 
 void AWHBattleShipBase::DecreaseMoveSpeed()
 {
-	if (BattleShipMovementComp)
+	if (IsValid(BattleShipMovementComp))
 	{
 		BattleShipMovementComp->DecreaseSpeedType();
 	}

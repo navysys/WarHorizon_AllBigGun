@@ -33,7 +33,7 @@ public:
 protected:
 	void LoadDataTableToName(FName Name);
 	void DebugTurretForward();
-	bool SpinToTargetAngle();
+	void SpinToTargetAngle();
 
 public:
 	void SetTargetDistance(float Distance);
@@ -55,6 +55,8 @@ protected:
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UNiagaraSystem> GunFireEffect;
 
+	FTimerHandle RotationTimerHandle;
+
 	UPROPERTY(VisibleAnywhere)
 	uint16 TurretID;
 	UPROPERTY(VisibleAnywhere)
@@ -73,15 +75,15 @@ protected:
 	float Range;
 
 	UPROPERTY(EditAnywhere)
-	float MaxHorizontalAngle;
+	float MaxHorizontalAngle = 150.0f;
 	UPROPERTY(EditAnywhere)
 	float MaxVerticalAngle;
 
 	UPROPERTY(EditAnywhere)
-	float RotationSpeed;
+	float RotationDelay = 0.05f;
 
 	UPROPERTY(EditAnywhere)
-	float TargetAngle = 0.0f;
+	float TargetAngle = 9999.9999f;
 
 	UPROPERTY(EditAnywhere)
 	bool bIsLookTarget = true;

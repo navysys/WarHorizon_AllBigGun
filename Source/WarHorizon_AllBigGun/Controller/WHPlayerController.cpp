@@ -16,8 +16,6 @@ AWHPlayerController::AWHPlayerController()
 	bAutoManageActiveCameraTarget = true;
 
 	CurrentControllerMappingType = EControllerMappingType::Default;
-
-
 }
 
 void AWHPlayerController::BeginPlay()
@@ -54,6 +52,7 @@ void AWHPlayerController::SetupInputComponent()
 	}
 }
 
+// 나중에 비행기를 컨트롤 하는 상태를 위해 조작을 제한하기 위함
 void AWHPlayerController::ChangeWaitingAttackMappingContext()
 {
 
@@ -74,12 +73,10 @@ void AWHPlayerController::ChangeWaitingAttackMappingContext()
 
 void AWHPlayerController::MoveOrTargeting(const FInputActionValue& Value)
 {
-	if (BattleShipPawn != nullptr)
+	if ( BattleShipPawn != nullptr)
 	{
 		FHitResult Hit;
 		GetHitResultUnderCursor(ECC_Visibility, false, Hit);
-
-		//UE_LOG(LogTemp, Warning, TEXT("%i"), Hit.);
 
 		if (Hit.bBlockingHit)
 		{
@@ -128,9 +125,7 @@ void AWHPlayerController::TargetAttack(const FInputActionValue& Value)
 		// A 누른 뒤 함선을 클릭 했을 경우
 		if (Hit.bBlockingHit && Hit.GetActor()->ActorHasTag(TEXT("BattleShip")))
 		{
-			APawn* TargetShip = Cast<APawn>(Hit.GetActor());
-			BattleShipPawn->SpinTurrets(TargetShip);
-
+			BattleShipPawn->SpinTurrets(Hit.GetActor());
 			BattleShipPawn->NormalAttack();
 
 			// 디폴트 상태로 전환
@@ -153,27 +148,9 @@ void AWHPlayerController::SpinTurret(const FInputActionValue& Value)
 		FHitResult Hit;
 		GetHitResultUnderCursor(ECC_Visibility, false, Hit);
 		
-
 		if (Hit.bBlockingHit)
 		{
-			APawn* BattleShip = Cast<APawn>(BattleShipPawn);
-			FVector Pos = FVector(BattleShip->GetActorLocation().X, BattleShip-> GetActorLocation().Y, 0);
-			FVector HitPoint = FVector(Hit.Location.X, Hit.Location.Y, 0.0f);
-
-			// 두 점 사이의 방향 벡터를 계산합니다
-			FVector Direction = (HitPoint - Pos).GetSafeNormal();
-
-			// 방향 벡터로부터 회전 값을 계산합니다
-			float Angle = FRotationMatrix::MakeFromX(Direction).Rotator().Yaw;
-			if (Angle < 0)
-			{
-				Angle += 360.0f;
-			}
-
-			// Hit 과 함선 사이의 거리
-			float Distance = FVector::Distance(Pos, HitPoint);
-
-			BattleShipPawn->SpinTurrets(HitPoint);
+			BattleShipPawn->SpinTurrets(Hit.Location);
 			DrawDebugLine(GetWorld(), FVector(Hit.Location.X, Hit.Location.Y, 30000.0f), Hit.Location, FColor::Red, false, 3, 0, 200);
 		}
 	}

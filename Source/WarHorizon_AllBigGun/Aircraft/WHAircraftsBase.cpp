@@ -75,22 +75,34 @@ void AWHAircraftsBase::InitToDataTable(int Id)
 
 void AWHAircraftsBase::MoveFront()
 {
-	AircraftMovementComp->AddInputVector(GetActorForwardVector());
+	if (IsValid(AircraftMovementComp))
+	{
+		AircraftMovementComp->AddInputVector(GetActorForwardVector());
+	}
 }
 
 void AWHAircraftsBase::Turn(int Angle)
 {
-	AircraftMovementComp->Turn(Angle);
+	if (IsValid(AircraftMovementComp))
+	{
+		AircraftMovementComp->Turn(Angle);
+	}
 }
 
 void AWHAircraftsBase::IncreaseHeight(float MaxZ)
 {
-	AircraftMovementComp->IncreaseHeight(MaxZ);
+	if (IsValid(AircraftMovementComp))
+	{
+		AircraftMovementComp->IncreaseHeight(MaxZ);
+	}
 }
 
 void AWHAircraftsBase::DecreaseHeight(float MinZ)
 {
-	AircraftMovementComp->DecreaseHeight(MinZ);
+	if (IsValid(AircraftMovementComp))
+	{
+		AircraftMovementComp->DecreaseHeight(MinZ);
+	}
 }
 
 void AWHAircraftsBase::GunAttack()
@@ -127,10 +139,13 @@ uint8 AWHAircraftsBase::GetAircraftType()
 
 void AWHAircraftsBase::DestroyAircraft(int Index)
 {
-	ArrayAircrafts[Index]->Destroy();		// 차후에는 비행기가 불나면서 중력 낙하하도록하는 함수 호출
-	ArrayAircrafts.RemoveAt(Index);
-	AircraftsNum = ArrayAircrafts.Num();
-	SetInitAircraftPosition();
+	if (ArrayAircrafts.Num() > Index)
+	{
+		ArrayAircrafts[Index]->Destroy();		// 차후에는 비행기가 불나면서 중력 낙하하도록하는 함수 호출
+		ArrayAircrafts.RemoveAt(Index);
+		AircraftsNum = ArrayAircrafts.Num();
+		SetInitAircraftPosition();
+	}
 }
 
 APawn* AWHAircraftsBase::GetMotherShip()

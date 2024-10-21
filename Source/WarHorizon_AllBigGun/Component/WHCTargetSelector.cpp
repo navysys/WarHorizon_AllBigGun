@@ -52,17 +52,12 @@ void UWHCTargetSelector::TickComponent(float DeltaTime, ELevelTick TickType, FAc
 				Angle += 360.0f;
 			}
 
-			for (FTurretArray TArray : AllTurretArray)
+			for (AWHTurretBase* Turret : MainTurrets)
 			{
-				if (TArray.TurretsType == ETurretType::Main)
-				{
-					for (AWHTurretBase* Turret : TArray.Turrets)
-					{
-						Turret->SetTargetAngle(Angle);
-						Turret->SetTargetDistance(Dist);
-					}
-				}
+				Turret->SetTargetAngle(Angle);
+				Turret->SetTargetDistance(Dist);
 			}
+
 		}
 	}
 }

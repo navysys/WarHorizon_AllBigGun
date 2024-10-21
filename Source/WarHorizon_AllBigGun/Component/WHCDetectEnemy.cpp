@@ -1,20 +1,13 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 
 #include "Component/WHCDetectEnemy.h"
 #include "DrawDebugHelpers.h"
 
-// Sets default values for this component's properties
+
 UWHCDetectEnemy::UWHCDetectEnemy()
 {
-	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
-	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
-	// ...
 }
 
-
-// Called when the game starts
 void UWHCDetectEnemy::BeginPlay()
 {
 	Super::BeginPlay();
@@ -25,8 +18,6 @@ void UWHCDetectEnemy::BeginPlay()
 	//GetWorld()->GetTimerManager().SetTimer(AircraftTimerHandle, this, &UWHCDetectEnemy::DetectAircraft, 0.5f, true);
 }
 
-
-// Called every frame
 void UWHCDetectEnemy::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
@@ -68,7 +59,6 @@ void UWHCDetectEnemy::DetectBattleShip()
 	bool bResult = GetWorld()->OverlapMultiByProfile(BOverlapResults, Center, FQuat::Identity, BPresetName, FCollisionShape::MakeSphere(BRadius), CollisionQueryParam);
 	if (bResult)
 	{
-		//UE_LOG(LogTemp, Warning, TEXT("Detect Enemy Comp -> Detect"));
 		TArray<APawn*> ArrayPawn;
 		for (auto const& OverlapResult : BOverlapResults)
 		{
@@ -78,16 +68,16 @@ void UWHCDetectEnemy::DetectBattleShip()
 				ArrayPawn.Emplace(Pawn);
 			}
 		}
-		DetectedBattleShips = ArrayPawn;
-		if (DetectedBattleShips.Num() > 1)
+		if (ArrayPawn.Num() > 1)
 		{
-			SortingArrayToDistance(DetectedBattleShips);
+			SortingArrayToDistance(ArrayPawn);
 			DrawDebugSphere(GetWorld(), Center, BRadius, 20, FColor::Green, false, 0.5f);
 		}
 		else 
 		{
 			DrawDebugSphere(GetWorld(), Center, BRadius, 20, FColor::Red, false, 0.5f);
 		}
+		*DetectedBattleShips = ArrayPawn;
 	}
 	else
 	{
@@ -118,11 +108,11 @@ void UWHCDetectEnemy::DetectAircraft()
 				DrawDebugSphere(GetWorld(), Center, ARadius, 20, FColor::Green, false, 0.5f);
 			}
 		}
-		DetectedAircrafts = ArrayPawn;
-		if (DetectedAircrafts.Num() > 1)
+		if (ArrayPawn.Num() > 1)
 		{
-			SortingArrayToDistance(DetectedAircrafts);
+			SortingArrayToDistance(ArrayPawn);
 		}
+		*DetectedAircrafts = ArrayPawn;
 	}
 	else
 	{

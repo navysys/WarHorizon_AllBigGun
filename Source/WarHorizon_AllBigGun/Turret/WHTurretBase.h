@@ -1,9 +1,8 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #pragma once
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "Game/WHCustomStructs.h"
 #include "Enum/ETurretType.h"
 #include "WHTurretBase.generated.h"
 
@@ -23,25 +22,25 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-	virtual void Tick(float DeltaTime) override;
 	virtual void PostInitializeComponents() override;
 
 public:	
+	virtual void Tick(float DeltaTime) override;
+
+	virtual void Fire();
+
 	void SetFrontDirection(char Dir);
 	char GetFrontDirection() { return FrontDirection; }
-	virtual void Fire();
+	void SetTargetData(FTargetData Data);
+	void SetTargetData(const TArray<FTargetData>* DatasPtr);
+
 protected:
 	void LoadDataTableToName(FName Name);
 	void DebugTurretForward();
 	void SpinToTargetAngle();
 
-public:
-	void SetTargetDistance(float Distance);
-	void SetTargetAngle(float Angle);
-
-
 protected:
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY()
 	APawn* BaseBattleShip;
 
 	UPROPERTY(VisibleAnywhere)
@@ -50,24 +49,20 @@ protected:
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UStaticMeshComponent> StaticMeshComp;
 
+	UPROPERTY(VisibleAnywhere)
 	TArray<USceneComponent*> MuzzleComps;
 
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UNiagaraSystem> GunFireEffect;
 
-	FTimerHandle RotationTimerHandle;
-
-	UPROPERTY(VisibleAnywhere)
-	uint16 TurretID;
-	UPROPERTY(VisibleAnywhere)
-	FString TurretName;
-	UPROPERTY(VisibleAnywhere)
-	ETurretType TurretType;
-
-	// 포탑의 정면을 LRFB 로 구분
-	char FrontDirection;
+	// 데이터 베이스 초기화 변수
+protected:
 	UPROPERTY(EditAnywhere)
-	float SocketYaw;
+	uint16 TurretID;
+	UPROPERTY(EditAnywhere)
+	FString TurretName;
+	UPROPERTY(EditAnywhere)
+	ETurretType TurretType;
 
 	UPROPERTY(EditAnywhere)
 	float ReloadTime;
@@ -82,24 +77,28 @@ protected:
 	UPROPERTY(EditAnywhere)
 	float RotationDelay = 0.05f;
 
+	// 포탑 회전을 위한 변수
+protected:
+	FTimerHandle RotationTimerHandle;
+
 	UPROPERTY(EditAnywhere)
-	float TargetAngle = 9999.9999f;
+	FTargetData TargetData;
 
 	UPROPERTY(EditAnywhere)
 	bool bIsLookTarget = true;
 
-public:
+	// 포탑의 정면을 LRFB 로 구분
+	char FrontDirection;
+	float SocketYaw;
+
+	// 포탄 발사를 위한 변수
+protected:
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<AWHShell> Shell;
-
-	UPROPERTY(VisibleAnywhere)
-	float TargetDistance;
 
 	UPROPERTY(EditAnywhere)
 	TArray<float> Dispersion;
 
-	// 포탄 날아가는 각도를 위한 변수
-	// Air 와 Torpedo 터렛에서는 사용 x
 	UPROPERTY(VisibleAnywhere)
 	FVector ShellVelocityVector = FVector::ZeroVector;
 
@@ -108,7 +107,4 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	float ShellLaunchAngle;
-
-	// 비헤이비어 트리 기능
-	// 
 };

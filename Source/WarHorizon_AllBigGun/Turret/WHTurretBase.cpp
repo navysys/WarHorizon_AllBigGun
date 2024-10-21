@@ -1,5 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 
 #include "Turret/WHTurretBase.h"
 #include "Game/WHGameInstance.h"
@@ -9,10 +7,8 @@
 #include "Engine/StaticMeshSocket.h"
 
 
-// Sets default values
 AWHTurretBase::AWHTurretBase()
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
 	RootComp = CreateDefaultSubobject<USceneComponent>(TEXT("RootComp"));
@@ -32,7 +28,6 @@ AWHTurretBase::AWHTurretBase()
 	
 }
 
-// Called when the game starts or when spawned
 void AWHTurretBase::BeginPlay()
 {
 	Super::BeginPlay();
@@ -42,13 +37,11 @@ void AWHTurretBase::BeginPlay()
 	GetWorld()->GetTimerManager().SetTimer(RotationTimerHandle, this, &AWHTurretBase::SpinToTargetAngle, RotationDelay, false);
 }
 
-// Called every frame
 void AWHTurretBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
 	DebugTurretForward();
-	//SpinToTargetAngle();
 }
 
 void AWHTurretBase::PostInitializeComponents()
@@ -160,34 +153,29 @@ void AWHTurretBase::LoadDataTableToName(FName Name)
 
 void AWHTurretBase::DebugTurretForward()
 {
-	FVector TurretLocation = GetActorLocation();
-	FVector ForwardVector = GetActorForwardVector();
-	FVector RightVector = GetActorRightVector();
-	FVector LineEnd = GetActorLocation();
+	FVector TurretLocation = StaticMeshComp->GetComponentLocation();
+	FVector ForwardVector = StaticMeshComp->GetForwardVector();
+	FVector LineEnd = TurretLocation + ForwardVector * Range;
 	FColor Color = FColor::Yellow;
 	float Thickness = 10.0f;
 
 	if (TurretType == ETurretType::Main)
 	{
-		LineEnd = TurretLocation + ForwardVector * Range;
 		Color = FColor::Red;
 		Thickness = 100.0f;
 	}
 	else if (TurretType == ETurretType::Sub)
 	{
-		LineEnd = TurretLocation + ForwardVector * Range;
 		Color = FColor::Yellow;
 		Thickness = 50.0f;
 	}
 	else if (TurretType == ETurretType::Air)
 	{
-		LineEnd = TurretLocation + ForwardVector * Range;
 		Color = FColor::Blue;
 		Thickness = 20.0f;
 	}
 	else if (TurretType == ETurretType::DualPurpose)
 	{
-		LineEnd = TurretLocation + ForwardVector * Range;
 		Color = FColor::Green;
 		Thickness = 50.0f;
 	}
@@ -205,13 +193,13 @@ void AWHTurretBase::SpinToTargetAngle()
 		{
 			float Angle;
 			// 360도 회전 계산용 각도
-			if (TargetAngle == 9999.9999f)
+			if (TargetData.Angle == 0)
 			{
 				Angle = 0.0f;
 			}
 			else
 			{
-				Angle = TurretYaw + TargetAngle - SocketYaw;
+				Angle = TurretYaw + TargetData.Angle - SocketYaw;
 			}
 
 			if (Angle > 180.0f)
@@ -236,13 +224,13 @@ void AWHTurretBase::SpinToTargetAngle()
 		{
 			float RelativeAngle;
 			// 제한된 각도 내에서의 회전 각도
-			if (TargetAngle == 9999.9999f)
+			if (TargetData.Angle == 0)
 			{
 				RelativeAngle = 0.0f;
 			}
 			else
 			{
-				RelativeAngle = round(TargetAngle - SocketYaw);
+				RelativeAngle = round(TargetData.Angle - SocketYaw);
 			}
 
 			if (RelativeAngle > 180.0f)
@@ -301,12 +289,25 @@ void AWHTurretBase::SpinToTargetAngle()
 	}
 }
 
-void AWHTurretBase::SetTargetDistance(float Distance)
+void AWHTurretBase::SetTargetData(FTargetData Data)
 {
-	TargetDistance = Distance;
+	TargetData = Data;
 }
 
-void AWHTurretBase::SetTargetAngle(float Angle)
+void AWHTurretBase::SetTargetData(const TArray<FTargetData>* DatasPtr)
 {
-	TargetAngle = Angle;
+	if (DatasPtr)
+	{
+		for (FTargetData Data : *DatasPtr)
+		{
+			if (Data.Angle - SocketYaw < MaxHorizontalAngle)
+			{
+				if (Data.Distance < Range)
+				{
+					TargetData = Data;
+					return;
+				}
+			}
+		}
+	}
 }

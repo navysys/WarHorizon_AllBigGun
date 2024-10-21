@@ -21,15 +21,12 @@
 #include "Skill/WHSkillBase.h"
 
 
-// Sets default values
 AWHBattleShipBase::AWHBattleShipBase()
 {
 	PrimaryActorTick.bCanEverTick = true;
 
 	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
 	Tags.Add(FName("BattleShip"));
-
-	
 
 	// 스켈레탈 매시
 	BoxComp = CreateDefaultSubobject<UBoxComponent>(TEXT("RootComp"));
@@ -43,7 +40,6 @@ AWHBattleShipBase::AWHBattleShipBase()
 	// 스켈레탈 매시의 콜리전 프로파일은 나중에 수정
 
 	CameraBodyComp = CreateDefaultSubobject<UWHCCameraBodyComponent>(TEXT("CameraBody"));
-
 
 	SpringArmComp = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArmComponent"));
 	SpringArmComp->SetRelativeRotation(FRotator(-50.0f, 90.0f, 0.0f));
@@ -63,12 +59,9 @@ AWHBattleShipBase::AWHBattleShipBase()
 	TargetSelectorComp = CreateDefaultSubobject<UWHCTargetSelector>(TEXT("TargetSelectorComp"));
 }
 
-// Called when the game starts or when spawned
 void AWHBattleShipBase::BeginPlay()
 {
 	Super::BeginPlay();
-	
-	
 
 	//test
 	//SpawnAircrafts(0);
@@ -100,11 +93,10 @@ void AWHBattleShipBase::PostInitializeComponents()
 
 	if (IsValid(TargetSelectorComp))
 	{
-		TargetSelectorComp->InitTargetSelectorComponent(AllTurretArray, EnemyBattleShips, EnemyAircrafts);
+		TargetSelectorComp->InitTargetSelectorComponent(AllTurretArray, &EnemyBattleShips, EnemyAircrafts);
 	}
 }
 
-// Called every frame
 void AWHBattleShipBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
@@ -339,7 +331,10 @@ void AWHBattleShipBase::SpinTurrets(AActor* Target)
 
 void AWHBattleShipBase::SpinTurrets(FVector HitPoint)
 {
-
+	if (IsValid(TargetSelectorComp))
+	{
+		TargetSelectorComp->SetMainTurretPoint(HitPoint);
+	}
 }
 
 void AWHBattleShipBase::UseSkill(char Key)
@@ -387,7 +382,6 @@ void AWHBattleShipBase::SpawnAircrafts(int Index)
 		AWHAircraftsBase* SpawnedAircrafts = GetWorld()->SpawnActor<AWHAircraftsBase>(GetActorLocation(), FRotator::ZeroRotator, SpawnParams);
 		SpawnedAircrafts->InitToDataTable(AircraftIDs[Index]);
 		AllAircraftsArray.Emplace(SpawnedAircrafts);
-
 	}
 }
 

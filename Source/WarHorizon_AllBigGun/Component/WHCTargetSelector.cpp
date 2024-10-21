@@ -3,15 +3,12 @@
 #include "Turret/WHTurretBase.h"
 
 
-
 UWHCTargetSelector::UWHCTargetSelector()
 {
 	PrimaryComponentTick.bCanEverTick = true;
 
 }
 
-
-// Called when the game starts
 void UWHCTargetSelector::BeginPlay()
 {
 	Super::BeginPlay();
@@ -19,8 +16,6 @@ void UWHCTargetSelector::BeginPlay()
 	Owner = GetOwner();
 }
 
-
-// Called every frame
 void UWHCTargetSelector::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
@@ -30,48 +25,39 @@ void UWHCTargetSelector::TickComponent(float DeltaTime, ELevelTick TickType, FAc
 	// Dual 터렛은 공격 가능한 함선이 있다면 함선을 공격하고 없다면 Air 터렛처럼 대공을 수행함
 	// Torpedo 런처는 메인터렛과 같이 동작하나 거리값은 없어도 되고 포탄 대신 어뢰를 발사
 
+	SetSubTurretDataToTargetArray();
+	for (AWHTurretBase* Turret : ForwardSTs)
+	{
+		if (STLDatas.Num())
+		{
+			Turret->SetTargetData(&STFDatas);
+		}
+	}
+	for (AWHTurretBase* Turret : BackSTs)
+	{
+		if (STLDatas.Num())
+		{
+			Turret->SetTargetData(&STBDatas);
+		}
+	}
+
 	if (bIsTracingTarget)
 	{
-		if (IsValid(MainTarget))
+		if (IsValid(MTTarget))
 		{
 			// 함선과 타겟 사이의 각도와 거리 계산 후 전달
-			FVector Pos = Owner->GetActorLocation();
-			FVector TPos = MainTarget->GetActorLocation();
-
-			float Dist = FVector::Dist2D(Pos, TPos);
-			
-			FVector Dir = (TPos - Pos).GetSafeNormal2D();
-			float Yaw = FRotationMatrix::MakeFromX(Dir).Rotator().Yaw;
-			float Angle = round(Yaw - Owner->GetActorRotation().Yaw);
-			if (Angle > 180.0f)
-			{
-				Angle -= 360.0f;
-			}
-			else if (Angle < -180.0f)
-			{
-				Angle += 360.0f;
-			}
+			FTargetData Data = CalculateOwnerToPointData(MTTarget->GetActorLocation());
 
 			for (AWHTurretBase* Turret : MainTurrets)
 			{
-				Turret->SetTargetAngle(Angle);
-				Turret->SetTargetDistance(Dist);
+				Turret->SetTargetData(Data);
 			}
 
 		}
 	}
 }
 
-void UWHCTargetSelector::CalculateToTargetInfo()
-{
-	for (FTurretArray TArray : AllTurretArray)
-	{
-
-	}
-
-}
-
-void UWHCTargetSelector::InitTargetSelectorComponent(const TArray<FTurretArray> AllArray, TArray<APawn*> BattleShips, TArray<APawn*> Aircrafts)
+void UWHCTargetSelector::InitTargetSelectorComponent(const TArray<FTurretArray> AllArray,TArray<APawn*>* BattleShips, TArray<APawn*> Aircrafts)
 {
 	AllTurretArray = AllArray;
 	BSTargetArray = BattleShips;
@@ -169,7 +155,17 @@ void UWHCTargetSelector::InitTargetSelectorComponent(const TArray<FTurretArray> 
 void UWHCTargetSelector::SetMainTurretTarget(AActor* Target)
 {
 	bIsTracingTarget = true;
-	MainTarget = Target;
+	MTTarget = Target;
+}
+
+void UWHCTargetSelector::SetMainTurretPoint(FVector Point)
+{
+	bIsTracingTarget = false;
+	FTargetData Data = CalculateOwnerToPointData(Point);
+	for (AWHTurretBase* Turret : MainTurrets)
+	{
+		Turret->SetTargetData(Data);
+	}
 }
 
 void UWHCTargetSelector::CommandTurretsFire(ETurretType TurretType)
@@ -189,82 +185,117 @@ void UWHCTargetSelector::CommandTurretsFire(ETurretType TurretType)
 	}
 }
 
-void UWHCTargetSelector::UpdateTargetInfo(ETurretType TurretType, APawn* TargetPawn)
+void UWHCTargetSelector::SetAirTurretDataToTargetArray()
 {
-}
-
-void UWHCTargetSelector::UpdateTargetInfo(ETurretType TurretType, FVector Point)
-{
-}
-
-void UWHCTargetSelector::CalculateAirTurretRotation()
-{
-	ACTargetAngles.Empty();
+	ACTargetDatas.Empty();
 	if (ACTargetArray.Num() != 0)
 	{
 		for (APawn* AC : ACTargetArray)
 		{
-			FVector Dir1 = AC->GetActorLocation() - Owner->GetActorLocation();
-			Dir1.Normalize();
-			FVector Dir2 = Owner->GetActorForwardVector();
-
-			float DotProduct = FVector::DotProduct(Dir1, Dir2);
-			float Angle = FMath::Acos(DotProduct) * (180.0f / PI);
-
-			ACTargetAngles.Emplace(Angle);
+			FTargetData Angle = CalculateOwnerToPointData(AC->GetActorLocation());
+			ACTargetDatas.Emplace(Angle);
 		}
 		
-		if (ACTargetAngles.Num() != 0)
+		if (ACTargetDatas.Num() != 0)
 		{
 			bool L = true;
 			bool R = true;
 			bool F = true;
 			bool B = true;
-			for (int i = 0; i < ACTargetAngles.Num(); i++)
+			for (int i = 0; i < ACTargetDatas.Num(); i++)
 			{
-				if (ACTargetAngles[i] <= -30.0f && ACTargetAngles[i] >= -150.0f)
+				if (ACTargetDatas[i].Angle <= -30.0f && ACTargetDatas[i].Angle >= -150.0f)
 				{
 					if (L)
 					{
-						CurrentLeftAngle = ACTargetAngles[i] - 90.0f;
+						ATLData = ACTargetDatas[i];
 						L = false;
 					}
 				}
-				else if (ACTargetAngles[i] >= 30.0f && ACTargetAngles[i] <= 150.0f)
+				else if (ACTargetDatas[i].Angle >= 30.0f && ACTargetDatas[i].Angle <= 150.0f)
 				{
 					if (R)
 					{
-						CurrentRightAngle = ACTargetAngles[i] + 90.0f;
+						ATRData = ACTargetDatas[i];
 						R = false;
 					}
 				}
-				else if (ACTargetAngles[i] > -30.0f && ACTargetAngles[i] < 30.0f)
+				else if (ACTargetDatas[i].Angle > -30.0f && ACTargetDatas[i].Angle < 30.0f)
 				{
 					if (F)
 					{
-						CurrentFowardAngle = ACTargetAngles[i];
+						ATFData = ACTargetDatas[i];
 						F = false;
 					}
 				}
-				else if (ACTargetAngles[i] > 150.0f && ACTargetAngles[i] < -150.0f)
+				else if (ACTargetDatas[i].Angle > 150.0f && ACTargetDatas[i].Angle < -150.0f)
 				{
 					if (B)
 					{
-						float InitAngle = 0;
-						if (ACTargetAngles[i] > 0)
-						{
-							InitAngle = -180.0f;
-						}
-						else
-						{
-							InitAngle = 180.0f;
-						}
-						CurrentBackAngle = ACTargetAngles[i] + InitAngle;
+						ATBData = ACTargetDatas[i];
 						B = false;
 					}
 				}
 			}
 		}
-
 	}
+}
+
+void UWHCTargetSelector::SetSubTurretDataToTargetArray()
+{
+	BSTargetDatas.Empty();
+	if (BSTargetArray->Num() != 0)
+	{
+		
+		for (APawn* BS : *BSTargetArray)
+		{
+			FTargetData Data = CalculateOwnerToPointData(BS->GetActorLocation());
+			BSTargetDatas.Emplace(Data);
+		}
+
+		if (BSTargetDatas.Num() != 0)
+		{
+			for (int i = 0; i < BSTargetDatas.Num(); i++)
+			{
+				if (BSTargetDatas[i].Angle <= -30.0f && BSTargetDatas[i].Angle >= -150.0f)
+				{
+					STLDatas.Emplace(BSTargetDatas[i]);
+				}
+				if (BSTargetDatas[i].Angle >= 30.0f && BSTargetDatas[i].Angle <= 150.0f)
+				{
+					STRDatas.Emplace(BSTargetDatas[i]);
+				}
+				if (BSTargetDatas[i].Angle > -120.0f && BSTargetDatas[i].Angle < 120.0f)
+				{
+					STFDatas.Emplace(BSTargetDatas[i]);
+				}
+				if (BSTargetDatas[i].Angle > 60.0f && BSTargetDatas[i].Angle < -60.0f)
+				{
+					STBDatas.Emplace(BSTargetDatas[i]);
+				}
+			}
+		}
+	}
+}
+
+FTargetData UWHCTargetSelector::CalculateOwnerToPointData(FVector Point)
+{
+	FVector Pos = Owner->GetActorLocation();
+	FVector TPos = Point;
+
+	float Dist = FVector::Dist2D(Pos, TPos);
+
+	FVector Dir = (TPos - Pos).GetSafeNormal2D();
+	float Yaw = FRotationMatrix::MakeFromX(Dir).Rotator().Yaw;
+	float Angle = round(Yaw - Owner->GetActorRotation().Yaw);
+	if (Angle > 180.0f)
+	{
+		Angle -= 360.0f;
+	}
+	else if (Angle < -180.0f)
+	{
+		Angle += 360.0f;
+	}
+
+	return FTargetData(Angle, Dist);
 }

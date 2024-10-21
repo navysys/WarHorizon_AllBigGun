@@ -1,5 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 
 #include "Component/WHCBattleShipMovement.h"
 
@@ -16,7 +14,6 @@ void UWHCBattleShipMovement::BeginPlay()
 	MaxSpeed = 0;
 	TurningBoost = 1;
 }
-
 
 void UWHCBattleShipMovement::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {

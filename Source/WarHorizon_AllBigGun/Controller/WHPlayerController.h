@@ -1,5 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #pragma once
 
 #include "CoreMinimal.h"
@@ -8,13 +6,10 @@
 #include "Game/WHCustomStructs.h"
 #include "WHPlayerController.generated.h"
 
-/**
- *
- */
-
 class UInputMappingContext;
 class UInputAction;
 class IBattleShipInterface;
+
 
 UENUM()
 enum class EControllerMappingType : uint8
@@ -22,6 +17,7 @@ enum class EControllerMappingType : uint8
 	Default,
 	WaitingAttack
 };
+
 
 UCLASS()
 class WARHORIZON_ALLBIGGUN_API AWHPlayerController : public APlayerController

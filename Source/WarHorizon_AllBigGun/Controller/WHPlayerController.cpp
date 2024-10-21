@@ -1,5 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 
 #include "Controller/WHPlayerController.h"
 #include "EnhancedInputComponent.h"
@@ -9,6 +7,7 @@
 #include "GameFramework/Actor.h"
 #include "Interface/BattleShipInterface.h"
 #include "DrawDebugHelpers.h"
+
 
 AWHPlayerController::AWHPlayerController()
 {

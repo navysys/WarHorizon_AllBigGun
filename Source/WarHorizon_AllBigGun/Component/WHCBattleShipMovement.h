@@ -1,14 +1,9 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #pragma once
 
 #include "CoreMinimal.h"
 #include "GameFramework/FloatingPawnMovement.h"
 #include "WHCBattleShipMovement.generated.h"
 
-/**
- * 
- */
 
 UENUM()
 enum class ESpeedType : uint8
@@ -21,6 +16,7 @@ enum class ESpeedType : uint8
 	Max UMETA(DisplayName = "Max"),
 	Invalid
 };
+
 
 UCLASS(ClassGroup = Movement, meta = (BlueprintSpawnableComponent))
 class WARHORIZON_ALLBIGGUN_API UWHCBattleShipMovement : public UFloatingPawnMovement

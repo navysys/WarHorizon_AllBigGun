@@ -1,5 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 
 #include "Controller/WHAircraftsAIController.h"
 #include "BehaviorTree/BehaviorTree.h"
@@ -7,6 +5,7 @@
 #include "BehaviorTree/BlackboardComponent.h"
 #include "BehaviorTree/AircraftsAI.h"
 #include "Enum/EAircraftsState.h"
+
 
 AWHAircraftsAIController::AWHAircraftsAIController()
 {

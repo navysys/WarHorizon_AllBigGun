@@ -1,14 +1,11 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #pragma once
 
 #include "CoreMinimal.h"
 #include "WHSkillBase.generated.h"
 
-/**
- * 
- */
+
 class AWHBattleShipBase;
+
 
 UCLASS(BlueprintType)
 class WARHORIZON_ALLBIGGUN_API UWHSkillBase : public UObject

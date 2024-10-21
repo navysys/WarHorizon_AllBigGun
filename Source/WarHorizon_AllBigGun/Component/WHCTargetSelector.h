@@ -1,5 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #pragma once
 
 #include "CoreMinimal.h"
@@ -10,6 +8,7 @@
 
 struct FTurretArray;
 class AWHTurretBase;
+
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class WARHORIZON_ALLBIGGUN_API UWHCTargetSelector : public UActorComponent
@@ -25,39 +24,34 @@ protected:
 	virtual void BeginPlay() override;
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
-protected:
-	void CalculateToTargetInfo();
-
 public:
-	void InitTargetSelectorComponent(const TArray<FTurretArray> AllArray, TArray<APawn*> BattleShips, TArray<APawn*> Aircrafts);
-	void SetTargetBattleShips(const TArray<APawn*>* BattleShips) { BSTargetArray = *BattleShips; }
+	void InitTargetSelectorComponent(const TArray<FTurretArray> AllArray, TArray<APawn*>* BattleShips, TArray<APawn*> Aircrafts);
+	void SetTargetBattleShips(TArray<APawn*>* BattleShips) { BSTargetArray = BattleShips; }
 	void SetTargetAircreafts(const TArray<APawn*>* Aircrafts) { ACTargetArray = *Aircrafts; }
 
-	//테스트 함수
-	void SetCurrentLeftAngle(float Left) { CurrentLeftAngle = Left; }
-
 	void SetMainTurretTarget(AActor* Target);
-	void SetMainTurretAngleAndDistance(FVector Point);
+	void SetMainTurretPoint(FVector Point);
 	void CommandTurretsFire(ETurretType TurretType);
-	void UpdateTargetInfo(ETurretType TurretType, APawn* TargetPawn);
-	void UpdateTargetInfo(ETurretType TurretType, FVector Point);
 protected:
-	void CalculateAirTurretRotation();
+	void SetAirTurretDataToTargetArray();
+	void SetSubTurretDataToTargetArray();
+	FTargetData CalculateOwnerToPointData(FVector Point);
 
 protected:
 	AActor* Owner;
 	bool bIsTracingTarget;
-	AActor* MainTarget;
+	AActor* MTTarget;
 
 	// 타겟
-	TArray<APawn*> BSTargetArray;
+	TArray<APawn*>* BSTargetArray;
 	TArray<APawn*> ACTargetArray;
 
-	TArray<float> ACTargetAngles;
+	TArray<FTargetData> BSTargetDatas;
+	TArray<FTargetData> ACTargetDatas;
 	// 터렛
 	TArray<FTurretArray> AllTurretArray;
 
-	// 메인 터렛 (어뢰 발사기 가능)
+	// 메인 터렛 (어뢰 발사기 포함)
 	TArray<AWHTurretBase*> MainTurrets;
 	// 방향 기준 서브 터렛
 	TArray<AWHTurretBase*> ForwardSTs;
@@ -76,13 +70,22 @@ protected:
 	TArray<AWHTurretBase*> RightDTs;
 
 	UPROPERTY(VisibleAnywhere)
-	float CurrentFowardAngle = 9999.9999f;
+	TArray<FTargetData> STFDatas;
 	UPROPERTY(VisibleAnywhere)
-	float CurrentBackAngle = 9999.9999f;
+	TArray<FTargetData> STBDatas;
 	UPROPERTY(VisibleAnywhere)
-	float CurrentLeftAngle = 9999.9999f;
+	TArray<FTargetData> STLDatas;
 	UPROPERTY(VisibleAnywhere)
-	float CurrentRightAngle = 9999.9999f;
+	TArray<FTargetData> STRDatas;
+
+	UPROPERTY(VisibleAnywhere)
+	FTargetData ATFData;
+	UPROPERTY(VisibleAnywhere)
+	FTargetData ATBData;
+	UPROPERTY(VisibleAnywhere)
+	FTargetData ATLData;
+	UPROPERTY(VisibleAnywhere)
+	FTargetData ATRData;
 
 	FTimerHandle DirectionTimerHandle;
 	float DirectionTimerInterval = 0.5f;

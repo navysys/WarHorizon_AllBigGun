@@ -1,22 +1,18 @@
 #define LANDINGSPEEDLIMIT 0.5f
 #define FOLLOWGROUPHEIGHTDECEL 0.75f
 
-// Fill out your copyright notice in the Description page of Project Settings.
 #include "Aircraft/WHAircraft.h"
 #include "Kismet/KismetMathLibrary.h"
 
 
-// Sets default values
 AWHAircraft::AWHAircraft()
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
 	StaticMeshComp = CreateDefaultSubobject<UStaticMeshComponent>("StaticMeshComp");
 	RootComponent = StaticMeshComp;
 }
 
-// Called when the game starts or when spawned
 void AWHAircraft::BeginPlay()
 {
 	Super::BeginPlay();
@@ -32,7 +28,6 @@ void AWHAircraft::BeginPlay()
 	//변수 init 함수 만들어서 수치 aircrafts base 에서 받아서 동작하도록 이후 수정
 }
 
-// Called every frame
 void AWHAircraft::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);

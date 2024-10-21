@@ -3,12 +3,17 @@
 #include "Kismet/GameplayStatics.h"
 #include "Turret/WHShell.h"
 
+AWHNormalTurretBase::AWHNormalTurretBase()
+{
+	
+}
+
 void AWHNormalTurretBase::Fire()
 {
 	Super::Fire();
 
 	FVector MuzzleLocation = MuzzleComps[0]->GetComponentLocation();
-	FVector TargetLoc = MuzzleLocation + StaticMeshComp->GetForwardVector() * TargetDistance;  // 타겟 지점.
+	FVector TargetLoc = MuzzleLocation + StaticMeshComp->GetForwardVector() * TargetData.Distance;  // 타겟 지점.
 	float ArcValue = 0.65f;                       // ArcParam (0.0-1.0) 경사도 나중에 타겟 셀렉터에서 설정하도록 수정
 	float GravityZ = GetWorld()->GetGravityZ();
 	if (UGameplayStatics::SuggestProjectileVelocity_CustomArc(this, ShellVelocityVector, MuzzleLocation, TargetLoc, GravityZ, ArcValue))

@@ -1,5 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #pragma once
 
 #include "CoreMinimal.h"
@@ -15,10 +13,8 @@ class WARHORIZON_ALLBIGGUN_API AWHNormalTurretBase : public AWHTurretBase
 	GENERATED_BODY()
 	
 public:
+	AWHNormalTurretBase();
+protected:
 	virtual void Fire() override;
-
-public:
-
-
 
 };

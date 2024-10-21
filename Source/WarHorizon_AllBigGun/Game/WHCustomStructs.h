@@ -1,5 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #pragma once
 
 #include "CoreMinimal.h"
@@ -8,9 +6,7 @@
 #include "Enum/ETurretAttackType.h"
 #include "WHCustomStructs.generated.h"
 
-/**
- * 
- */
+
 UCLASS()
 class WARHORIZON_ALLBIGGUN_API UWHCustomStructs : public UObject
 {
@@ -28,4 +24,16 @@ struct FTurretArray
 
 	UPROPERTY(EditAnywhere)
 	TArray<class AWHTurretBase*> Turrets;
+};
+
+USTRUCT(Atomic)
+struct FTargetData
+{
+	GENERATED_USTRUCT_BODY()
+
+	UPROPERTY(EditAnywhere)
+	float Angle;
+
+	UPROPERTY(EditAnywhere)
+	float Distance;
 };

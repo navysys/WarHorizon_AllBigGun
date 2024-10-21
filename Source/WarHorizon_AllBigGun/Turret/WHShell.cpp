@@ -1,5 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 
 #include "Turret/WHShell.h"
 #include "GameFramework/ProjectileMovementComponent.h"
@@ -12,10 +10,8 @@
 #include "WaterBodyCustomActor.h"
 
 
-// Sets default values
 AWHShell::AWHShell()
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
 	StaticMeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMeshComp"));
@@ -90,7 +86,6 @@ void AWHShell::PreInitializeComponents()
 	}
 }
 
-// Called when the game starts or when spawned
 void AWHShell::BeginPlay()
 {
 	Super::BeginPlay();
@@ -100,7 +95,6 @@ void AWHShell::BeginPlay()
 	UNiagaraFunctionLibrary::SpawnSystemAttached(TailEffect, StaticMeshComp, FName(TEXT("Tail")), FVector(0), FRotator(), EAttachLocation::KeepRelativeOffset, true, true);
 }
 
-// Called every frame
 void AWHShell::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);

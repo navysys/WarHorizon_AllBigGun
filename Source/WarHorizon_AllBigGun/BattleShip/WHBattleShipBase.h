@@ -29,11 +29,9 @@ class WARHORIZON_ALLBIGGUN_API AWHBattleShipBase : public APawn, public IBattleS
 	GENERATED_BODY()
 
 public:
-	// Sets default values for this pawn's properties
 	AWHBattleShipBase();
 
 protected:
-	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 	virtual void PostInitializeComponents() override;
 
@@ -137,7 +135,7 @@ protected:
 
 protected:
 	// 모든 터렛을 저장
-	UPROPERTY(VisibleAnywhere, Category = "BattleShip | Turrets")
+	UPROPERTY(VisibleAnywhere, Category = "BattleShip | Turret")
 	TArray<FTurretArray> AllTurretArray;
 
 	// 모든 항공기를 저장

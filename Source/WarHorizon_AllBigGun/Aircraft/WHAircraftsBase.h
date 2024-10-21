@@ -8,34 +8,31 @@
 #include "Enum/EAircraftsType.h"
 #include "WHAircraftsBase.generated.h"
 
+class UWHCAircraftsMovement;
+class AWHAircraft;
+
 UCLASS()
 class WARHORIZON_ALLBIGGUN_API AWHAircraftsBase : public APawn, public IAircraftsInterface
 {
 	GENERATED_BODY()
 
 public:
-	// Sets default values for this pawn's properties
 	AWHAircraftsBase();
 
 protected:
-	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
 public:	
-	// Called every frame
 	virtual void Tick(float DeltaTime) override;
-
-	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
-public:
-
+protected:
 	UPROPERTY(VisibleAnywhere)
 	USceneComponent* DefaultSceneComp;
 	UPROPERTY(VisibleAnywhere)
 	UStaticMesh* StaticMeshRef;
 	UPROPERTY(VisibleAnywhere)
-	TObjectPtr<class UWHCAircraftsMovement> AircraftMovementComp;
+	TObjectPtr<UWHCAircraftsMovement> AircraftMovementComp;
 
 	UPROPERTY(VisibleAnywhere, Category = "Aircrafts")
 	APawn* MotherShipPawn;
@@ -67,7 +64,7 @@ public:
 	bool IsSpawnEnd = false;
 
 	UPROPERTY(VisibleAnywhere, Category = "Aircrafts | Stat")
-	TArray<class AWHAircraft*> ArrayAircrafts;
+	TArray<AWHAircraft*> ArrayAircrafts;
 	UPROPERTY(VisibleAnywhere, Category = "Aircrafts | Stat")
 	uint32 AircraftsNum;
 

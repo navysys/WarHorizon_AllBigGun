@@ -13,19 +13,14 @@ class WARHORIZON_ALLBIGGUN_API AWHAircraft : public AActor
 	GENERATED_BODY()
 	
 public:	
-	// Sets default values for this actor's properties
 	AWHAircraft();
 
 protected:
-	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
 public:	
-	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	//UPROPERTY(VisibleAnywhere)
-	//USceneComponent* SceneComp;
 	UStaticMesh* StaticMesh;
 	UPROPERTY(VisibleAnywhere)
 	UStaticMeshComponent* StaticMeshComp;

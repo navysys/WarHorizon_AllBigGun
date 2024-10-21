@@ -1,5 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 
 #include "Aircraft/WHAircraftsBase.h"
 #include "Aircraft/WHAircraft.h"
@@ -10,7 +8,6 @@
 // Sets default values
 AWHAircraftsBase::AWHAircraftsBase()
 {
- 	// Set this pawn to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
 	AIControllerClass = AWHAircraftsAIController::StaticClass();
@@ -32,26 +29,17 @@ AWHAircraftsBase::AWHAircraftsBase()
 	AircraftMovementComp->Deceleration = 500.0f;
 }
 
-// Called when the game starts or when spawned
 void AWHAircraftsBase::BeginPlay()
 {
 	Super::BeginPlay();
 	
 }
 
-// Called every frame
 void AWHAircraftsBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 	MoveFront();
 	SetAircraftFormations();
-}
-
-// Called to bind functionality to input
-void AWHAircraftsBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
-{
-	Super::SetupPlayerInputComponent(PlayerInputComponent);
-
 }
 
 void AWHAircraftsBase::InitToDataTable(int Id)

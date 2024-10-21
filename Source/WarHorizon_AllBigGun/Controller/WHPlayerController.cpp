@@ -7,6 +7,7 @@
 #include "GameFramework/Actor.h"
 #include "Interface/BattleShipInterface.h"
 #include "DrawDebugHelpers.h"
+#include "Widget/WHInGameWidgetBase.h"
 
 
 AWHPlayerController::AWHPlayerController()

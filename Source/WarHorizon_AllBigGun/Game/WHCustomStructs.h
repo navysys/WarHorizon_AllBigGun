@@ -3,7 +3,6 @@
 #include "CoreMinimal.h"
 #include "UObject/NoExportTypes.h"
 #include "Enum/ETurretType.h"
-#include "Enum/ETurretAttackType.h"
 #include "WHCustomStructs.generated.h"
 
 
@@ -32,8 +31,8 @@ struct FTargetData
 	GENERATED_USTRUCT_BODY()
 
 	UPROPERTY(EditAnywhere)
-	float Angle;
+	float Angle = 0;
 
 	UPROPERTY(EditAnywhere)
-	float Distance;
+	float Distance = 0;
 };

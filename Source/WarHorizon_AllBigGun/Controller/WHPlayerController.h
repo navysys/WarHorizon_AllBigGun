@@ -4,12 +4,12 @@
 #include "GameFramework/PlayerController.h"
 #include "InputActionValue.h"
 #include "Game/WHCustomStructs.h"
-#include "Widget/WHInGameWidgetBase.h"
 #include "WHPlayerController.generated.h"
 
 class UInputMappingContext;
 class UInputAction;
 class IBattleShipInterface;
+class UWHInGameWidgetBase;
 
 
 UENUM()

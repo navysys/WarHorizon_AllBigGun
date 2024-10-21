@@ -7,8 +7,10 @@
 
 void UWHInGameWidgetBase::NativeConstruct()
 {
+	Super::NativeConstruct();
+
 	ChatScroll = Cast<UScrollBox>(GetWidgetFromName(TEXT("ChatScroll")));
-	ChatText = Cast<UEditableTextBox>(GetWidgetFromName(TEXT("ChatText")));
+	ChatText = Cast<UEditableTextBox>(GetWidgetFromName(TEXT("ChatTextBox")));
 	if (ChatText)
 	{
 		ChatText->OnTextCommitted.AddDynamic(this, &UWHInGameWidgetBase::OnCommittedText);

@@ -33,6 +33,7 @@ public:
 	char GetFrontDirection() { return FrontDirection; }
 	void SetTargetData(FTargetData Data);
 	void SetTargetData(const TArray<FTargetData>* DatasPtr);
+	float GetShellVelocity() { return ShellVelocity; }
 
 protected:
 	void LoadDataTableToName(FName Name);
@@ -52,7 +53,7 @@ protected:
 	UPROPERTY(VisibleAnywhere)
 	TArray<USceneComponent*> MuzzleComps;
 
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(EditAnywhere)
 	TObjectPtr<UNiagaraSystem> GunFireEffect;
 
 	// 데이터 베이스 초기화 변수

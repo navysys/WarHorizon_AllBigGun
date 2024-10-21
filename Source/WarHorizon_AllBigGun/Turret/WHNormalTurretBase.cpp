@@ -29,10 +29,8 @@ void AWHNormalTurretBase::Fire()
 
 	ShellVelocity = ShellVelocityVector.Size();
 
-
-
 	// 포탄 발사 관련
-	FRotator Rot = StaticMeshComp->GetRelativeRotation() + FRotator(ShellLaunchAngle, 0.0f, 0.0f);
+	FRotator Rot = StaticMeshComp->GetComponentRotation() + FRotator(ShellLaunchAngle, 0.0f, 0.0f);
 	for (int i = 0; i < MuzzleComps.Num(); i++)
 	{
 		AWHShell* SpawnShell = GetWorld()->SpawnActor<AWHShell>(Shell, MuzzleComps[i]->GetComponentLocation(), Rot + FRotator(0.0f, Dispersion[i], 0.0f), SpawnParams);

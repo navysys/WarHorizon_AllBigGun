@@ -1,98 +1,54 @@
 
 #include "Turret/WHShell.h"
 #include "GameFramework/ProjectileMovementComponent.h"
-#include "Components/CapsuleComponent.h"
+#include "Components/BoxComponent.h"
 #include "Controller/WHPlayerController.h"
 #include "NiagaraSystem.h"
 #include "NiagaraFunctionLibrary.h"
 #include "NiagaraActor.h"
 #include "NiagaraComponent.h"
 #include "WaterBodyCustomActor.h"
+#include "Turret/WHTurretBase.h"
 
 
 AWHShell::AWHShell()
 {
 	PrimaryActorTick.bCanEverTick = true;
 
+	BoxComp = CreateDefaultSubobject<UBoxComponent>(TEXT("BoxCollision"));
+	RootComponent = BoxComp;
+	BoxComp->SetBoxExtent(FVector(550.f, 15.0f, 15.0f));
+	BoxComp->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+	BoxComp->SetCollisionProfileName(TEXT("TeamAShellPreset"));
+
 	StaticMeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMeshComp"));
-	RootComponent = StaticMeshComp;
 	StaticMeshComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	static ConstructorHelpers::FObjectFinder<UStaticMesh> DefaultMeshObject(TEXT("StaticMesh'/Game/Resource/Turret/SM_Shell'"));
-	if (DefaultMeshObject.Succeeded())
-	{
-		StaticMeshComp->SetStaticMesh(DefaultMeshObject.Object);
-	}
-	else
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Shell No Static Mesh"));
-	}
-
-	static ConstructorHelpers::FObjectFinder<UNiagaraSystem> TailObject(TEXT("NiagaraSystem'/Game/Resource/Niagara/NS_ShellTail'"));
-	if (TailObject.Succeeded())
-	{
-		TailEffect = TailObject.Object;
-	}
-	else
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Shell No Effect : Tail"));
-	}
-
-	//static ConstructorHelpers::FObjectFinder<UNiagaraSystem> HitObject(TEXT("NiagaraSystem'/Game/Resource/Niagara/NS_HitEffect'"));
-	//if (HitObject.Succeeded())
-	//{
-	//	HitEffect = HitObject.Object;
-	//}
-	//else
-	//{
-	//	//UE_LOG(LogTemp, Warning, TEXT("Shell No Effect : Hit"));
-	//}
-
-	static ConstructorHelpers::FObjectFinder<UNiagaraSystem> WaterHitObject(TEXT("NiagaraSystem'/Game/Resource/Niagara/NS_WaterHit'"));
-	if (WaterHitObject.Succeeded())
-	{
-		WaterHitEffect = WaterHitObject.Object;
-	}
-	else
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Shell No Effect : WaterHit"));
-	}
-
-	CapsuleComp = CreateDefaultSubobject<UCapsuleComponent>(TEXT("CapsuleCollision"));
-	CapsuleComp->SetRelativeLocation(FVector(-10.0f, 0, 24.0f));
-	CapsuleComp->SetRelativeRotation(FRotator(90.0f, 0, 0));
-	CapsuleComp->SetCapsuleSize(15.0f, 55.0f);
-	CapsuleComp->SetupAttachment(RootComponent);
-	CapsuleComp->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
-	CapsuleComp->SetCollisionProfileName(TEXT("TeamAShellPreset"));
+	StaticMeshComp->SetupAttachment(RootComponent);
 
 	ProjectileMovementComp = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("ProjectileMovementComp"));
 	ProjectileMovementComp->bRotationFollowsVelocity = true;
 
+	BoxComp->OnComponentBeginOverlap.AddDynamic(this, &AWHShell::OnOverlapBegin);
 }
 
 void AWHShell::PreInitializeComponents()
 {
 	Super::PreInitializeComponents();
 
-	AController* InstigatorController = GetInstigatorController();
-	if (InstigatorController != nullptr)
+	if (AWHTurretBase* Turret = Cast<AWHTurretBase>(Owner))
 	{
-		AWHPlayerController* PlayerController = Cast<AWHPlayerController>(InstigatorController); // 테스트용 코드
-		ProjectileMovementComp->InitialSpeed = PlayerController->ShellSpeed;
-	}
-	else
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Shell PreInit Instigator Controller nullptr"));
+		ProjectileMovementComp->InitialSpeed = Turret->GetShellVelocity();
 	}
 }
 
 void AWHShell::BeginPlay()
 {
 	Super::BeginPlay();
-	
-	CapsuleComp->OnComponentBeginOverlap.AddDynamic(this, &AWHShell::OnOverlapBegin);
 
-	UNiagaraFunctionLibrary::SpawnSystemAttached(TailEffect, StaticMeshComp, FName(TEXT("Tail")), FVector(0), FRotator(), EAttachLocation::KeepRelativeOffset, true, true);
+	if (TailEffect)
+	{
+		UNiagaraFunctionLibrary::SpawnSystemAttached(TailEffect, StaticMeshComp, FName(TEXT("Tail")), FVector(0), FRotator(), EAttachLocation::KeepRelativeOffset, true, true);
+	}
 }
 
 void AWHShell::Tick(float DeltaTime)
@@ -115,14 +71,13 @@ void AWHShell::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* 
 
 	if (OtherActor->ActorHasTag(TEXT("BattleShip")))
 	{
-		if (WaterHitEffect) // 현재는 물 이펙트
+		if (HitEffect)
 		{
-			// 나중에는 연기 이펙트 현재는 물
 			ANiagaraActor* NiagaraActor = GetWorld()->SpawnActor<ANiagaraActor>(ANiagaraActor::StaticClass(), SweepResult.ImpactPoint, FRotator::ZeroRotator);
 			if (NiagaraActor)
 			{
 				NiagaraActor->SetActorLocation(GetActorLocation());
-				NiagaraActor->GetNiagaraComponent()->SetAsset(WaterHitEffect);
+				NiagaraActor->GetNiagaraComponent()->SetAsset(HitEffect);
 				NiagaraActor->GetNiagaraComponent()->Activate(true);
 			}
 		}

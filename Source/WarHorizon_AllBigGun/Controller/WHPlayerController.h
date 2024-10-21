@@ -4,6 +4,7 @@
 #include "GameFramework/PlayerController.h"
 #include "InputActionValue.h"
 #include "Game/WHCustomStructs.h"
+#include "Widget/WHInGameWidgetBase.h"
 #include "WHPlayerController.generated.h"
 
 class UInputMappingContext;
@@ -88,7 +89,17 @@ protected:
 	void ChangeContext(const FInputActionValue& Value);
 
 public:
-	float ShellSpeed;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UI")
+	TObjectPtr<UWHInGameWidgetBase> InGameWidget;
+
+	UFUNCTION(Server, Reliable, WithValidation)
+	void C2S_SendMessage(const FText& Messsage);
+	bool C2S_SendMessage_Validate(const FText& Messsage);
+	void C2S_SendMessage_Implementation(const FText& Message);
+
+	UFUNCTION(Client, UnReliable)
+	void S2C_AddMessage(const FText& Messsage);
+	void S2C_AddMessage_Implementation(const FText& Messsage);
 
 
 };

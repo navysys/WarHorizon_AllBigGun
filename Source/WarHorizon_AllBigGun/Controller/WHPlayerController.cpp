@@ -28,6 +28,21 @@ void AWHPlayerController::BeginPlay()
 	{
 		SubSystem->AddMappingContext(DefaultContext, 1);
 	}
+
+	FSoftClassPath InGameWidgetClassPath(TEXT("/Script/UMGEditor.WidgetBlueprint'/Game/UI/WBP_Main.WBP_Main_C'"));
+
+	if (IsLocalPlayerController())
+	{
+		UClass* WidgetClass = InGameWidgetClassPath.TryLoadClass<UWHInGameWidgetBase>();
+		if (IsValid(WidgetClass))
+		{
+			InGameWidget = CreateWidget<UWHInGameWidgetBase>(this, WidgetClass);
+			if (IsValid(InGameWidget))
+			{
+				InGameWidget->AddToViewport();
+			}
+		}
+	}
 }
 
 void AWHPlayerController::Tick(float DeltaTime)
@@ -60,7 +75,7 @@ void AWHPlayerController::ChangeWaitingAttackMappingContext()
 		if (CurrentControllerMappingType == EControllerMappingType::Default)
 		{
 			CurrentControllerMappingType = EControllerMappingType::WaitingAttack;
-			SubSystem->AddMappingContext(WaitingAttackContext, 0);
+			SubSystem->AddMappingContext(WaitingAttackContext, 2);
 		}
 		else if (CurrentControllerMappingType == EControllerMappingType::WaitingAttack)
 		{
@@ -122,20 +137,25 @@ void AWHPlayerController::TargetAttack(const FInputActionValue& Value)
 		GetHitResultUnderCursor(ECC_Visibility, false, Hit);
 
 		// A 누른 뒤 함선을 클릭 했을 경우
-		if (Hit.bBlockingHit && Hit.GetActor()->ActorHasTag(TEXT("BattleShip")))
+		if (Hit.bBlockingHit)
 		{
-			BattleShipPawn->SpinTurrets(Hit.GetActor());
-			BattleShipPawn->NormalAttack();
-
+			if (Hit.GetActor()->ActorHasTag(TEXT("BattleShip")))
+			{
+				BattleShipPawn->SpinTurrets(Hit.GetActor());
+				BattleShipPawn->NormalAttack();
+			}
+			else if (Hit.GetActor()->ActorHasTag(TEXT("Plane")))
+			{
+				// A 누른 뒤 바닥을 왼클릭 했을 경우
+				BattleShipPawn->SpinTurrets(Hit.Location);
+				BattleShipPawn->NormalAttack();
+			}
 			// 디폴트 상태로 전환
 			if (CurrentControllerMappingType == EControllerMappingType::WaitingAttack)
 			{
 				ChangeWaitingAttackMappingContext();
 			}
 		}
-		// A 누른 뒤 바닥을 왼클릭 했을 경우
-		// 가까운 함선 탐색 후 SpinTurrets(TargetShip) 으로 actor 전달해야 함
-
 
 	}
 }
@@ -174,4 +194,26 @@ void AWHPlayerController::Deceleration(const FInputActionValue& Value)
 void AWHPlayerController::ChangeContext(const FInputActionValue& Value)
 {
 	ChangeWaitingAttackMappingContext();
+}
+
+bool AWHPlayerController::C2S_SendMessage_Validate(const FText& Messsage)
+{
+	return true;
+}
+
+void AWHPlayerController::C2S_SendMessage_Implementation(const FText& Message)
+{
+	for (auto Iter = GetWorld()->GetPlayerControllerIterator(); Iter; ++Iter)
+	{
+		AWHPlayerController* PC = Cast<AWHPlayerController>(*Iter);
+		if (IsValid(PC))
+		{
+			PC->S2C_AddMessage(Message);
+		}
+	}
+}
+
+void AWHPlayerController::S2C_AddMessage_Implementation(const FText& Messsage)
+{
+	InGameWidget->AddChatMessage(Messsage);
 }

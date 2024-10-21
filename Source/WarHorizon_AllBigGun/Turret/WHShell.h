@@ -4,7 +4,7 @@
 #include "GameFramework/Actor.h"
 #include "WHShell.generated.h"
 
-class UCapsuleComponent;
+class UBoxComponent;
 class UProjectileMovementComponent;
 class UNiagaraComponent;
 class UNiagaraSystem;
@@ -32,22 +32,21 @@ public:
 	void OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
 public:
-	//class AWHPlayerController* PlayerController;
-
+	UPROPERTY(VisibleAnywhere)
+	TObjectPtr<UBoxComponent> BoxComp;
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UStaticMeshComponent> StaticMeshComp;
-	UPROPERTY(VisibleAnywhere)
-	TObjectPtr<UCapsuleComponent> CapsuleComp;
+
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UProjectileMovementComponent> ProjectileMovementComp;
 	UPROPERTY(VisibleAnywhere)
-	TObjectPtr<UNiagaraComponent> TailNiagaraComp;
+	TObjectPtr<UNiagaraComponent> TailNiagaraComp; 
 
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(EditAnywhere)
 	TObjectPtr<UNiagaraSystem> TailEffect;
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(EditAnywhere)
 	TObjectPtr<UNiagaraSystem> HitEffect;
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(EditAnywhere)
 	TObjectPtr<UNiagaraSystem> WaterHitEffect;
 
 

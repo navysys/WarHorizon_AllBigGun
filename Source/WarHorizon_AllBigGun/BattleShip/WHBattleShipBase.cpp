@@ -314,6 +314,7 @@ void AWHBattleShipBase::RapidAttack()
 void AWHBattleShipBase::NormalAttack()
 {
 	// 현재는 fastfire 와 같지만 이후에는 조준 완료 시에만 발사하고 조준이 안된 함포 회전하는 것 까지
+	UE_LOG(LogTemp, Warning, TEXT("Normal Attack Called"));
 	if (IsValid(TargetSelectorComp))
 	{
 		TargetSelectorComp->CommandTurretsFire(ETurretType::Main);

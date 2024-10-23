@@ -41,6 +41,18 @@ void AWHTurretBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	BeforeFireTime += DeltaTime;
+	if (!bIsFireReady)
+	{
+		if (bIsLookTarget)
+		{
+			if (BeforeFireTime > ReloadTime)
+			{
+				bIsFireReady = true;
+			}
+		}
+	}
+
 	DebugTurretForward();
 }
 
@@ -63,27 +75,6 @@ void AWHTurretBase::PostInitializeComponents()
 			{
 				MuzzleComps.Pop()->DestroyComponent();
 			}
-		}
-
-		// 분산도 관련 코드 나중에는 계수 곱해주도록 수정
-		int MuzzleInt = MuzzleComps.Num();
-		float DispersionAngle = 0.0f;
-		if (MuzzleInt == 4)
-		{
-			DispersionAngle = 7.5f;
-		}
-		else if (MuzzleInt == 3)
-		{
-			DispersionAngle = 5.0f;
-		}
-		else if (MuzzleInt == 2)
-		{
-			DispersionAngle = 2.5f;
-		}
-
-		for (int i = 1; i <= MuzzleInt; i++)
-		{
-			Dispersion.Emplace((DispersionAngle / (MuzzleInt - 1)) * (i - ((MuzzleInt + 1) / 2)));
 		}
 	}
 }
@@ -111,6 +102,8 @@ void AWHTurretBase::SetFrontDirection(char Dir)
 
 void AWHTurretBase::Fire()
 {
+	bIsFireReady = false;
+	BeforeFireTime = 0.0f;
 	if (GunFireEffect)
 	{
 		float Num = MuzzleComps.Num() / 2;
@@ -284,6 +277,27 @@ void AWHTurretBase::SpinToTargetAngle()
 				}
 			}
 		}
+		if (TargetData.Angle != 0 && TargetData.Distance != 0)
+		{
+			float RAngle = round(TargetData.Angle - SocketYaw);
+			if (RAngle > 180.0f)
+			{
+				RAngle -= 360.0f;
+			}
+			else if (RAngle < -180.0f)
+			{
+				RAngle += 360.0f;
+			}
+
+			if (abs(TurretYaw - RAngle) < 5.0f)
+			{
+				bIsLookTarget = true;
+			}
+			else
+			{
+				bIsLookTarget = false;
+			}
+		}
 
 		GetWorld()->GetTimerManager().SetTimer(RotationTimerHandle, this, &AWHTurretBase::SpinToTargetAngle, RotationDelay, false);
 	}
@@ -300,13 +314,20 @@ void AWHTurretBase::SetTargetData(const TArray<FTargetData>* DatasPtr)
 	{
 		for (FTargetData Data : *DatasPtr)
 		{
-			if (Data.Angle - SocketYaw < MaxHorizontalAngle)
+			float RelativeAngle = Data.Angle - SocketYaw;
+			if (RelativeAngle > 180.0f)
 			{
-				if (Data.Distance < Range)
-				{
-					TargetData = Data;
-					return;
-				}
+				RelativeAngle -= 360.0f;
+			}
+			else if (RelativeAngle < -180.0f)
+			{
+				RelativeAngle += 360.0f;
+			}
+
+			if (abs(RelativeAngle) < MaxHorizontalAngle)
+			{
+				TargetData = Data;
+				return;
 			}
 		}
 	}

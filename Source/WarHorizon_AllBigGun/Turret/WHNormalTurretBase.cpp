@@ -2,15 +2,47 @@
 #include "Turret/WHNormalTurretBase.h"
 #include "Kismet/GameplayStatics.h"
 #include "Turret/WHShell.h"
+#include "NiagaraActor.h"
+#include "NiagaraComponent.h"
+
 
 AWHNormalTurretBase::AWHNormalTurretBase()
 {
-	
+
+}
+
+void AWHNormalTurretBase::BeginPlay()
+{
+	Super::BeginPlay();
+
+	// 분산도 관련 코드 나중에는 계수 곱해주도록 수정
+	int MuzzleInt = MuzzleComps.Num();
+	float DispersionAngle = 0.0f;
+	if (MuzzleInt == 4)
+	{
+		DispersionAngle = 7.5f;
+	}
+	else if (MuzzleInt == 3)
+	{
+		DispersionAngle = 5.0f;
+	}
+	else if (MuzzleInt == 2)
+	{
+		DispersionAngle = 2.5f;
+	}
+
+	for (int i = 1; i <= MuzzleInt; i++)
+	{
+		Dispersion.Emplace((DispersionAngle / (MuzzleInt - 1)) * (i - ((MuzzleInt + 1) / 2)));
+	}
 }
 
 void AWHNormalTurretBase::Fire()
 {
 	Super::Fire();
+
+	bIsFireReady = false;
+	BeforeFireTime = 0.0f;
 
 	FVector MuzzleLocation = MuzzleComps[0]->GetComponentLocation();
 	FVector TargetLoc = MuzzleLocation + StaticMeshComp->GetForwardVector() * TargetData.Distance;  // 타겟 지점.

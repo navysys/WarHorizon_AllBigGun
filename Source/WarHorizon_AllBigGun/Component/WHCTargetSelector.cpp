@@ -25,22 +25,6 @@ void UWHCTargetSelector::TickComponent(float DeltaTime, ELevelTick TickType, FAc
 	// Dual 터렛은 공격 가능한 함선이 있다면 함선을 공격하고 없다면 Air 터렛처럼 대공을 수행함
 	// Torpedo 런처는 메인터렛과 같이 동작하나 거리값은 없어도 되고 포탄 대신 어뢰를 발사
 
-	SetSubTurretDataToTargetArray();
-	for (AWHTurretBase* Turret : ForwardSTs)
-	{
-		if (STLDatas.Num())
-		{
-			Turret->SetTargetData(&STFDatas);
-		}
-	}
-	for (AWHTurretBase* Turret : BackSTs)
-	{
-		if (STLDatas.Num())
-		{
-			Turret->SetTargetData(&STBDatas);
-		}
-	}
-
 	if (bIsTracingTarget)
 	{
 		if (IsValid(MTTarget))
@@ -55,6 +39,8 @@ void UWHCTargetSelector::TickComponent(float DeltaTime, ELevelTick TickType, FAc
 
 		}
 	}
+
+	SetSubTurretDataToTargetArray();
 }
 
 void UWHCTargetSelector::InitTargetSelectorComponent(const TArray<FTurretArray> AllArray,TArray<APawn*>* BattleShips, TArray<APawn*> Aircrafts)
@@ -244,6 +230,10 @@ void UWHCTargetSelector::SetAirTurretDataToTargetArray()
 void UWHCTargetSelector::SetSubTurretDataToTargetArray()
 {
 	BSTargetDatas.Empty();
+	STLDatas.Empty();
+	STRDatas.Empty();
+	STFDatas.Empty();
+	STBDatas.Empty();
 	if (BSTargetArray->Num() != 0)
 	{
 		
@@ -269,10 +259,42 @@ void UWHCTargetSelector::SetSubTurretDataToTargetArray()
 				{
 					STFDatas.Emplace(BSTargetDatas[i]);
 				}
-				if (BSTargetDatas[i].Angle > 60.0f && BSTargetDatas[i].Angle < -60.0f)
+				if (BSTargetDatas[i].Angle > 60.0f || BSTargetDatas[i].Angle < -60.0f)
 				{
 					STBDatas.Emplace(BSTargetDatas[i]);
 				}
+			}
+		}
+
+		if (STFDatas.Num() > 0)
+		{
+			for (AWHTurretBase* Turret : ForwardSTs)
+			{
+				Turret->SetTargetData(&STFDatas);
+			}
+		}
+
+		if (STBDatas.Num() > 0)
+		{
+			for (AWHTurretBase* Turret : BackSTs)
+			{
+				Turret->SetTargetData(&STBDatas);
+			}
+		}
+
+		if (STLDatas.Num() > 0)
+		{
+			for (AWHTurretBase* Turret : LeftSTs)
+			{
+				Turret->SetTargetData(&STLDatas);
+			}
+		}
+
+		if (STRDatas.Num() > 0)
+		{
+			for (AWHTurretBase* Turret : RightSTs)
+			{
+				Turret->SetTargetData(&STRDatas);
 			}
 		}
 	}

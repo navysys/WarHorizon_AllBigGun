@@ -4,31 +4,32 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
-#include "WHInGameWidgetBase.generated.h"
+#include "WHClientWidgetBase.generated.h"
 
-class UScrollBox;
 class UEditableTextBox;
+class UButton;
 
 
 UCLASS()
-class WARHORIZON_ALLBIGGUN_API UWHInGameWidgetBase : public UUserWidget
+class WARHORIZON_ALLBIGGUN_API UWHClientWidgetBase : public UUserWidget
 {
 	GENERATED_BODY()
-	
 public:
 	virtual void NativeConstruct() override;
 
 	UFUNCTION()
-	void OnCommittedText(const FText& Text, ETextCommit::Type CommitMethod);
+	void OnStartServerButtonClicked();
 
-	void AddChatMessage(FText AddMessage);
+	UFUNCTION()
+	void OnConnectButtonClicked();
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Components")
-	TObjectPtr<UScrollBox> ChatScroll;
+	TObjectPtr<UButton> StartServerButton;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Components")
-	TObjectPtr<UEditableTextBox> ChatText;
+	TObjectPtr<UButton> ConnectButton;
 
-
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Components")
+	TObjectPtr<UEditableTextBox> ServerIP;
 };

@@ -8,7 +8,7 @@
 #include "NiagaraActor.h"
 #include "NiagaraComponent.h"
 #include "WaterBodyCustomActor.h"
-#include "Turret/WHTurretBase.h"
+#include "Turret/WHNormalTurretBase.h"
 
 
 AWHShell::AWHShell()
@@ -35,7 +35,7 @@ void AWHShell::PreInitializeComponents()
 {
 	Super::PreInitializeComponents();
 
-	if (AWHTurretBase* Turret = Cast<AWHTurretBase>(Owner))
+	if (AWHNormalTurretBase* Turret = Cast<AWHNormalTurretBase>(Owner))
 	{
 		ProjectileMovementComp->InitialSpeed = Turret->GetShellVelocity();
 	}

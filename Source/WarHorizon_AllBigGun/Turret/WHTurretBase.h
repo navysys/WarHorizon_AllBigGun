@@ -33,7 +33,7 @@ public:
 	char GetFrontDirection() { return FrontDirection; }
 	void SetTargetData(FTargetData Data);
 	void SetTargetData(const TArray<FTargetData>* DatasPtr);
-	float GetShellVelocity() { return ShellVelocity; }
+
 
 protected:
 	void LoadDataTableToName(FName Name);
@@ -66,7 +66,7 @@ protected:
 	ETurretType TurretType;
 
 	UPROPERTY(EditAnywhere)
-	float ReloadTime;
+	float ReloadTime = 8.0f;
 	UPROPERTY(EditAnywhere)
 	float Range;
 
@@ -86,26 +86,13 @@ protected:
 	FTargetData TargetData;
 
 	UPROPERTY(EditAnywhere)
-	bool bIsLookTarget = true;
+	bool bIsLookTarget = false;
 
 	// 포탑의 정면을 LRFB 로 구분
 	char FrontDirection;
 	float SocketYaw;
 
-	// 포탄 발사를 위한 변수
-protected:
-	UPROPERTY(EditAnywhere)
-	TSubclassOf<AWHShell> Shell;
+	float BeforeFireTime = 0.0f;
 
-	UPROPERTY(EditAnywhere)
-	TArray<float> Dispersion;
-
-	UPROPERTY(VisibleAnywhere)
-	FVector ShellVelocityVector = FVector::ZeroVector;
-
-	UPROPERTY(VisibleAnywhere)
-	float ShellVelocity = 0.0f;
-
-	UPROPERTY(EditAnywhere)
-	float ShellLaunchAngle;
+	bool bIsFireReady = false;
 };

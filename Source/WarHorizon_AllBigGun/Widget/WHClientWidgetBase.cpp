@@ -4,6 +4,8 @@
 #include "Widget/WHClientWidgetBase.h"
 #include "Components/Button.h"
 #include "Components/EditableTextBox.h"
+#include "Controller/WHClientPlayerController.h"
+#include "Kismet/GameplayStatics.h"
 
 
 void UWHClientWidgetBase::NativeConstruct()
@@ -23,8 +25,15 @@ void UWHClientWidgetBase::NativeConstruct()
 
 void UWHClientWidgetBase::OnStartServerButtonClicked()
 {
+	// 데디케이트 서버 전환 시 삭제 될 함수
+	UGameplayStatics::OpenLevel(GetWorld(), TEXT("InGame"), true, TEXT("listen"));
 }
 
 void UWHClientWidgetBase::OnConnectButtonClicked()
 {
+	AWHClientPlayerController* ClientPC = Cast<AWHClientPlayerController>(GetOwningPlayer());
+	if (ClientPC)
+	{
+		ClientPC->TestJoinServer(FName(ServerIP->GetText().ToString()));
+	}
 }

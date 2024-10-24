@@ -23,4 +23,6 @@ UWHGameInstance::UWHGameInstance()
 		AircraftDataTable = AircraftDataRef.Object;
 		check(AircraftDataTable->GetRowMap().Num() > 0);
 	}
+
+
 }

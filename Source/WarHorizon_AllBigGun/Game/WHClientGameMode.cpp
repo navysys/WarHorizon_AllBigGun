@@ -2,4 +2,9 @@
 
 
 #include "Game/WHClientGameMode.h"
+#include "Kismet/GameplayStatics.h"
 
+void AWHClientGameMode::JoinServer(FName ServerIP)
+{
+	UGameplayStatics::OpenLevel(GetWorld(), FName(ServerIP));
+}

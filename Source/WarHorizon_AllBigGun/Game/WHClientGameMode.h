@@ -14,4 +14,6 @@ class WARHORIZON_ALLBIGGUN_API AWHClientGameMode : public AGameModeBase
 {
 	GENERATED_BODY()
 	
+public:
+	void JoinServer(FName ServerIP);
 };

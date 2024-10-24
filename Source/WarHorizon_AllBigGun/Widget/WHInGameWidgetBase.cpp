@@ -19,7 +19,6 @@ void UWHInGameWidgetBase::NativeConstruct()
 
 void UWHInGameWidgetBase::OnCommittedText(const FText& Text, ETextCommit::Type CommitMethod)
 {
-	UE_LOG(LogTemp, Warning, TEXT("On CommittedText Called"));
 	switch (CommitMethod)
 	{
 	case ETextCommit::OnEnter:

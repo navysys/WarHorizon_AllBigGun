@@ -21,5 +21,8 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UI")
 	TObjectPtr<UWHClientWidgetBase> ClientWidget;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UI")
+	TSubclassOf<UUserWidget> WidgetClass;
 
+	void TestJoinServer(FName IP);
 };

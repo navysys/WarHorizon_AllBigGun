@@ -67,8 +67,6 @@ void AWHShell::Init(APawn* Player, APawn* PlayerTurret, float Dmg, FVector InitS
 
 void AWHShell::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	UE_LOG(LogTemp, Warning, TEXT("Shell : BeginOverlap %s"), *OtherComp->GetFName().ToString());
-
 	if (OtherActor->ActorHasTag(TEXT("BattleShip")))
 	{
 		if (HitEffect)

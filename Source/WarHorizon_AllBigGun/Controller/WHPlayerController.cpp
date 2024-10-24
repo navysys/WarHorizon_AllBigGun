@@ -29,6 +29,7 @@ void AWHPlayerController::BeginPlay()
 	{
 		SubSystem->AddMappingContext(DefaultContext, 1);
 	}
+	SetInputMode(FInputModeGameOnly());
 
 	FSoftClassPath InGameWidgetClassPath(TEXT("/Script/UMGEditor.WidgetBlueprint'/Game/UI/WBP_Main.WBP_Main_C'"));
 
@@ -60,7 +61,7 @@ void AWHPlayerController::SetupInputComponent()
 		EnhancedInputComponent->BindAction(MoveOrTargetingAction, ETriggerEvent::Triggered, this, &AWHPlayerController::MoveOrTargeting);
 		EnhancedInputComponent->BindAction(RapidAttackAction, ETriggerEvent::Triggered, this, &AWHPlayerController::RapidAttack);
 		EnhancedInputComponent->BindAction(TargetAttackAction, ETriggerEvent::Triggered, this, &AWHPlayerController::TargetAttack);
-		EnhancedInputComponent->BindAction(SpinTurretAction, ETriggerEvent::Triggered, this, &AWHPlayerController::SpinTurret);
+		EnhancedInputComponent->BindAction(SpinTurretAction, ETriggerEvent::Started, this, &AWHPlayerController::SpinTurret);
 		EnhancedInputComponent->BindAction(AccelerationAction, ETriggerEvent::Triggered, this, &AWHPlayerController::Acceleration);
 		EnhancedInputComponent->BindAction(DecelerationAction, ETriggerEvent::Triggered, this, &AWHPlayerController::Deceleration);
 		EnhancedInputComponent->BindAction(ChangeContextAction, ETriggerEvent::Triggered, this, &AWHPlayerController::ChangeContext);
@@ -163,6 +164,8 @@ void AWHPlayerController::TargetAttack(const FInputActionValue& Value)
 
 void AWHPlayerController::SpinTurret(const FInputActionValue& Value)
 {
+	UE_LOG(LogTemp, Warning, TEXT("SpinTurret Called"));
+
 	if (BattleShipPawn != nullptr)
 	{
 		FHitResult Hit;

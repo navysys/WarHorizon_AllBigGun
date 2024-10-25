@@ -29,7 +29,7 @@ void AWHPlayerController::BeginPlay()
 	{
 		SubSystem->AddMappingContext(DefaultContext, 1);
 	}
-	SetInputMode(FInputModeGameOnly());
+	SetInputMode(FInputModeGameAndUI());
 
 	FSoftClassPath InGameWidgetClassPath(TEXT("/Script/UMGEditor.WidgetBlueprint'/Game/UI/WBP_Main.WBP_Main_C'"));
 

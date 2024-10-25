@@ -69,15 +69,9 @@ void AWHShell::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* 
 {
 	if (OtherActor->ActorHasTag(TEXT("BattleShip")))
 	{
-		if (HitEffect)
+		if (HitEffectActor)
 		{
-			ANiagaraActor* NiagaraActor = GetWorld()->SpawnActor<ANiagaraActor>(ANiagaraActor::StaticClass(), SweepResult.ImpactPoint, FRotator::ZeroRotator);
-			if (NiagaraActor)
-			{
-				NiagaraActor->SetActorLocation(GetActorLocation());
-				NiagaraActor->GetNiagaraComponent()->SetAsset(HitEffect);
-				NiagaraActor->GetNiagaraComponent()->Activate(true);
-			}
+			GetWorld()->SpawnActor<AActor>(HitEffectActor, SweepResult.ImpactPoint, FRotator::ZeroRotator);
 		}
 	}
 	else

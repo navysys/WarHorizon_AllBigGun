@@ -49,6 +49,9 @@ public:
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<UNiagaraSystem> WaterHitEffect;
 
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<AActor> HitEffectActor;
+
 
 	UPROPERTY(VisibleAnywhere)
 	APawn* BaseBattleShip;

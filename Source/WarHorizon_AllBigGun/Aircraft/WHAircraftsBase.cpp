@@ -13,6 +13,8 @@ AWHAircraftsBase::AWHAircraftsBase()
 	AIControllerClass = AWHAircraftsAIController::StaticClass();
 	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
 
+	bAlwaysRelevant = true;
+
 	MaxSpeed = 1500.0f;
 
 	DefaultSceneComp = CreateDefaultSubobject<USceneComponent>(TEXT("SceneComponent"));

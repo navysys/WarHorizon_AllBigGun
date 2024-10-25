@@ -28,6 +28,8 @@ AWHBattleShipBase::AWHBattleShipBase()
 	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
 	Tags.Add(FName("BattleShip"));
 
+	bAlwaysRelevant = true;
+
 	// ½ºÄÌ·¹Å» ¸Å½Ã
 	BoxComp = CreateDefaultSubobject<UBoxComponent>(TEXT("RootComp"));
 	BoxComp->SetBoxExtent(BoxSize);

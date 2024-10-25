@@ -33,7 +33,7 @@ void UWHCCameraBodyComponent::TickComponent(float DeltaTime, ELevelTick TickType
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	if (IsValid(PlayerController))
+	if (bCanCameraMove && IsValid(PlayerController))
 	{
 		FVector2D CurrentMoveSpeed = CurrentInputMoveSpeed;
 		FVector2D MousePosition;

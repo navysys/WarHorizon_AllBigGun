@@ -6,6 +6,7 @@
 #include "Controller/WHPlayerController.h"
 #include "Components/BoxComponent.h"
 #include "Components/SkeletalMeshComponent.h"
+#include "NiagaraComponent.h"
 #include "Engine/SkeletalMeshSocket.h"
 #include "Camera/CameraComponent.h"
 #include "GameFramework/SpringArmComponent.h"
@@ -40,6 +41,14 @@ AWHBattleShipBase::AWHBattleShipBase()
 	SkeletalMeshComp = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("SkeletalMesh"));
 	SkeletalMeshComp->SetupAttachment(BoxComp);
 	// 스켈레탈 매시의 콜리전 프로파일은 나중에 수정
+
+	SmokestackComp = CreateDefaultSubobject<UNiagaraComponent>("SmokeStackNiagara");
+	SmokestackComp->SetupAttachment(SkeletalMeshComp, TEXT("Smokestack"));
+	if (Smokestack)
+	{
+		SmokestackComp->SetAsset(Smokestack);
+	}
+	SmokestackComp->SetIntParameter(TEXT("SpawnRate"), 0);
 
 	CameraBodyComp = CreateDefaultSubobject<UWHCCameraBodyComponent>(TEXT("CameraBody"));
 
@@ -358,6 +367,30 @@ void AWHBattleShipBase::IncreaseMoveSpeed()
 	if (IsValid(BattleShipMovementComp))
 	{
 		BattleShipMovementComp->IncreaseSpeedType();
+		if (BattleShipMovementComp->SpeedType == ESpeedType::Max)
+		{
+			SmokestackComp->SetIntParameter(TEXT("SpawnRate"), 120);
+		}
+		else if (BattleShipMovementComp->SpeedType == ESpeedType::ThreeQuater)
+		{
+			SmokestackComp->SetIntParameter(TEXT("SpawnRate"), 80);
+		}
+		else if (BattleShipMovementComp->SpeedType == ESpeedType::OneHalf)
+		{
+			SmokestackComp->SetIntParameter(TEXT("SpawnRate"), 60);
+		}
+		else if (BattleShipMovementComp->SpeedType == ESpeedType::OneQuater)
+		{
+			SmokestackComp->SetIntParameter(TEXT("SpawnRate"), 40);
+		}
+		else if (BattleShipMovementComp->SpeedType == ESpeedType::Stop)
+		{
+			SmokestackComp->SetIntParameter(TEXT("SpawnRate"), 0);
+		}
+		else if (BattleShipMovementComp->SpeedType == ESpeedType::Back)
+		{
+			SmokestackComp->SetIntParameter(TEXT("SpawnRate"), 40);
+		}
 	}
 }
 

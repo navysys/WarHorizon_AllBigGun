@@ -22,6 +22,8 @@ class AWHTurretBase;
 class AWHAircraftsBase;
 class UWHSkillBase;
 class UWHCCameraBodyComponent;
+class UNiagaraComponent;
+class UNiagaraSystem;
 
 UCLASS()
 class WARHORIZON_ALLBIGGUN_API AWHBattleShipBase : public APawn, public IBattleShipInterface
@@ -109,11 +111,15 @@ protected:
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<USkeletalMeshComponent> SkeletalMeshComp;
 	UPROPERTY(VisibleAnywhere)
+	TObjectPtr<UNiagaraComponent> SmokestackComp;
+	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UWHCCameraBodyComponent> CameraBodyComp;
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UCameraComponent> CameraComp;
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<USpringArmComponent> SpringArmComp;
+
+
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UWHCBattleShipMovement> BattleShipMovementComp;
 	UPROPERTY(VisibleAnywhere)
@@ -166,4 +172,7 @@ public:
 	TSubclassOf<AWHTurretBase> DualTurret2;
 	UPROPERTY(EditAnywhere, Category = "BattleShip | Turret")
 	TSubclassOf<AWHTurretBase> TorpedoLauncher;
+
+	UPROPERTY(EditAnywhere, Category = "BattleShip | Niagara")
+	TObjectPtr<UNiagaraSystem> Smokestack;
 };

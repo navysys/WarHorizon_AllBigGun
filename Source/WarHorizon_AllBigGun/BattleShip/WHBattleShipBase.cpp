@@ -381,7 +381,7 @@ void AWHBattleShipBase::IncreaseMoveSpeed()
 		}
 		else if (BattleShipMovementComp->SpeedType == ESpeedType::OneQuater)
 		{
-			SmokestackComp->SetIntParameter(TEXT("SpawnRate"), 40);
+			SmokestackComp->SetIntParameter(TEXT("SpawnRate"), 30);
 		}
 		else if (BattleShipMovementComp->SpeedType == ESpeedType::Stop)
 		{

@@ -5,6 +5,9 @@
 #include "WHAirTurretBase.generated.h"
 
 
+class AWHBullet;
+
+
 UCLASS()
 class WARHORIZON_ALLBIGGUN_API AWHAirTurretBase : public AWHTurretBase
 {
@@ -12,4 +15,13 @@ class WARHORIZON_ALLBIGGUN_API AWHAirTurretBase : public AWHTurretBase
 	
 public:
 	AWHAirTurretBase();
+
+	virtual void Fire() override;
+
+public:
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<AWHBullet> Bullet;
+
+	UPROPERTY(EditAnywhere)
+	float HorizontalAngle = 70.0f;
 };

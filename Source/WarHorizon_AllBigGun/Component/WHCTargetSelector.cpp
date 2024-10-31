@@ -168,6 +168,16 @@ void UWHCTargetSelector::CommandTurretsFire(ETurretType TurretType)
 				}
 			}
 		}
+		else if ((TArray.TurretsType == ETurretType::Air))
+		{
+			for (AWHTurretBase* Turret : TArray.Turrets)
+			{
+				if (IsValid(Turret))
+				{
+					Turret->Fire();
+				}
+			}
+		}
 	}
 }
 

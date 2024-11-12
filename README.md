@@ -5,21 +5,22 @@
 
 
 # Tech Stack
-<img src="https://img.shields.io/badge/unreal%20engine-%23313131.svg?&style=for-the-badge&logo=unreal%20engine&logoColor=white" /> <img src="https://img.shields.io/badge/springboot-6DB33F?&style=for-the-badge&logo=springboot&logoColor=white" /> <img src="https://img.shields.io/badge/mysql-%234479A1.svg?&style=for-the-badge&logo=mysql&logoColor=white" />
+<img src="https://img.shields.io/badge/unreal%20engine-%23313131.svg?&style=for-the-badge&logo=unreal%20engine&logoColor=white" /> <img src="https://img.shields.io/badge/springboot-6DB33F?&style=for-the-badge&logo=springboot&logoColor=white" /> <img src="https://img.shields.io/badge/mysql-%234479A1.svg?&style=for-the-badge&logo=mysql&logoColor=white" /> <img src="https://img.shields.io/badge/json-%23000000.svg?&style=for-the-badge&logo=json&logoColor=white" />
 
 
 
 # Feature
 ### Unreal Engine
-#### Login
-
-#### Client
-
-#### InGame
++ 로그인
++ 서버 생성
++ 서버 참여
++ 매치메이킹
++ 플레이어 / AI
++ 채팅
 
 ### Web Server
-
-### MySQL
-
++ 로그인 / 회원가입
++ 게임 결과 저장, 반환
++ 채팅 기록
 
 # Server Client Structure

@@ -16,6 +16,10 @@
 <br>
 <img src="https://img.shields.io/badge/visual%20studio-%235C2D91.svg?&style=for-the-badge&logo=visual%20studio&logoColor=white" /><img src="https://img.shields.io/badge/intellij%20idea-%23000000.svg?&style=for-the-badge&logo=intellij%20idea&logoColor=white" />
 
+# Server Client Structure
+![서버클라이언트구조](https://github.com/user-attachments/assets/664bf13b-987c-4ab5-a71a-7a468ec58be4)
+<br>
+
 # Feature
 ### Unreal Engine
 + 로그인
@@ -24,10 +28,6 @@
 + 매치메이킹
 + 플레이어 / AI
 + 채팅
-
-# Server Client Structure
-![서버클라이언트구조](https://github.com/user-attachments/assets/664bf13b-987c-4ab5-a71a-7a468ec58be4)
-<br>
 
 ### Web Server
 + 로그인 / 회원가입

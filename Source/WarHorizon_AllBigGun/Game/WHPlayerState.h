@@ -74,6 +74,4 @@ protected:
 
 	UPROPERTY(EditAnywhere, Category = "Stat | Movement")
 	float RotationAcceleration = 1;
-
-
 };

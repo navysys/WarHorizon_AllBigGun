@@ -36,5 +36,5 @@ public:
 	FVector2D CurrentInputMoveSpeed;
 
 	UPROPERTY()
-	bool bCanCameraMove = false;
+	bool bCanCameraMove = true;
 };

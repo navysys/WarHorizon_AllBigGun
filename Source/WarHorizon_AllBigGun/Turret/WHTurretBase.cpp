@@ -173,7 +173,7 @@ void AWHTurretBase::DebugTurretForward()
 		Thickness = 50.0f;
 	}
 
-	DrawDebugLine(GetWorld(), TurretLocation, LineEnd, Color, false, -1.f, 0, Thickness);
+	//DrawDebugLine(GetWorld(), TurretLocation, LineEnd, Color, false, -1.f, 0, Thickness);
 }
 
 void AWHTurretBase::SpinToTargetAngle()

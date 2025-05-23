@@ -8,6 +8,7 @@
 #include "Interface/BattleShipInterface.h"
 #include "DrawDebugHelpers.h"
 #include "Widget/WHInGameWidgetBase.h"
+#include "Component/WHCSkillHandler.h"
 
 
 AWHPlayerController::AWHPlayerController()
@@ -16,6 +17,9 @@ AWHPlayerController::AWHPlayerController()
 	bAutoManageActiveCameraTarget = true;
 
 	CurrentControllerMappingType = EControllerMappingType::Default;
+
+	// 쿨타임을 서버에서 관리하기 위한 컴포넌트
+	SkillHandlerComp = CreateDefaultSubobject<UWHCSkillHandler>(TEXT("SkillHandlerComp"));
 }
 
 void AWHPlayerController::BeginPlay()
@@ -24,6 +28,11 @@ void AWHPlayerController::BeginPlay()
 
 	//나중에 서버로 바꾸면 빙의 할 때 설정하도록 변경
 	BattleShipPawn = Cast<IBattleShipInterface>(GetPawn());
+
+	if (IsValid(SkillHandlerComp))
+	{
+		//SkillHandlerComp->InitSkillHandlerComponent(SkillPtrQ, SkillPtrW, SkillPtrE, SkillPtrR);
+	}
 
 	if (UEnhancedInputLocalPlayerSubsystem* SubSystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer()))
 	{
@@ -200,11 +209,13 @@ void AWHPlayerController::ChangeContext(const FInputActionValue& Value)
 	ChangeWaitingAttackMappingContext();
 }
 
+// false 이라면 서버 호출이 거절
 bool AWHPlayerController::C2S_SendMessage_Validate(const FText& Messsage)
 {
 	return true;
 }
 
+// 서버에서만 실행 될 함수
 void AWHPlayerController::C2S_SendMessage_Implementation(const FText& Message)
 {
 	for (auto Iter = GetWorld()->GetPlayerControllerIterator(); Iter; ++Iter)
@@ -217,6 +228,7 @@ void AWHPlayerController::C2S_SendMessage_Implementation(const FText& Message)
 	}
 }
 
+// 서버에서 클라이언트로 호출
 void AWHPlayerController::S2C_AddMessage_Implementation(const FText& Messsage)
 {
 	InGameWidget->AddChatMessage(Messsage);

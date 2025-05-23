@@ -7,8 +7,8 @@ void AWHSubTurretBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if (bIsFireReady)
-	{
-		Fire();
-	}
+	//if (bIsFireReady)
+	//{
+	//	Fire();
+	//}
 }

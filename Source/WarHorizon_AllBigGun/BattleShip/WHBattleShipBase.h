@@ -15,15 +15,14 @@ class UCameraComponent;
 class USpringArmComponent;
 class UWHCBattleShipMovement;
 class UWHCDetectEnemy;
-class UWHCSkillHandler;
 class UWHCTargetSelector;
 class USkeletalMesh;
 class AWHTurretBase;
 class AWHAircraftsBase;
-class UWHSkillBase;
 class UWHCCameraBodyComponent;
 class UNiagaraComponent;
 class UNiagaraSystem;
+class UWHSkillBase;
 
 UCLASS()
 class WARHORIZON_ALLBIGGUN_API AWHBattleShipBase : public APawn, public IBattleShipInterface
@@ -32,7 +31,7 @@ class WARHORIZON_ALLBIGGUN_API AWHBattleShipBase : public APawn, public IBattleS
 
 public:
 	AWHBattleShipBase();
-
+	
 protected:
 	virtual void BeginPlay() override;
 	virtual void PostInitializeComponents() override;
@@ -40,7 +39,7 @@ protected:
 public:
 	virtual void Tick(float DeltaTime) override;
 
-protected:
+public:
 	virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
 
 	// 데이터 로드 및 초기화 함수
@@ -54,11 +53,12 @@ protected:
 	virtual void NormalAttack() override;
 	virtual void SpinTurrets(AActor* Target) override;
 	virtual void SpinTurrets(FVector HitPoint) override;
-	virtual void UseSkill(char Key) override;
 	virtual void SpinBattleShip(FVector HitPoint) override;
 	virtual void IncreaseMoveSpeed() override;
 	virtual void DecreaseMoveSpeed() override;
 	virtual void SpawnAircrafts(int Index) override;
+
+	virtual UObject* GetSkill(char Button) override;
 
 protected:
 	UPROPERTY(VisibleAnywhere, Category = "BattleShip | ID")
@@ -125,19 +125,17 @@ protected:
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UWHCDetectEnemy> DetectEnemyComp;
 	UPROPERTY(VisibleAnywhere)
-	TObjectPtr<UWHCSkillHandler> SkillHandlerComp;
-	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UWHCTargetSelector> TargetSelectorComp;
-protected:
 
+protected:
 	UPROPERTY(EditAnywhere, Category = "BattleShip | Skill")
-	TSoftObjectPtr<UObject> SkillPtrQ;
+	UWHSkillBase* SkillQ;
 	UPROPERTY(EditAnywhere, Category = "BattleShip | Skill")
-	TSoftObjectPtr<UObject> SkillPtrW;
+	UWHSkillBase* SkillW;
 	UPROPERTY(EditAnywhere, Category = "BattleShip | Skill")
-	TSoftObjectPtr<UObject> SkillPtrE;
+	UWHSkillBase* SkillE;
 	UPROPERTY(EditAnywhere, Category = "BattleShip | Skill")
-	TSoftObjectPtr<UObject> SkillPtrR;
+	UWHSkillBase* SkillR;
 
 protected:
 	// 모든 터렛을 저장

@@ -6,6 +6,7 @@
 #include "Game/WHCustomStructs.h"
 #include "WHPlayerController.generated.h"
 
+class UWHCSkillHandler;
 class UInputMappingContext;
 class UInputAction;
 class IBattleShipInterface;
@@ -35,8 +36,11 @@ public:
 protected:
 	virtual void SetupInputComponent() override;
 
-private:
+public:
 	IBattleShipInterface* BattleShipPawn;
+
+	UPROPERTY(VisibleAnywhere)
+	TObjectPtr<UWHCSkillHandler> SkillHandlerComp;
 
 protected:
 	EControllerMappingType CurrentControllerMappingType;

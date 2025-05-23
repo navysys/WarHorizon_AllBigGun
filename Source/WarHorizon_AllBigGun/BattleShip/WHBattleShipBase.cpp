@@ -12,7 +12,6 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "Component/WHCBattleShipMovement.h"
 #include "Component/WHCDetectEnemy.h"
-#include "Component/WHCSkillHandler.h"
 #include "Component/WHCTargetSelector.h"
 #include "Component/WHCCameraBodyComponent.h"
 #include "Turret/WHTurretBase.h"
@@ -20,6 +19,7 @@
 #include "Enum/ETurretAttackType.h"
 #include "Containers/Array.h"
 #include "Skill/WHSkillBase.h"
+#include "Skill/WHSkillYamatoQ.h"
 
 
 AWHBattleShipBase::AWHBattleShipBase()
@@ -48,7 +48,6 @@ AWHBattleShipBase::AWHBattleShipBase()
 	{
 		SmokestackComp->SetAsset(Smokestack);
 	}
-	SmokestackComp->SetIntParameter(TEXT("SpawnRate"), 0);
 
 	CameraBodyComp = CreateDefaultSubobject<UWHCCameraBodyComponent>(TEXT("CameraBody"));
 
@@ -66,14 +65,17 @@ AWHBattleShipBase::AWHBattleShipBase()
 	
 	BattleShipMovementComp = CreateDefaultSubobject<UWHCBattleShipMovement>(TEXT("BattleShipMovementComp"));
 	DetectEnemyComp = CreateDefaultSubobject<UWHCDetectEnemy>(TEXT("DetectEnemyComp"));
-	SkillHandlerComp = CreateDefaultSubobject<UWHCSkillHandler>(TEXT("SkillHandlerComp"));
 	TargetSelectorComp = CreateDefaultSubobject<UWHCTargetSelector>(TEXT("TargetSelectorComp"));
+
+	SkillQ = CreateDefaultSubobject<UWHSkillYamatoQ>(TEXT("SkillQ"));
+	SkillQ->Init(this);
 }
 
 void AWHBattleShipBase::BeginPlay()
 {
 	Super::BeginPlay();
 
+	SkillQ->Effect();
 	//test
 	//SpawnAircrafts(0);
 }
@@ -81,6 +83,8 @@ void AWHBattleShipBase::BeginPlay()
 void AWHBattleShipBase::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
+
+	SmokestackComp->SetIntParameter(TEXT("SpawnRate"), 0);
 
 	LoadDataTableToName(FName(BattleShipName));
 	CreateTurretToMeshCompSocket(SkeletalMeshComp);
@@ -97,10 +101,6 @@ void AWHBattleShipBase::PostInitializeComponents()
 		DetectEnemyComp->SetDetectedAircrafts(&EnemyAircrafts);
 	}
 
-	if (IsValid(SkillHandlerComp))
-	{
-		SkillHandlerComp->InitSkillHandlerComponent(SkillPtrQ, SkillPtrW, SkillPtrE, SkillPtrR);
-	}
 
 	if (IsValid(TargetSelectorComp))
 	{
@@ -143,11 +143,6 @@ void AWHBattleShipBase::LoadDataTableToName(FName Name)
 				InitRotationAcceleration = Table->RotationAcceleration;
 				InitRotationAccelerationIncrease = Table->RotationAccelerationIncrease;
 
-				SkillPtrQ = Table->SkillQ;
-				SkillPtrW = Table->SkillW;
-				SkillPtrE = Table->SkillE;
-				SkillPtrR = Table->SkillR;
-
 				AircraftIDs.Emplace(Table->AircraftsID);
 				AircraftIDs.Emplace(Table->AircraftsID2);
 				AircraftIDs.Emplace(Table->AircraftsID3);
@@ -165,6 +160,7 @@ void AWHBattleShipBase::CreateTurretToMeshCompSocket(USkeletalMeshComponent* Mes
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
 	TArray<FName> SocketNames = SkeletalMeshComp->GetAllSocketNames();
+	uint8 DirectionCharIndex = 8;
 
 	// 家南俊 器啪 积己 棺 何馒
 	if (SocketNames.Num() > 0)
@@ -187,8 +183,8 @@ void AWHBattleShipBase::CreateTurretToMeshCompSocket(USkeletalMeshComponent* Mes
 					if (Sock != nullptr)
 					{
 						AWHTurretBase* SpawnedTurret = GetWorld()->SpawnActor<AWHTurretBase>(MainTurret, Sock->GetSocketLocation(SkeletalMeshComp), FRotator::ZeroRotator, SpawnParams);
-						SpawnedTurret->AttachToComponent(SkeletalMeshComp, FAttachmentTransformRules::SnapToTargetNotIncludingScale, Sock->SocketName);
-						SpawnedTurret->SetFrontDirection(SocketNames[i].ToString()[8]);
+						SpawnedTurret->AttachToComponent(SkeletalMeshComp, FAttachmentTransformRules::SnapToTargetIncludingScale, Sock->SocketName);
+						SpawnedTurret->SetFrontDirection(SocketNames[i].ToString()[DirectionCharIndex]);
 
 						MainTurrets.Turrets.Emplace(SpawnedTurret);
 					}
@@ -203,7 +199,7 @@ void AWHBattleShipBase::CreateTurretToMeshCompSocket(USkeletalMeshComponent* Mes
 					{
 						AWHTurretBase* SpawnedTurret = GetWorld()->SpawnActor<AWHTurretBase>(SubTurret1, Sock->GetSocketLocation(SkeletalMeshComp), FRotator::ZeroRotator, SpawnParams);
 						SpawnedTurret->AttachToComponent(SkeletalMeshComp, FAttachmentTransformRules::SnapToTargetNotIncludingScale, Sock->SocketName);
-						SpawnedTurret->SetFrontDirection(SocketNames[i].ToString()[8]);
+						SpawnedTurret->SetFrontDirection(SocketNames[i].ToString()[DirectionCharIndex]);
 
 						SubTurrets.Turrets.Emplace(SpawnedTurret);
 					}
@@ -218,7 +214,7 @@ void AWHBattleShipBase::CreateTurretToMeshCompSocket(USkeletalMeshComponent* Mes
 					{
 						AWHTurretBase* SpawnedTurret = GetWorld()->SpawnActor<AWHTurretBase>(SubTurret2, Sock->GetSocketLocation(SkeletalMeshComp), FRotator::ZeroRotator, SpawnParams);
 						SpawnedTurret->AttachToComponent(SkeletalMeshComp, FAttachmentTransformRules::SnapToTargetNotIncludingScale, Sock->SocketName);
-						SpawnedTurret->SetFrontDirection(SocketNames[i].ToString()[8]);
+						SpawnedTurret->SetFrontDirection(SocketNames[i].ToString()[DirectionCharIndex]);
 
 						SubTurrets.Turrets.Emplace(SpawnedTurret);
 					}
@@ -233,7 +229,7 @@ void AWHBattleShipBase::CreateTurretToMeshCompSocket(USkeletalMeshComponent* Mes
 					{
 						AWHTurretBase* SpawnedTurret = GetWorld()->SpawnActor<AWHTurretBase>(AirTurret1, Sock->GetSocketLocation(SkeletalMeshComp), FRotator::ZeroRotator, SpawnParams);
 						SpawnedTurret->AttachToComponent(SkeletalMeshComp, FAttachmentTransformRules::SnapToTargetNotIncludingScale, Sock->SocketName);
-						SpawnedTurret->SetFrontDirection(SocketNames[i].ToString()[8]);
+						SpawnedTurret->SetFrontDirection(SocketNames[i].ToString()[DirectionCharIndex]);
 
 						AirTurrets.Turrets.Emplace(SpawnedTurret);
 					}
@@ -248,7 +244,7 @@ void AWHBattleShipBase::CreateTurretToMeshCompSocket(USkeletalMeshComponent* Mes
 					{
 						AWHTurretBase* SpawnedTurret = GetWorld()->SpawnActor<AWHTurretBase>(AirTurret2, Sock->GetSocketLocation(SkeletalMeshComp), FRotator::ZeroRotator, SpawnParams);
 						SpawnedTurret->AttachToComponent(SkeletalMeshComp, FAttachmentTransformRules::SnapToTargetNotIncludingScale, Sock->SocketName);
-						SpawnedTurret->SetFrontDirection(SocketNames[i].ToString()[8]);
+						SpawnedTurret->SetFrontDirection(SocketNames[i].ToString()[DirectionCharIndex]);
 
 						AirTurrets.Turrets.Emplace(SpawnedTurret);
 					}
@@ -263,7 +259,7 @@ void AWHBattleShipBase::CreateTurretToMeshCompSocket(USkeletalMeshComponent* Mes
 					{
 						AWHTurretBase* SpawnedTurret = GetWorld()->SpawnActor<AWHTurretBase>(DualTurret1, Sock->GetSocketLocation(SkeletalMeshComp), FRotator::ZeroRotator, SpawnParams);
 						SpawnedTurret->AttachToComponent(SkeletalMeshComp, FAttachmentTransformRules::SnapToTargetNotIncludingScale, Sock->SocketName);
-						SpawnedTurret->SetFrontDirection(SocketNames[i].ToString()[8]);
+						SpawnedTurret->SetFrontDirection(SocketNames[i].ToString()[DirectionCharIndex]);
 
 						DualTurrets.Turrets.Emplace(SpawnedTurret);
 					}
@@ -278,7 +274,7 @@ void AWHBattleShipBase::CreateTurretToMeshCompSocket(USkeletalMeshComponent* Mes
 					{
 						AWHTurretBase* SpawnedTurret = GetWorld()->SpawnActor<AWHTurretBase>(DualTurret2, Sock->GetSocketLocation(SkeletalMeshComp), FRotator::ZeroRotator, SpawnParams);
 						SpawnedTurret->AttachToComponent(SkeletalMeshComp, FAttachmentTransformRules::SnapToTargetNotIncludingScale, Sock->SocketName);
-						SpawnedTurret->SetFrontDirection(SocketNames[i].ToString()[8]);
+						SpawnedTurret->SetFrontDirection(SocketNames[i].ToString()[DirectionCharIndex]);
 
 						DualTurrets.Turrets.Emplace(SpawnedTurret);
 					}
@@ -293,7 +289,7 @@ void AWHBattleShipBase::CreateTurretToMeshCompSocket(USkeletalMeshComponent* Mes
 					{
 						AWHTurretBase* SpawnedTurret = GetWorld()->SpawnActor<AWHTurretBase>(TorpedoLauncher, Sock->GetSocketLocation(SkeletalMeshComp), FRotator::ZeroRotator, SpawnParams);
 						SpawnedTurret->AttachToComponent(SkeletalMeshComp, FAttachmentTransformRules::SnapToTargetNotIncludingScale, Sock->SocketName);
-						SpawnedTurret->SetFrontDirection(SocketNames[i].ToString()[8]);
+						SpawnedTurret->SetFrontDirection(SocketNames[i].ToString()[DirectionCharIndex]);
 
 						TorpedoLaunchers.Turrets.Emplace(SpawnedTurret);
 					}
@@ -349,11 +345,6 @@ void AWHBattleShipBase::SpinTurrets(FVector HitPoint)
 	}
 }
 
-void AWHBattleShipBase::UseSkill(char Key)
-{
-
-}
-
 void AWHBattleShipBase::SpinBattleShip(FVector HitPoint)
 {
 	if (IsValid(BattleShipMovementComp))
@@ -366,6 +357,7 @@ void AWHBattleShipBase::IncreaseMoveSpeed()
 {
 	if (IsValid(BattleShipMovementComp))
 	{
+		int32 Value = 0;
 		BattleShipMovementComp->IncreaseSpeedType();
 		if (BattleShipMovementComp->SpeedType == ESpeedType::Max)
 		{
@@ -419,5 +411,15 @@ void AWHBattleShipBase::SpawnAircrafts(int Index)
 		SpawnedAircrafts->InitToDataTable(AircraftIDs[Index]);
 		AllAircraftsArray.Emplace(SpawnedAircrafts);
 	}
+}
+
+UObject* AWHBattleShipBase::GetSkill(char Button)
+{
+	if (Button == 'Q')
+	{
+		return SkillQ;
+	}
+
+	return nullptr;
 }
 

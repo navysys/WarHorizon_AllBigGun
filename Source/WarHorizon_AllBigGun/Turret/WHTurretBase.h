@@ -48,7 +48,7 @@ protected:
 	TObjectPtr<USceneComponent> RootComp;
 
 	UPROPERTY(VisibleAnywhere)
-	TObjectPtr<UStaticMeshComponent> StaticMeshComp;
+	TObjectPtr<USkeletalMeshComponent> SkeletalMeshComp;
 
 	UPROPERTY(VisibleAnywhere)
 	TArray<USceneComponent*> MuzzleComps;

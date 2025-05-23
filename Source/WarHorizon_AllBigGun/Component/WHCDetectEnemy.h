@@ -34,8 +34,8 @@ protected:
 
 	FName BPresetName;
 	FName APresetName;
-	float BRadius = 40000.0f;
-	float ARadius = 40000.0f;
+	float BRadius = 6000.0f;
+	float ARadius = 6000.0f;
 
 	TArray<APawn*>* DetectedBattleShips;
 	TArray<APawn*>* DetectedAircrafts;

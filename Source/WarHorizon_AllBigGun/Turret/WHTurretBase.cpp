@@ -14,15 +14,15 @@ AWHTurretBase::AWHTurretBase()
 	RootComp = CreateDefaultSubobject<USceneComponent>(TEXT("RootComp"));
 	RootComponent = RootComp;
 
-	StaticMeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMesh"));
-	StaticMeshComp->SetupAttachment(RootComponent);
-	StaticMeshComp->SetCollisionProfileName(TEXT("NoCollision"));
+	SkeletalMeshComp = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("SkelMesh"));
+	SkeletalMeshComp->SetupAttachment(RootComponent);
+	SkeletalMeshComp->SetCollisionProfileName(TEXT("NoCollision"));
 
 	for (int i = 0; i < 4; i++)
 	{
 		FName CompName = FName(TEXT("Muzzle"),i+1);
 		USceneComponent* Muzzle = CreateDefaultSubobject<USceneComponent>(CompName);
-		Muzzle->SetupAttachment(StaticMeshComp);
+		Muzzle->SetupAttachment(SkeletalMeshComp);
 		MuzzleComps.Emplace(Muzzle);
 	}
 	
@@ -60,23 +60,23 @@ void AWHTurretBase::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
 
-	if (IsValid(StaticMeshComp))
-	{
-		TArray<UStaticMeshSocket*> Muzzles = StaticMeshComp->GetStaticMesh()->Sockets;
+	//if (IsValid(SkeletalMeshComp))
+	//{
+	//	TArray<USkeletalMeshSocket*> Muzzles = SkeletalMeshComp->GetSkeletalMeshAsset()->GetActiveSocketList();
 
-		for (int i = 0; i < Muzzles.Num(); i++)
-		{
-			MuzzleComps[i]->SetRelativeLocation(Muzzles[i]->RelativeLocation);
-		}
-		if (Muzzles.Num() < MuzzleComps.Num())
-		{
-			int OverNum = MuzzleComps.Num() - Muzzles.Num();
-			for (int j = 0; j < OverNum; j++)
-			{
-				MuzzleComps.Pop()->DestroyComponent();
-			}
-		}
-	}
+	//	for (int i = 0; i < Muzzles.Num(); i++)
+	//	{
+	//		MuzzleComps[i]->SetRelativeLocation(Muzzles[i]->GetSocketLocalTransform()->);
+	//	}
+	//	if (Muzzles.Num() < MuzzleComps.Num())
+	//	{
+	//		int OverNum = MuzzleComps.Num() - Muzzles.Num();
+	//		for (int j = 0; j < OverNum; j++)
+	//		{
+	//			MuzzleComps.Pop()->DestroyComponent();
+	//		}
+	//	}
+	//}
 }
 
 void AWHTurretBase::SetFrontDirection(char Dir)
@@ -108,7 +108,7 @@ void AWHTurretBase::Fire()
 	{
 		float Num = MuzzleComps.Num() / 2;
 		int Center = FMath::CeilToInt(Num);
-		ANiagaraActor* NiagaraActor = GetWorld()->SpawnActor<ANiagaraActor>(ANiagaraActor::StaticClass(), MuzzleComps[Center]->GetComponentLocation(), StaticMeshComp->GetRelativeRotation());
+		ANiagaraActor* NiagaraActor = GetWorld()->SpawnActor<ANiagaraActor>(ANiagaraActor::StaticClass(), MuzzleComps[Center]->GetComponentLocation(), SkeletalMeshComp->GetRelativeRotation());
 		if (NiagaraActor)
 		{
 			NiagaraActor->GetNiagaraComponent()->SetAsset(GunFireEffect);
@@ -146,8 +146,8 @@ void AWHTurretBase::LoadDataTableToName(FName Name)
 
 void AWHTurretBase::DebugTurretForward()
 {
-	FVector TurretLocation = StaticMeshComp->GetComponentLocation();
-	FVector ForwardVector = StaticMeshComp->GetForwardVector();
+	FVector TurretLocation = SkeletalMeshComp->GetComponentLocation();
+	FVector ForwardVector = SkeletalMeshComp->GetForwardVector();
 	FVector LineEnd = TurretLocation + ForwardVector * Range;
 	FColor Color = FColor::Yellow;
 	float Thickness = 10.0f;
@@ -155,32 +155,32 @@ void AWHTurretBase::DebugTurretForward()
 	if (TurretType == ETurretType::Main)
 	{
 		Color = FColor::Red;
-		Thickness = 100.0f;
+		Thickness = 20.0f;
 	}
 	else if (TurretType == ETurretType::Sub)
 	{
 		Color = FColor::Yellow;
-		Thickness = 50.0f;
+		Thickness = 10.0f;
 	}
 	else if (TurretType == ETurretType::Air)
 	{
 		Color = FColor::Blue;
-		Thickness = 20.0f;
+		Thickness = 5.0f;
 	}
 	else if (TurretType == ETurretType::DualPurpose)
 	{
 		Color = FColor::Green;
-		Thickness = 50.0f;
+		Thickness = 10.0f;
 	}
 
-	//DrawDebugLine(GetWorld(), TurretLocation, LineEnd, Color, false, -1.f, 0, Thickness);
+	DrawDebugLine(GetWorld(), TurretLocation, LineEnd, Color, false, -1.f, 0, Thickness);
 }
 
 void AWHTurretBase::SpinToTargetAngle()
 {
-	if (IsValid(StaticMeshComp) && IsValid(BaseBattleShip))
+	if (IsValid(SkeletalMeshComp) && IsValid(BaseBattleShip))
 	{
-		float TurretYaw = StaticMeshComp->GetRelativeRotation().Yaw;
+		float TurretYaw = SkeletalMeshComp->GetRelativeRotation().Yaw;
 		
 		if (MaxHorizontalAngle == 360.0f)
 		{
@@ -206,11 +206,11 @@ void AWHTurretBase::SpinToTargetAngle()
 
 			if (Angle > 1.0f)
 			{
-				StaticMeshComp->AddRelativeRotation(FRotator(0, 0.5f, 0));
+				SkeletalMeshComp->AddRelativeRotation(FRotator(0, 0.5f, 0));
 			}
 			else if (Angle < -1.0f)
 			{
-				StaticMeshComp->AddRelativeRotation(FRotator(0, -0.5f, 0));
+				SkeletalMeshComp->AddRelativeRotation(FRotator(0, -0.5f, 0));
 			}
 		}
 		else
@@ -239,23 +239,23 @@ void AWHTurretBase::SpinToTargetAngle()
 			{
 				if (TurretYaw > RelativeAngle + 1.0f)
 				{
-					StaticMeshComp->AddRelativeRotation(FRotator(0, -0.5f, 0));
-					if (StaticMeshComp->GetRelativeRotation().Yaw < RelativeAngle)
+					SkeletalMeshComp->AddRelativeRotation(FRotator(0, -0.5f, 0));
+					if (SkeletalMeshComp->GetRelativeRotation().Yaw < RelativeAngle)
 					{
-						StaticMeshComp->SetRelativeRotation(FRotator(0, RelativeAngle, 0));
+						SkeletalMeshComp->SetRelativeRotation(FRotator(0, RelativeAngle, 0));
 					}
 				}
 				else if (TurretYaw < RelativeAngle - 1.0f)
 				{
-					StaticMeshComp->AddRelativeRotation(FRotator(0, 0.5f, 0));
-					if (StaticMeshComp->GetRelativeRotation().Yaw > RelativeAngle)
+					SkeletalMeshComp->AddRelativeRotation(FRotator(0, 0.5f, 0));
+					if (SkeletalMeshComp->GetRelativeRotation().Yaw > RelativeAngle)
 					{
-						StaticMeshComp->SetRelativeRotation(FRotator(0, RelativeAngle, 0));
+						SkeletalMeshComp->SetRelativeRotation(FRotator(0, RelativeAngle, 0));
 					}
 				}
 				else
 				{
-					StaticMeshComp->SetRelativeRotation(FRotator(0, RelativeAngle, 0));
+					SkeletalMeshComp->SetRelativeRotation(FRotator(0, RelativeAngle, 0));
 				}
 			}
 			else
@@ -264,16 +264,16 @@ void AWHTurretBase::SpinToTargetAngle()
 				{
 					if (TurretYaw >= 0)
 					{
-						StaticMeshComp->AddRelativeRotation(FRotator(0, 0.5f, 0));
+						SkeletalMeshComp->AddRelativeRotation(FRotator(0, 0.5f, 0));
 					}
 					else
 					{
-						StaticMeshComp->AddRelativeRotation(FRotator(0, -0.5f, 0));
+						SkeletalMeshComp->AddRelativeRotation(FRotator(0, -0.5f, 0));
 					}
 				}
 				else
 				{
-					StaticMeshComp->SetRelativeRotation(FRotator(0, MaxHorizontalAngle, 0));
+					SkeletalMeshComp->SetRelativeRotation(FRotator(0, MaxHorizontalAngle, 0));
 				}
 			}
 		}

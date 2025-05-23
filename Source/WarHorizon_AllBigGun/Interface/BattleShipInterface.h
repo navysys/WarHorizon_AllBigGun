@@ -22,9 +22,10 @@ public:
 	virtual void NormalAttack() = 0;
 	virtual void SpinTurrets(AActor* Target) = 0;
 	virtual void SpinTurrets(FVector HitPoint) = 0;
-	virtual void UseSkill(char Key) = 0;
 	virtual void SpinBattleShip(FVector HitPoint) = 0;
 	virtual void IncreaseMoveSpeed() = 0;
 	virtual void DecreaseMoveSpeed() = 0;
 	virtual void SpawnAircrafts(int Index) = 0;
+
+	virtual UObject* GetSkill(char Button) = 0;
 };

@@ -14,8 +14,8 @@ void UWHCDetectEnemy::BeginPlay()
 
 	PawnOwner = Cast<APawn>(GetOwner());
 
-	GetWorld()->GetTimerManager().SetTimer(BattleShipTimerHandle, this, &UWHCDetectEnemy::DetectBattleShip, 0.5f, true);
-	//GetWorld()->GetTimerManager().SetTimer(AircraftTimerHandle, this, &UWHCDetectEnemy::DetectAircraft, 0.5f, true);
+	//GetWorld()->GetTimerManager().SetTimer(BattleShipTimerHandle, this, &UWHCDetectEnemy::DetectBattleShip, 0.5f, true);
+	GetWorld()->GetTimerManager().SetTimer(AircraftTimerHandle, this, &UWHCDetectEnemy::DetectAircraft, 0.5f, true);
 }
 
 void UWHCDetectEnemy::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
@@ -71,17 +71,17 @@ void UWHCDetectEnemy::DetectBattleShip()
 		if (ArrayPawn.Num() > 1)
 		{
 			SortingArrayToDistance(ArrayPawn);
-			DrawDebugSphere(GetWorld(), Center, BRadius, 20, FColor::Green, false, 0.5f);
+			//DrawDebugSphere(GetWorld(), Center, BRadius, 20, FColor::Green, false, 0.5f);
 		}
 		else 
 		{
-			DrawDebugSphere(GetWorld(), Center, BRadius, 20, FColor::Red, false, 0.5f);
+			//DrawDebugSphere(GetWorld(), Center, BRadius, 20, FColor::Red, false, 0.5f);
 		}
 		*DetectedBattleShips = ArrayPawn;
 	}
 	else
 	{
-		DrawDebugSphere(GetWorld(), Center, BRadius, 20, FColor::Red, false, 0.5f);
+		//DrawDebugSphere(GetWorld(), Center, BRadius, 20, FColor::Red, false, 0.5f);
 	}
 }
 
@@ -93,7 +93,6 @@ void UWHCDetectEnemy::DetectAircraft()
 	CollisionQueryParam.AddIgnoredActor(PawnOwner);
 
 	FVector Center = PawnOwner->GetActorLocation();
-	Center.Z = 16000.0f;
 
 	bool bResult = GetWorld()->OverlapMultiByProfile(AOverlapResults, Center, FQuat::Identity, APresetName, FCollisionShape::MakeSphere(ARadius), CollisionQueryParam);
 	if (bResult)

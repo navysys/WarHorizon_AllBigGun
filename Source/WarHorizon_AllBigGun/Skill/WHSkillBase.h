@@ -1,45 +1,26 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "BattleShip/WHBattleShipBase.h"
 #include "WHSkillBase.generated.h"
 
 
-class AWHBattleShipBase;
-
-
-UCLASS(BlueprintType)
+UCLASS(Blueprintable)
 class WARHORIZON_ALLBIGGUN_API UWHSkillBase : public UObject
 {
 	GENERATED_BODY()
 	
 public:
 	UWHSkillBase();
-	UWHSkillBase(AWHBattleShipBase* BaseShip);
 
-	// 나중에 여기서 쿨타임 적용, 코스트 변경에 따른 UI 변경
+	void Init(AWHBattleShipBase* Base);
 	virtual void Effect();
 
-protected:
-	bool CSAttackHit(int Num);
-	bool CSDefenseShield(int Num);
-	bool CSTakeDamage(int Num);
-
-	void AECoolDownSelf(float Time);
-	void AECoolDownAll(float Time);
-
-private:
+public:
 	AWHBattleShipBase* BaseBattleShip;
 
-public:
 	float Value;
 	float Coefficient;
 	float Cost;
 	float CoolTime;
-	
-	// CS(조건문)를 위한 기본 변수
-	int32 AttackCount;
-	int32 DefenseCount;
-	int32 DamagedCount;
-
-	// AE(부가효과)를 위한 기본 변수
 };

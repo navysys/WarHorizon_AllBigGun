@@ -16,24 +16,24 @@ void AWHNormalTurretBase::BeginPlay()
 	Super::BeginPlay();
 
 	// 분산도 관련 코드 나중에는 계수 곱해주도록 수정
-	int MuzzleInt = MuzzleComps.Num();
+	int MuzzleCount = MuzzleComps.Num();
 	float DispersionAngle = 0.0f;
-	if (MuzzleInt == 4)
+	if (MuzzleCount == 4)
 	{
 		DispersionAngle = 7.5f;
 	}
-	else if (MuzzleInt == 3)
+	else if (MuzzleCount == 3)
 	{
 		DispersionAngle = 5.0f;
 	}
-	else if (MuzzleInt == 2)
+	else if (MuzzleCount == 2)
 	{
 		DispersionAngle = 2.5f;
 	}
 
-	for (int i = 1; i <= MuzzleInt; i++)
+	for (int i = 1; i <= MuzzleCount; i++)
 	{
-		Dispersion.Emplace((DispersionAngle / (MuzzleInt - 1)) * (i - ((MuzzleInt + 1) / 2)));
+		Dispersion.Emplace((DispersionAngle / (MuzzleCount - 1)) * (i - ((MuzzleCount + 1) / 2)));
 	}
 }
 
@@ -45,7 +45,7 @@ void AWHNormalTurretBase::Fire()
 	BeforeFireTime = 0.0f;
 
 	FVector MuzzleLocation = MuzzleComps[0]->GetComponentLocation();
-	FVector TargetLoc = MuzzleLocation + StaticMeshComp->GetForwardVector() * TargetData.Distance;  // 타겟 지점.
+	FVector TargetLoc = MuzzleLocation + SkeletalMeshComp->GetForwardVector() * TargetData.Distance;  // 타겟 지점.
 	float ArcValue = 0.65f;                       // ArcParam (0.0-1.0) 경사도 나중에 타겟 셀렉터에서 설정하도록 수정
 	float GravityZ = GetWorld()->GetGravityZ();
 	if (UGameplayStatics::SuggestProjectileVelocity_CustomArc(this, ShellVelocityVector, MuzzleLocation, TargetLoc, GravityZ, ArcValue))
@@ -62,7 +62,7 @@ void AWHNormalTurretBase::Fire()
 	ShellVelocity = ShellVelocityVector.Size();
 
 	// 포탄 발사 관련
-	FRotator Rot = StaticMeshComp->GetComponentRotation() + FRotator(ShellLaunchAngle, 0.0f, 0.0f);
+	FRotator Rot = SkeletalMeshComp->GetComponentRotation() + FRotator(ShellLaunchAngle, 0.0f, 0.0f);
 	for (int i = 0; i < MuzzleComps.Num(); i++)
 	{
 		AWHShell* SpawnShell = GetWorld()->SpawnActor<AWHShell>(Shell, MuzzleComps[i]->GetComponentLocation(), Rot + FRotator(0.0f, Dispersion[i], 0.0f), SpawnParams);

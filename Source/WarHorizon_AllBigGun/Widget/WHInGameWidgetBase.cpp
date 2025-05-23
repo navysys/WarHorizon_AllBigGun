@@ -13,6 +13,7 @@ void UWHInGameWidgetBase::NativeConstruct()
 	ChatText = Cast<UEditableTextBox>(GetWidgetFromName(TEXT("ChatTextBox")));
 	if (ChatText)
 	{
+		// ChatText 의 델리게이트에 함수 추가
 		ChatText->OnTextCommitted.AddDynamic(this, &UWHInGameWidgetBase::OnCommittedText);
 	}
 }
@@ -26,6 +27,7 @@ void UWHInGameWidgetBase::OnCommittedText(const FText& Text, ETextCommit::Type C
 		AWHPlayerController* PC = Cast<AWHPlayerController>(GetOwningPlayer());
 		if (IsValid(PC))
 		{
+			// 플레이어 컨트롤러의 함수 호출 -> 클라이언트에서 서버로 메세지 송신
 			PC->C2S_SendMessage(Text);
 		}
 		ChatText->SetText(FText::FromString(TEXT("")));

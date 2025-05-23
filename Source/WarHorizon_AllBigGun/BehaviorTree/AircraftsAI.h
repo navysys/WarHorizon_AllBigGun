@@ -25,3 +25,4 @@
 
 // Enum е╦ют
 #define BBKEY_AIRCRAFTSSTATE TEXT("AircraftsState")
+

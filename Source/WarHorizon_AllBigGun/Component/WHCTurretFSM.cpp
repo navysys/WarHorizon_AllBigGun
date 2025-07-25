@@ -105,13 +105,23 @@ void UWHCTurretFSM::Stop(float DeltaTime)
 
 void UWHCTurretFSM::Ready(float DeltaTime)
 {
-	// Fire 명령이 떨어지면 사격
+	// AllClear 명령이 떨어지면 사격
 	// 기본적으로 플레이어 조작으로는 Ready 까지만 가능
-	// TurretHandler 컴포넌트에서 모든 포탑이 준비가 되었을 때 or 준비 된 포탑만이라도 공격할 때 Fire 상태 넘어가도록
-	// 부포의 경우 타겟이 존재하면 쿨타임마다 Fire 로 넘어가도록 설정
+	// TurretHandler 컴포넌트에서 포탑이 준비가 되었을 때 AllClear 상태 넘어가도록
+	// 부포의 경우 타겟이 존재하면 쿨타임마다 상태 전환
+
+	// 목표 각도와 차이가 일정 이상되면 Turn 상태로 변환
+	//if(Angle )
+
+	if (CommandState == ETurretState::AllClear)
+	{
+		CurrentState = ETurretState::Fire;
+	}
 }
 
 void UWHCTurretFSM::Fire(float DeltaTime)
 {
+	// TurretBase 클래스의 Fire 함수 호출
+
 }
 

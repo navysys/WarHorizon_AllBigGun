@@ -443,9 +443,9 @@ bool AWHBattleShipBase::CanUseSkill(char Code)
 	if (Code == 'M') // Main Turret
 	{
 		bool bIsReady = TurretHandlerComp->CheckTurretsState(ETurretType::Main, ETurretState::Ready);
-		bool bIsNear = TurretHandlerComp->CheckTurretsState(ETurretType::Main, ETurretState::Near);
+		//bool bIsNear = TurretHandlerComp->CheckTurretsState(ETurretType::Main, ETurretState::Near);
 
-		if (bIsReady || bIsNear)
+		if (bIsReady)
 		{
 			return true;
 		}
@@ -453,9 +453,9 @@ bool AWHBattleShipBase::CanUseSkill(char Code)
 	else if (Code == 'T') // Torpedo
 	{
 		bool bIsReady = TurretHandlerComp->CheckTurretsState(ETurretType::Torpedo, ETurretState::Ready);
-		bool bIsNear = TurretHandlerComp->CheckTurretsState(ETurretType::Torpedo, ETurretState::Near);
+		//bool bIsNear = TurretHandlerComp->CheckTurretsState(ETurretType::Torpedo, ETurretState::Near);
 
-		if (bIsReady || bIsNear)
+		if (bIsReady)
 		{
 			return true;
 		}
@@ -463,9 +463,9 @@ bool AWHBattleShipBase::CanUseSkill(char Code)
 	else if (Code == 'S') // Sub Turret
 	{
 		bool bIsReady = TurretHandlerComp->CheckTurretsState(ETurretType::Sub, ETurretState::Ready);
-		bool bIsNear = TurretHandlerComp->CheckTurretsState(ETurretType::Sub, ETurretState::Near);
+		//bool bIsNear = TurretHandlerComp->CheckTurretsState(ETurretType::Sub, ETurretState::Near);
 
-		if (bIsReady || bIsNear)
+		if (bIsReady)
 		{
 			return true;
 		}
@@ -473,9 +473,9 @@ bool AWHBattleShipBase::CanUseSkill(char Code)
 	else if (Code == 'D') // Dual Purpose
 	{
 		bool bIsReady = TurretHandlerComp->CheckTurretsState(ETurretType::DualPurpose, ETurretState::Ready);
-		bool bIsNear = TurretHandlerComp->CheckTurretsState(ETurretType::DualPurpose, ETurretState::Near);
+		//bool bIsNear = TurretHandlerComp->CheckTurretsState(ETurretType::DualPurpose, ETurretState::Near);
 
-		if (bIsReady || bIsNear)
+		if (bIsReady)
 		{
 			return true;
 		}
@@ -483,9 +483,9 @@ bool AWHBattleShipBase::CanUseSkill(char Code)
 	else if (Code == 'A') // Anti Aircraft
 	{
 		bool bIsReady = TurretHandlerComp->CheckTurretsState(ETurretType::Air, ETurretState::Ready);
-		bool bIsNear = TurretHandlerComp->CheckTurretsState(ETurretType::Air, ETurretState::Near);
+		//bool bIsNear = TurretHandlerComp->CheckTurretsState(ETurretType::Air, ETurretState::Near);
 
-		if (bIsReady || bIsNear)
+		if (bIsReady)
 		{
 			return true;
 		}

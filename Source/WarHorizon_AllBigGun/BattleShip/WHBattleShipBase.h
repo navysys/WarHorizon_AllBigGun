@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Pawn.h"
 #include "Interface/BattleShipInterface.h"
+#include "Interface/SkillUsableInterface.h"
 #include "Enum/EBattleShipType.h"
 #include "Game/WHCustomStructs.h"
 #include "WHBattleShipBase.generated.h"
@@ -15,7 +16,7 @@ class UCameraComponent;
 class USpringArmComponent;
 class UWHCBattleShipMovement;
 class UWHCDetectEnemy;
-class UWHCTargetSelector;
+class UWHCTurretHandler;
 class USkeletalMesh;
 class AWHTurretBase;
 class AWHAircraftsBase;
@@ -25,7 +26,7 @@ class UNiagaraSystem;
 class UWHSkillBase;
 
 UCLASS()
-class WARHORIZON_ALLBIGGUN_API AWHBattleShipBase : public APawn, public IBattleShipInterface
+class WARHORIZON_ALLBIGGUN_API AWHBattleShipBase : public APawn, public IBattleShipInterface, public ISkillUsableInterface
 {
 	GENERATED_BODY()
 
@@ -48,7 +49,7 @@ public:
 
 	//void SetDead();
 
-	// 인터페이스 관련 함수
+	// 함선 인터페이스 관련 함수
 	virtual void RapidAttack() override;
 	virtual void NormalAttack() override;
 	virtual void SpinTurrets(AActor* Target) override;
@@ -58,7 +59,9 @@ public:
 	virtual void DecreaseMoveSpeed() override;
 	virtual void SpawnAircrafts(int Index) override;
 
+	// 스킬 인터페이스 관련 함수
 	virtual UObject* GetSkill(char Button) override;
+	virtual bool CanUseSkill(char Code) override;
 
 protected:
 	UPROPERTY(VisibleAnywhere, Category = "BattleShip | ID")
@@ -125,17 +128,14 @@ protected:
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UWHCDetectEnemy> DetectEnemyComp;
 	UPROPERTY(VisibleAnywhere)
-	TObjectPtr<UWHCTargetSelector> TargetSelectorComp;
+	TObjectPtr<UWHCTurretHandler> TurretHandlerComp;
 
 protected:
 	UPROPERTY(EditAnywhere, Category = "BattleShip | Skill")
-	UWHSkillBase* SkillQ;
+	TArray<TSubclassOf<UWHSkillBase>> SkillClasses;
+
 	UPROPERTY(EditAnywhere, Category = "BattleShip | Skill")
-	UWHSkillBase* SkillW;
-	UPROPERTY(EditAnywhere, Category = "BattleShip | Skill")
-	UWHSkillBase* SkillE;
-	UPROPERTY(EditAnywhere, Category = "BattleShip | Skill")
-	UWHSkillBase* SkillR;
+	TArray<UWHSkillBase*> OwnedSkills;
 
 protected:
 	// 모든 터렛을 저장

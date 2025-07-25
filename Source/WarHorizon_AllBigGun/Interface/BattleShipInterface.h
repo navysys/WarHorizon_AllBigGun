@@ -16,7 +16,6 @@ class WARHORIZON_ALLBIGGUN_API IBattleShipInterface
 {
 	GENERATED_BODY()
 
-	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
 	virtual void RapidAttack() = 0;
 	virtual void NormalAttack() = 0;
@@ -26,6 +25,4 @@ public:
 	virtual void IncreaseMoveSpeed() = 0;
 	virtual void DecreaseMoveSpeed() = 0;
 	virtual void SpawnAircrafts(int Index) = 0;
-
-	virtual UObject* GetSkill(char Button) = 0;
 };

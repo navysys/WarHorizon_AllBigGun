@@ -16,7 +16,7 @@ void AWHNormalTurretBase::BeginPlay()
 	Super::BeginPlay();
 
 	// 분산도 관련 코드 나중에는 계수 곱해주도록 수정
-	int MuzzleCount = MuzzleComps.Num();
+	uint8 MuzzleCount = MuzzleComps.Num(); //수정중
 	float DispersionAngle = 0.0f;
 	if (MuzzleCount == 4)
 	{
@@ -63,8 +63,14 @@ void AWHNormalTurretBase::Fire()
 
 	// 포탄 발사 관련
 	FRotator Rot = SkeletalMeshComp->GetComponentRotation() + FRotator(ShellLaunchAngle, 0.0f, 0.0f);
-	for (int i = 0; i < MuzzleComps.Num(); i++)
+	if (MuzzleComps.Num() > 0)
 	{
-		AWHShell* SpawnShell = GetWorld()->SpawnActor<AWHShell>(Shell, MuzzleComps[i]->GetComponentLocation(), Rot + FRotator(0.0f, Dispersion[i], 0.0f), SpawnParams);
+		if (Dispersion.Num() > 0)
+		{
+			for (int i = 0; i < MuzzleComps.Num(); i++)
+			{
+				AWHShell* SpawnShell = GetWorld()->SpawnActor<AWHShell>(Shell, MuzzleComps[i]->GetComponentLocation(), Rot + FRotator(0.0f, Dispersion[i], 0.0f), SpawnParams);
+			}
+		}
 	}
 }

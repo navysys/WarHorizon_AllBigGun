@@ -1,7 +1,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "BattleShip/WHBattleShipBase.h"
+#include "Interface/SkillUsableInterface.h"
 #include "WHSkillBase.generated.h"
 
 
@@ -13,14 +13,16 @@ class WARHORIZON_ALLBIGGUN_API UWHSkillBase : public UObject
 public:
 	UWHSkillBase();
 
-	void Init(AWHBattleShipBase* Base);
+	void Init(ISkillUsableInterface* Base);
 	virtual void Effect();
 
 public:
-	AWHBattleShipBase* BaseBattleShip;
+	ISkillUsableInterface* BaseUnit;
 
 	float Value;
 	float Coefficient;
 	float Cost;
 	float CoolTime;
+
+	// 이펙트도 여기서 소유해야 할 것
 };

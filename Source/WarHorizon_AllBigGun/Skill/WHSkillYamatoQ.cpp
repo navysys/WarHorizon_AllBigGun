@@ -6,5 +6,5 @@
 void UWHSkillYamatoQ::Effect()
 {
 	UE_LOG(LogTemp, Warning, TEXT("YamatoQ"));
-	BaseBattleShip->RapidAttack();
+	//BaseUnit->RapidAttack();
 }

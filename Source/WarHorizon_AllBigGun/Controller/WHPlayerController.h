@@ -17,7 +17,7 @@ UENUM()
 enum class EControllerMappingType : uint8
 {
 	Default,
-	WaitingAttack
+	SelectTarget
 };
 
 
@@ -37,7 +37,11 @@ protected:
 	virtual void SetupInputComponent() override;
 
 public:
-	IBattleShipInterface* BattleShipPawn;
+	APawn* BattleShipPawn;
+
+	char ActionKey;
+
+	bool bIsAiming = false;
 
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UWHCSkillHandler> SkillHandlerComp;
@@ -45,21 +49,30 @@ public:
 protected:
 	EControllerMappingType CurrentControllerMappingType;
 
-	void ChangeWaitingAttackMappingContext();
+	void ChangeSelectTargetMappingContext();
 
 	// IM
 	UPROPERTY(EditAnywhere, Category = Input)
 	TObjectPtr<UInputMappingContext> DefaultContext;
 
 	UPROPERTY(EditAnywhere, Category = Input)
-	TObjectPtr<UInputMappingContext> WaitingAttackContext;
+	TObjectPtr<UInputMappingContext> SelectTargetContext;
 
 	// IA
 	UPROPERTY(EditAnywhere, Category = Input)
 	TObjectPtr<UInputAction> MoveOrTargetingAction;
 
 	UPROPERTY(EditAnywhere, Category = Input)
-	TObjectPtr<UInputAction> RapidAttackAction;
+	TObjectPtr<UInputAction> SetFocusTargetAction;
+
+	UPROPERTY(EditAnywhere, Category = Input)
+	TObjectPtr<UInputAction> UseSkillAction_Q;
+	UPROPERTY(EditAnywhere, Category = Input)
+	TObjectPtr<UInputAction> UseSkillAction_W;
+	UPROPERTY(EditAnywhere, Category = Input)
+	TObjectPtr<UInputAction> UseSkillAction_E;
+	UPROPERTY(EditAnywhere, Category = Input)
+	TObjectPtr<UInputAction> UseSkillAction_R;
 
 	UPROPERTY(EditAnywhere, Category = Input)
 	TObjectPtr<UInputAction> TargetAttackAction;
@@ -74,7 +87,15 @@ protected:
 	TObjectPtr<UInputAction> DecelerationAction;
 
 	UPROPERTY(EditAnywhere, Category = Input)
-	TObjectPtr<UInputAction> ChangeContextAction;
+	TObjectPtr<UInputAction> AimingFocusTargetAction;
+	UPROPERTY(EditAnywhere, Category = Input)
+	TObjectPtr<UInputAction> AimingSkillAction_Q;
+	UPROPERTY(EditAnywhere, Category = Input)
+	TObjectPtr<UInputAction> AimingSkillAction_W;
+	UPROPERTY(EditAnywhere, Category = Input)
+	TObjectPtr<UInputAction> AimingSkillAction_E;
+	UPROPERTY(EditAnywhere, Category = Input)
+	TObjectPtr<UInputAction> AimingSkillAction_R;
 
 
 	// 
@@ -90,7 +111,18 @@ protected:
 
 	void Deceleration(const FInputActionValue& Value);
 
-	void ChangeContext(const FInputActionValue& Value);
+	void AimingSkill_Q(const FInputActionValue& Value);
+	void AimingSkill_W(const FInputActionValue& Value);
+	void AimingSkill_E(const FInputActionValue& Value);
+	void AimingSkill_R(const FInputActionValue& Value);
+
+	void UseSkill_Q(const FInputActionValue& Value);
+	void UseSkill_W(const FInputActionValue& Value);
+	void UseSkill_E(const FInputActionValue& Value);
+	void UseSkill_R(const FInputActionValue& Value);
+
+	void AimingFocusTarget(const FInputActionValue& Value);
+	void SetFocusTarget(const FInputActionValue& Value);
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UI")

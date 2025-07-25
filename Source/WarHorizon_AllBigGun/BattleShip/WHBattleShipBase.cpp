@@ -12,7 +12,7 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "Component/WHCBattleShipMovement.h"
 #include "Component/WHCDetectEnemy.h"
-#include "Component/WHCTargetSelector.h"
+#include "Component/WHCTurretHandler.h"
 #include "Component/WHCCameraBodyComponent.h"
 #include "Turret/WHTurretBase.h"
 #include "Aircraft/WHAircraftsBase.h"
@@ -65,17 +65,29 @@ AWHBattleShipBase::AWHBattleShipBase()
 	
 	BattleShipMovementComp = CreateDefaultSubobject<UWHCBattleShipMovement>(TEXT("BattleShipMovementComp"));
 	DetectEnemyComp = CreateDefaultSubobject<UWHCDetectEnemy>(TEXT("DetectEnemyComp"));
-	TargetSelectorComp = CreateDefaultSubobject<UWHCTargetSelector>(TEXT("TargetSelectorComp"));
+	TurretHandlerComp = CreateDefaultSubobject<UWHCTurretHandler>(TEXT("TurretHandlerComp"));
 
-	SkillQ = CreateDefaultSubobject<UWHSkillYamatoQ>(TEXT("SkillQ"));
-	SkillQ->Init(this);
+	for (TSubclassOf<UWHSkillBase> SkillClass : SkillClasses)
+	{
+		if (SkillClass)
+		{
+			UWHSkillBase* Skill = NewObject<UWHSkillBase>();
+
+			if (Skill)
+			{
+				Skill->Init(this);
+
+				OwnedSkills.Add(Skill);
+			}
+		}
+	}
 }
 
 void AWHBattleShipBase::BeginPlay()
 {
 	Super::BeginPlay();
 
-	SkillQ->Effect();
+	//SkillQ->Effect();
 	//test
 	//SpawnAircrafts(0);
 }
@@ -102,9 +114,9 @@ void AWHBattleShipBase::PostInitializeComponents()
 	}
 
 
-	if (IsValid(TargetSelectorComp))
+	if (IsValid(TurretHandlerComp))
 	{
-		TargetSelectorComp->InitTargetSelectorComponent(AllTurretArray, &EnemyBattleShips, EnemyAircrafts);
+		TurretHandlerComp->InitTurretHandlerComponent(AllTurretArray, &EnemyBattleShips, EnemyAircrafts);
 	}
 }
 
@@ -312,9 +324,9 @@ void AWHBattleShipBase::CreateTurretToMeshCompSocket(USkeletalMeshComponent* Mes
 
 void AWHBattleShipBase::RapidAttack()
 {
-	if (IsValid(TargetSelectorComp))
+	if (IsValid(TurretHandlerComp))
 	{
-		TargetSelectorComp->CommandTurretsFire(ETurretType::Main);
+		TurretHandlerComp->CommandTurretsFire(ETurretType::Main);
 	}
 }
 
@@ -322,26 +334,26 @@ void AWHBattleShipBase::NormalAttack()
 {
 	// 현재는 fastfire 와 같지만 이후에는 조준 완료 시에만 발사하고 조준이 안된 함포 회전하는 것 까지
 	UE_LOG(LogTemp, Warning, TEXT("Normal Attack Called"));
-	if (IsValid(TargetSelectorComp))
+	if (IsValid(TurretHandlerComp))
 	{
-		TargetSelectorComp->CommandTurretsFire(ETurretType::Main);
+		TurretHandlerComp->CommandTurretsFire(ETurretType::Main);
 	}
 }
 
 
 void AWHBattleShipBase::SpinTurrets(AActor* Target)
 {
-	if (IsValid(TargetSelectorComp))
+	if (IsValid(TurretHandlerComp))
 	{
-		TargetSelectorComp->SetMainTurretTarget(Target);
+		TurretHandlerComp->SetMainTurretTarget(Target);
 	}
 }
 
 void AWHBattleShipBase::SpinTurrets(FVector HitPoint)
 {
-	if (IsValid(TargetSelectorComp))
+	if (IsValid(TurretHandlerComp))
 	{
-		TargetSelectorComp->SetMainTurretPoint(HitPoint);
+		TurretHandlerComp->SetMainTurretPoint(HitPoint);
 	}
 }
 
@@ -417,9 +429,72 @@ UObject* AWHBattleShipBase::GetSkill(char Button)
 {
 	if (Button == 'Q')
 	{
-		return SkillQ;
+		if (OwnedSkills.IsValidIndex(0))
+		{
+			return OwnedSkills[0];
+		}
 	}
 
 	return nullptr;
+}
+
+bool AWHBattleShipBase::CanUseSkill(char Code)
+{
+	if (Code == 'M') // Main Turret
+	{
+		bool bIsReady = TurretHandlerComp->CheckTurretsState(ETurretType::Main, ETurretState::Ready);
+		bool bIsNear = TurretHandlerComp->CheckTurretsState(ETurretType::Main, ETurretState::Near);
+
+		if (bIsReady || bIsNear)
+		{
+			return true;
+		}
+	}
+	else if (Code == 'T') // Torpedo
+	{
+		bool bIsReady = TurretHandlerComp->CheckTurretsState(ETurretType::Torpedo, ETurretState::Ready);
+		bool bIsNear = TurretHandlerComp->CheckTurretsState(ETurretType::Torpedo, ETurretState::Near);
+
+		if (bIsReady || bIsNear)
+		{
+			return true;
+		}
+	}
+	else if (Code == 'S') // Sub Turret
+	{
+		bool bIsReady = TurretHandlerComp->CheckTurretsState(ETurretType::Sub, ETurretState::Ready);
+		bool bIsNear = TurretHandlerComp->CheckTurretsState(ETurretType::Sub, ETurretState::Near);
+
+		if (bIsReady || bIsNear)
+		{
+			return true;
+		}
+	}
+	else if (Code == 'D') // Dual Purpose
+	{
+		bool bIsReady = TurretHandlerComp->CheckTurretsState(ETurretType::DualPurpose, ETurretState::Ready);
+		bool bIsNear = TurretHandlerComp->CheckTurretsState(ETurretType::DualPurpose, ETurretState::Near);
+
+		if (bIsReady || bIsNear)
+		{
+			return true;
+		}
+	}
+	else if (Code == 'A') // Anti Aircraft
+	{
+		bool bIsReady = TurretHandlerComp->CheckTurretsState(ETurretType::Air, ETurretState::Ready);
+		bool bIsNear = TurretHandlerComp->CheckTurretsState(ETurretType::Air, ETurretState::Near);
+
+		if (bIsReady || bIsNear)
+		{
+			return true;
+		}
+	}
+	else if (Code == 'B') // Buff Skill
+	{
+
+	}
+
+	return false;
 }
 

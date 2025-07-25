@@ -7,16 +7,16 @@ UWHSkillBase::UWHSkillBase()
 
 }
 
-void UWHSkillBase::Init(AWHBattleShipBase* Base)
+void UWHSkillBase::Init(ISkillUsableInterface* Base)
 {
-	BaseBattleShip = Base;
+	BaseUnit = Base;
 }
 
 void UWHSkillBase::Effect()
 {
-	if (!IsValid(BaseBattleShip))
+	if (BaseUnit == nullptr)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Skill : BaseBattleShip Not Valid"));
+		UE_LOG(LogTemp, Warning, TEXT("Skill : BaseUnit Not Valid"));
 		return;
 	}
 }

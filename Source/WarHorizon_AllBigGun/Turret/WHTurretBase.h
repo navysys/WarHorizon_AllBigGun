@@ -4,6 +4,7 @@
 #include "GameFramework/Actor.h"
 #include "Game/WHCustomStructs.h"
 #include "Enum/ETurretType.h"
+#include "Enum/ETurretState.h"
 #include "WHTurretBase.generated.h"
 
 class UNiagaraSystem;
@@ -33,7 +34,9 @@ public:
 	char GetFrontDirection() { return FrontDirection; }
 	void SetTargetData(FTargetData Data);
 	void SetTargetData(const TArray<FTargetData>* DatasPtr);
-
+	
+	ETurretType GetTurretType() { return TurretType; }
+	ETurretState GetTurretState() { return TurretState; }
 
 protected:
 	void LoadDataTableToName(FName Name);
@@ -50,11 +53,11 @@ protected:
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<USkeletalMeshComponent> SkeletalMeshComp;
 
-	UPROPERTY(VisibleAnywhere)
-	TArray<USceneComponent*> MuzzleComps;
-
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<UNiagaraSystem> GunFireEffect;
+
+	UPROPERTY(EditAnywhere)
+	TArray<USceneComponent*> MuzzleComps;
 
 	// 데이터 베이스 초기화 변수
 protected:
@@ -64,6 +67,8 @@ protected:
 	FString TurretName;
 	UPROPERTY(EditAnywhere)
 	ETurretType TurretType;
+	UPROPERTY(VisibleAnywhere)
+	ETurretState TurretState = ETurretState::Idle;
 
 	UPROPERTY(EditAnywhere)
 	float ReloadTime = 8.0f;
@@ -84,9 +89,6 @@ protected:
 
 	UPROPERTY(EditAnywhere)
 	FTargetData TargetData;
-
-	UPROPERTY(EditAnywhere)
-	bool bIsLookTarget = false;
 
 	// 포탑의 정면을 LRFB 로 구분
 	char FrontDirection;

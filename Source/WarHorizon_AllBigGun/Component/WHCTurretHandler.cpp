@@ -30,6 +30,7 @@ void UWHCTurretHandler::TickComponent(float DeltaTime, ELevelTick TickType, FAct
 		if (IsValid(MTTarget))
 		{
 			// 함선과 타겟 사이의 각도와 거리 계산 후 전달
+			// --------------------------------------------------------------------------------------- 자신의 속도와 벡터를 타겟의 것과 비교해서 사격 위치를 보정해주도록 변경해야 함
 			FTargetData Data = CalculateOwnerToPointData(MTTarget->GetActorLocation());
 
 			for (AWHTurretBase* Turret : MainTurrets)
@@ -39,15 +40,30 @@ void UWHCTurretHandler::TickComponent(float DeltaTime, ELevelTick TickType, FAct
 
 		}
 	}
+	//if (CheckTurretsState(ETurretType::Sub, ETurretState::Ready))
+	//{
+	//	for (AWHTurretBase* Turret : MainTurrets)
+	//	{
+	//		if (Turret->GetTurretState() == ETurretState::Ready)
+	//		{
+	//			// 지금은 쿨타임만 체크 하는데 거리나 더 체크할 것 있으면 여기서 체크
+	//			if (Turret->GetIsFireReady())
+	//			{
+	//				Turret->SetFSMCommandState(ETurretState::AllClear);
+	//			}
+	//		}
+	//	}
+	//}
 
 	SetSubTurretDataToTargetArray();
 }
 
-void UWHCTurretHandler::InitTurretHandlerComponent(const TArray<FTurretArray> AllArray,TArray<APawn*>* BattleShips, TArray<APawn*> Aircrafts)
+void UWHCTurretHandler::InitTurretHandlerComponent(const TArray<FTurretArray> AllArray,TArray<APawn*>* BattleShips, TArray<APawn*> Aircrafts, EBattleShipType BattleShipType)
 {
 	AllTurretArray = AllArray;
 	BSTargetArray = BattleShips;
 	ACTargetArray = Aircrafts;
+	OwnerType = BattleShipType;
 
 	for (FTurretArray TArray : AllTurretArray)
 	{
@@ -201,19 +217,132 @@ bool UWHCTurretHandler::CheckTurretsState(ETurretType TurretsType, ETurretState 
 	return false;
 }
 
-void UWHCTurretHandler::SetMainTurretTarget(AActor* Target)
+void UWHCTurretHandler::SetTurretsCommandState(ETurretType TurretsType, ETurretState CommandState)
+{
+	// 현재는 사격 준비가 되었을 때 사격하는 명령으로만 변경되도록 제작
+
+	if (TurretsType == ETurretType::Main)
+	{
+		for (AWHTurretBase* Turret : MainTurrets)
+		{
+			//if (Turret->GetTurretState() == ETurretState::Ready)
+			//{
+			//	if (Turret->GetIsFireReady())
+			//	{
+			//		Turret->SetFSMCommandState(ETurretState::AllClear);
+			//	}
+			//}
+			Turret->SetFSMCommandState(ETurretState::AllClear);
+		}
+	}
+	else if (TurretsType == ETurretType::Sub)
+	{
+		for (AWHTurretBase* Turret : SubTurrets)
+		{
+			if (Turret->GetTurretState() == ETurretState::Ready)
+			{
+				if (Turret->GetIsFireReady())
+				{
+					Turret->SetFSMCommandState(ETurretState::AllClear);
+				}
+			}
+		}
+	}
+	else if (TurretsType == ETurretType::DualPurpose)
+	{
+		for (AWHTurretBase* Turret : DualTurrets)
+		{
+			if (Turret->GetTurretState() == ETurretState::Ready)
+			{
+				if (Turret->GetIsFireReady())
+				{
+					Turret->SetFSMCommandState(ETurretState::AllClear);
+				}
+			}
+		}
+	}
+	else if (TurretsType == ETurretType::Air)
+	{
+		for (AWHTurretBase* Turret : AirTurrets)
+		{
+			if (Turret->GetTurretState() == ETurretState::Ready)
+			{
+				if (Turret->GetIsFireReady())
+				{
+					Turret->SetFSMCommandState(ETurretState::AllClear);
+				}
+			}
+		}
+	}
+	else if (TurretsType == ETurretType::Torpedo)
+	{
+		for (AWHTurretBase* Turret : TorpedoLaunchers)
+		{
+			//if (Turret->GetTurretState() == ETurretState::Ready)
+			//{
+			//	if (Turret->GetIsFireReady())
+			//	{
+			//		Turret->SetFSMCommandState(ETurretState::AllClear);
+			//	}
+			//}
+			Turret->SetFSMCommandState(ETurretState::AllClear);
+		}
+	}
+}
+
+void UWHCTurretHandler::SetTurretsReloadTime(ETurretType TurretsType, float RTime)
+{
+	if (TurretsType == ETurretType::Main)
+	{
+		for (AWHTurretBase* Turret : MainTurrets)
+		{
+			Turret->SetReloadTime(RTime);
+		}
+	}
+	else if (TurretsType == ETurretType::Sub)
+	{
+		for (AWHTurretBase* Turret : SubTurrets)
+		{
+			Turret->SetReloadTime(RTime);
+		}
+	}
+	else if (TurretsType == ETurretType::DualPurpose)
+	{
+		for (AWHTurretBase* Turret : DualTurrets)
+		{
+			Turret->SetReloadTime(RTime);
+		}
+	}
+	else if (TurretsType == ETurretType::Air)
+	{
+		for (AWHTurretBase* Turret : AirTurrets)
+		{
+			Turret->SetReloadTime(RTime);
+		}
+	}
+	else if (TurretsType == ETurretType::Torpedo)
+	{
+		for (AWHTurretBase* Turret : TorpedoLaunchers)
+		{
+			Turret->SetReloadTime(RTime);
+		}
+	}
+}
+
+void UWHCTurretHandler::SetTrackingTarget(AActor* Target)
 {
 	bIsTracingTarget = true;
 	MTTarget = Target;
 }
 
-void UWHCTurretHandler::SetMainTurretPoint(FVector Point)
+void UWHCTurretHandler::SetTargetPoint(FVector Point)
 {
 	bIsTracingTarget = false;
 	FTargetData Data = CalculateOwnerToPointData(Point);
 	for (AWHTurretBase* Turret : MainTurrets)
 	{
 		Turret->SetTargetData(Data);
+		Turret->SetFSMCommandState(ETurretState::Turn);
 	}
 }
 

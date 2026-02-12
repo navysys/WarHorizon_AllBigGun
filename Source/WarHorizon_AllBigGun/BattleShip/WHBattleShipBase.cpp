@@ -8,18 +8,16 @@
 #include "Components/SkeletalMeshComponent.h"
 #include "NiagaraComponent.h"
 #include "Engine/SkeletalMeshSocket.h"
-#include "Camera/CameraComponent.h"
-#include "GameFramework/SpringArmComponent.h"
 #include "Component/WHCBattleShipMovement.h"
 #include "Component/WHCDetectEnemy.h"
 #include "Component/WHCTurretHandler.h"
-#include "Component/WHCCameraBodyComponent.h"
 #include "Turret/WHTurretBase.h"
 #include "Aircraft/WHAircraftsBase.h"
 #include "Enum/ETurretAttackType.h"
 #include "Containers/Array.h"
 #include "Skill/WHSkillBase.h"
 #include "Skill/WHSkillYamatoQ.h"
+#include "Kismet/GameplayStatics.h"
 
 
 AWHBattleShipBase::AWHBattleShipBase()
@@ -48,46 +46,17 @@ AWHBattleShipBase::AWHBattleShipBase()
 	{
 		SmokestackComp->SetAsset(Smokestack);
 	}
-
-	CameraBodyComp = CreateDefaultSubobject<UWHCCameraBodyComponent>(TEXT("CameraBody"));
-
-	SpringArmComp = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArmComponent"));
-	SpringArmComp->SetRelativeRotation(FRotator(-50.0f, 90.0f, 0.0f));
-	SpringArmComp->TargetArmLength = 50000.0f;
-	SpringArmComp->bDoCollisionTest = false;
-	SpringArmComp->bInheritPitch = false;
-	SpringArmComp->bInheritYaw = false;
-	SpringArmComp->bInheritRoll = false;
-	SpringArmComp->SetupAttachment(CameraBodyComp);
-
-	CameraComp = CreateDefaultSubobject<UCameraComponent>(TEXT("CameraComponent"));
-	CameraComp->SetupAttachment(SpringArmComp);
 	
 	BattleShipMovementComp = CreateDefaultSubobject<UWHCBattleShipMovement>(TEXT("BattleShipMovementComp"));
 	DetectEnemyComp = CreateDefaultSubobject<UWHCDetectEnemy>(TEXT("DetectEnemyComp"));
 	TurretHandlerComp = CreateDefaultSubobject<UWHCTurretHandler>(TEXT("TurretHandlerComp"));
 
-	for (TSubclassOf<UWHSkillBase> SkillClass : SkillClasses)
-	{
-		if (SkillClass)
-		{
-			UWHSkillBase* Skill = NewObject<UWHSkillBase>();
-
-			if (Skill)
-			{
-				Skill->Init(this);
-
-				OwnedSkills.Add(Skill);
-			}
-		}
-	}
 }
 
 void AWHBattleShipBase::BeginPlay()
 {
 	Super::BeginPlay();
 
-	//SkillQ->Effect();
 	//test
 	//SpawnAircrafts(0);
 }
@@ -108,7 +77,7 @@ void AWHBattleShipBase::PostInitializeComponents()
 
 	if (IsValid(DetectEnemyComp))
 	{
-		DetectEnemyComp->InitDetectEnemyComponent(TeamInt);
+		//DetectEnemyComp->InitDetectEnemyComponent(TeamInt);
 		DetectEnemyComp->SetDetectedBattleShips(&EnemyBattleShips);
 		DetectEnemyComp->SetDetectedAircrafts(&EnemyAircrafts);
 	}
@@ -116,7 +85,22 @@ void AWHBattleShipBase::PostInitializeComponents()
 
 	if (IsValid(TurretHandlerComp))
 	{
-		TurretHandlerComp->InitTurretHandlerComponent(AllTurretArray, &EnemyBattleShips, EnemyAircrafts);
+		TurretHandlerComp->InitTurretHandlerComponent(AllTurretArray, &EnemyBattleShips, EnemyAircrafts, BattleShipType);
+	}
+
+	for (TSubclassOf<UWHSkillBase> SkillClass : SkillClasses)
+	{
+		if (SkillClass)
+		{
+			UWHSkillBase* Skill = NewObject<UWHSkillBase>(this, SkillClass);
+
+			if (Skill)
+			{
+				Skill->Init(this);
+
+				OwnedSkills.Add(Skill);
+			}
+		}
 	}
 }
 
@@ -322,30 +306,25 @@ void AWHBattleShipBase::CreateTurretToMeshCompSocket(USkeletalMeshComponent* Mes
 	}
 }
 
-void AWHBattleShipBase::RapidAttack()
+bool AWHBattleShipBase::NormalAttack(float RTime)
 {
 	if (IsValid(TurretHandlerComp))
 	{
-		TurretHandlerComp->CommandTurretsFire(ETurretType::Main);
+		if(TurretHandlerComp->CheckTurretsState(ETurretType::Main, ETurretState::Ready))
+		{
+			TurretHandlerComp->SetTurretsReloadTime(ETurretType::Main, RTime);
+			TurretHandlerComp->SetTurretsCommandState(ETurretType::Main, ETurretState::AllClear);
+			return true;
+		}
 	}
+	return false;
 }
 
-void AWHBattleShipBase::NormalAttack()
-{
-	// 현재는 fastfire 와 같지만 이후에는 조준 완료 시에만 발사하고 조준이 안된 함포 회전하는 것 까지
-	UE_LOG(LogTemp, Warning, TEXT("Normal Attack Called"));
-	if (IsValid(TurretHandlerComp))
-	{
-		TurretHandlerComp->CommandTurretsFire(ETurretType::Main);
-	}
-}
-
-
-void AWHBattleShipBase::SpinTurrets(AActor* Target)
+void AWHBattleShipBase::SetTrackingTarget(AActor* Target)
 {
 	if (IsValid(TurretHandlerComp))
 	{
-		TurretHandlerComp->SetMainTurretTarget(Target);
+		TurretHandlerComp->SetTrackingTarget(Target);
 	}
 }
 
@@ -353,7 +332,7 @@ void AWHBattleShipBase::SpinTurrets(FVector HitPoint)
 {
 	if (IsValid(TurretHandlerComp))
 	{
-		TurretHandlerComp->SetMainTurretPoint(HitPoint);
+		TurretHandlerComp->SetTargetPoint(HitPoint);
 	}
 }
 
@@ -425,9 +404,9 @@ void AWHBattleShipBase::SpawnAircrafts(int Index)
 	}
 }
 
-UObject* AWHBattleShipBase::GetSkill(char Button)
+UWHSkillBase* AWHBattleShipBase::GetSkill(char Button)
 {
-	if (Button == 'Q')
+	if (Button == '1')
 	{
 		if (OwnedSkills.IsValidIndex(0))
 		{
@@ -440,60 +419,60 @@ UObject* AWHBattleShipBase::GetSkill(char Button)
 
 bool AWHBattleShipBase::CanUseSkill(char Code)
 {
-	if (Code == 'M') // Main Turret
-	{
-		bool bIsReady = TurretHandlerComp->CheckTurretsState(ETurretType::Main, ETurretState::Ready);
-		//bool bIsNear = TurretHandlerComp->CheckTurretsState(ETurretType::Main, ETurretState::Near);
+	//if (Code == 'M') // Main Turret
+	//{
+	//	//bool bIsReady = TurretHandlerComp->CheckTurretsState(ETurretType::Main, ETurretState::Ready);
+	//	//bool bIsNear = TurretHandlerComp->CheckTurretsState(ETurretType::Main, ETurretState::Near);
 
-		if (bIsReady)
-		{
-			return true;
-		}
-	}
-	else if (Code == 'T') // Torpedo
-	{
-		bool bIsReady = TurretHandlerComp->CheckTurretsState(ETurretType::Torpedo, ETurretState::Ready);
-		//bool bIsNear = TurretHandlerComp->CheckTurretsState(ETurretType::Torpedo, ETurretState::Near);
+	//	if (bIsReady)
+	//	{
+	//		return true;
+	//	}
+	//}
+	//else if (Code == 'T') // Torpedo
+	//{
+	//	//bool bIsReady = TurretHandlerComp->CheckTurretsState(ETurretType::Torpedo, ETurretState::Ready);
+	//	//bool bIsNear = TurretHandlerComp->CheckTurretsState(ETurretType::Torpedo, ETurretState::Near);
 
-		if (bIsReady)
-		{
-			return true;
-		}
-	}
-	else if (Code == 'S') // Sub Turret
-	{
-		bool bIsReady = TurretHandlerComp->CheckTurretsState(ETurretType::Sub, ETurretState::Ready);
-		//bool bIsNear = TurretHandlerComp->CheckTurretsState(ETurretType::Sub, ETurretState::Near);
+	//	if (bIsReady)
+	//	{
+	//		return true;
+	//	}
+	//}
+	//else if (Code == 'S') // Sub Turret
+	//{
+	//	//bool bIsReady = TurretHandlerComp->CheckTurretsState(ETurretType::Sub, ETurretState::Ready);
+	//	//bool bIsNear = TurretHandlerComp->CheckTurretsState(ETurretType::Sub, ETurretState::Near);
 
-		if (bIsReady)
-		{
-			return true;
-		}
-	}
-	else if (Code == 'D') // Dual Purpose
-	{
-		bool bIsReady = TurretHandlerComp->CheckTurretsState(ETurretType::DualPurpose, ETurretState::Ready);
-		//bool bIsNear = TurretHandlerComp->CheckTurretsState(ETurretType::DualPurpose, ETurretState::Near);
+	//	if (bIsReady)
+	//	{
+	//		return true;
+	//	}
+	//}
+	//else if (Code == 'D') // Dual Purpose
+	//{
+	//	//bool bIsReady = TurretHandlerComp->CheckTurretsState(ETurretType::DualPurpose, ETurretState::Ready);
+	//	//bool bIsNear = TurretHandlerComp->CheckTurretsState(ETurretType::DualPurpose, ETurretState::Near);
 
-		if (bIsReady)
-		{
-			return true;
-		}
-	}
-	else if (Code == 'A') // Anti Aircraft
-	{
-		bool bIsReady = TurretHandlerComp->CheckTurretsState(ETurretType::Air, ETurretState::Ready);
-		//bool bIsNear = TurretHandlerComp->CheckTurretsState(ETurretType::Air, ETurretState::Near);
+	//	if (bIsReady)
+	//	{
+	//		return true;
+	//	}
+	//}
+	//else if (Code == 'A') // Anti Aircraft
+	//{
+	//	//bool bIsReady = TurretHandlerComp->CheckTurretsState(ETurretType::Air, ETurretState::Ready);
+	//	//bool bIsNear = TurretHandlerComp->CheckTurretsState(ETurretType::Air, ETurretState::Near);
 
-		if (bIsReady)
-		{
-			return true;
-		}
-	}
-	else if (Code == 'B') // Buff Skill
-	{
+	//	if (bIsReady)
+	//	{
+	//		return true;
+	//	}
+	//}
+	//else if (Code == 'B') // Buff Skill
+	//{
 
-	}
+	//}
 
 	return false;
 }

@@ -15,5 +15,5 @@ class WARHORIZON_ALLBIGGUN_API UWHSkillYamatoQ : public UWHSkillBase
 	GENERATED_BODY()
 	
 public:
-	virtual void Effect() override;
+	virtual bool Effect() override;
 };

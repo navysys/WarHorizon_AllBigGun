@@ -11,6 +11,7 @@ class UInputMappingContext;
 class UInputAction;
 class IBattleShipInterface;
 class UWHInGameWidgetBase;
+class AFOW_ClientManager;
 
 
 UENUM()
@@ -30,17 +31,19 @@ public:
 	AWHPlayerController();
 
 	virtual void BeginPlay() override;
-
 	virtual void Tick(float DeltaTime) override;
 
 protected:
 	virtual void SetupInputComponent() override;
 
 public:
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Fog Of War")
+	TSubclassOf<AFOW_ClientManager> FogOfWarClientManagerClass;
+	UPROPERTY(BlueprintReadOnly, Category = "Fog Of War")
+	AFOW_ClientManager* FogOfWarClientManager;
+
 	APawn* BattleShipPawn;
-
 	char ActionKey;
-
 	bool bIsAiming = false;
 
 	UPROPERTY(VisibleAnywhere)
@@ -66,13 +69,13 @@ protected:
 	TObjectPtr<UInputAction> SetFocusTargetAction;
 
 	UPROPERTY(EditAnywhere, Category = Input)
-	TObjectPtr<UInputAction> UseSkillAction_Q;
+	TObjectPtr<UInputAction> UseSkillAction_1;
 	UPROPERTY(EditAnywhere, Category = Input)
-	TObjectPtr<UInputAction> UseSkillAction_W;
+	TObjectPtr<UInputAction> UseSkillAction_2;
 	UPROPERTY(EditAnywhere, Category = Input)
-	TObjectPtr<UInputAction> UseSkillAction_E;
+	TObjectPtr<UInputAction> UseSkillAction_3;
 	UPROPERTY(EditAnywhere, Category = Input)
-	TObjectPtr<UInputAction> UseSkillAction_R;
+	TObjectPtr<UInputAction> UseSkillAction_4;
 
 	UPROPERTY(EditAnywhere, Category = Input)
 	TObjectPtr<UInputAction> TargetAttackAction;
@@ -89,19 +92,17 @@ protected:
 	UPROPERTY(EditAnywhere, Category = Input)
 	TObjectPtr<UInputAction> AimingFocusTargetAction;
 	UPROPERTY(EditAnywhere, Category = Input)
-	TObjectPtr<UInputAction> AimingSkillAction_Q;
+	TObjectPtr<UInputAction> AimingSkillAction_1;
 	UPROPERTY(EditAnywhere, Category = Input)
-	TObjectPtr<UInputAction> AimingSkillAction_W;
+	TObjectPtr<UInputAction> AimingSkillAction_2;
 	UPROPERTY(EditAnywhere, Category = Input)
-	TObjectPtr<UInputAction> AimingSkillAction_E;
+	TObjectPtr<UInputAction> AimingSkillAction_3;
 	UPROPERTY(EditAnywhere, Category = Input)
-	TObjectPtr<UInputAction> AimingSkillAction_R;
+	TObjectPtr<UInputAction> AimingSkillAction_4;
 
 
 	// 
 	void MoveOrTargeting(const FInputActionValue& Value);
-
-	void RapidAttack(const FInputActionValue& Value);
 
 	void TargetAttack(const FInputActionValue& Value);
 
@@ -111,15 +112,15 @@ protected:
 
 	void Deceleration(const FInputActionValue& Value);
 
-	void AimingSkill_Q(const FInputActionValue& Value);
-	void AimingSkill_W(const FInputActionValue& Value);
-	void AimingSkill_E(const FInputActionValue& Value);
-	void AimingSkill_R(const FInputActionValue& Value);
+	void AimingSkill_1(const FInputActionValue& Value);
+	void AimingSkill_2(const FInputActionValue& Value);
+	void AimingSkill_3(const FInputActionValue& Value);
+	void AimingSkill_4(const FInputActionValue& Value);
 
-	void UseSkill_Q(const FInputActionValue& Value);
-	void UseSkill_W(const FInputActionValue& Value);
-	void UseSkill_E(const FInputActionValue& Value);
-	void UseSkill_R(const FInputActionValue& Value);
+	void UseSkill_1(const FInputActionValue& Value);
+	void UseSkill_2(const FInputActionValue& Value);
+	void UseSkill_3(const FInputActionValue& Value);
+	void UseSkill_4(const FInputActionValue& Value);
 
 	void AimingFocusTarget(const FInputActionValue& Value);
 	void SetFocusTarget(const FInputActionValue& Value);

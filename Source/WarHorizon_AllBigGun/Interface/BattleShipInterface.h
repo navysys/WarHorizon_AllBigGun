@@ -17,9 +17,8 @@ class WARHORIZON_ALLBIGGUN_API IBattleShipInterface
 	GENERATED_BODY()
 
 public:
-	virtual void RapidAttack() = 0;
-	virtual void NormalAttack() = 0;
-	virtual void SpinTurrets(AActor* Target) = 0;
+	//virtual bool NormalAttack() = 0;
+	virtual void SetTrackingTarget(AActor* Target) = 0;
 	virtual void SpinTurrets(FVector HitPoint) = 0;
 	virtual void SpinBattleShip(FVector HitPoint) = 0;
 	virtual void IncreaseMoveSpeed() = 0;

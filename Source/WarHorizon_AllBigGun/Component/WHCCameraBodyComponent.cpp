@@ -10,7 +10,7 @@ UWHCCameraBodyComponent::UWHCCameraBodyComponent()
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
 
-	MoveSpeed = FVector2D(20000, 15000);
+	MoveSpeed = FVector2D(15000, 10000);
 	ScreenEdgePadding = FVector2D(100, 100);
 }
 
@@ -38,27 +38,25 @@ void UWHCCameraBodyComponent::TickComponent(float DeltaTime, ELevelTick TickType
 		FVector2D CurrentMoveSpeed = CurrentInputMoveSpeed;
 		FVector2D MousePosition;
 
-		PlayerController->GetMousePosition(MousePosition.X, MousePosition.Y);
-		if (CurrentInputMoveSpeed.X == 0 && CurrentInputMoveSpeed.Y == 0)
+		if (PlayerController->GetMousePosition(MousePosition.X, MousePosition.Y))
 		{
-			int32 ViewportWidth, ViewportHeight;
-			PlayerController->GetViewportSize(ViewportWidth, ViewportHeight);
+			if (CurrentInputMoveSpeed.X == 0 && CurrentInputMoveSpeed.Y == 0)
+			{
+				int32 ViewportWidth, ViewportHeight;
+				PlayerController->GetViewportSize(ViewportWidth, ViewportHeight);
 
-			const float X = (MousePosition.X <= ScreenEdgePadding.X) | -(MousePosition.X >= ViewportWidth - ScreenEdgePadding.X);
-			const float Y = (MousePosition.Y <= ScreenEdgePadding.Y) | -(MousePosition.Y >= ViewportHeight - ScreenEdgePadding.Y);
+				const float X = (MousePosition.X <= ScreenEdgePadding.X) | -(MousePosition.X >= ViewportWidth - ScreenEdgePadding.X);
+				const float Y = (MousePosition.Y <= ScreenEdgePadding.Y) | -(MousePosition.Y >= ViewportHeight - ScreenEdgePadding.Y);
 
-			CurrentMoveSpeed = FVector2D(X, Y);
+				CurrentMoveSpeed = FVector2D(X, Y);
+			}
+
+			FVector Forward = GetForwardVector() * CurrentMoveSpeed.Y * MoveSpeed.Y * DeltaTime;
+			FVector Sideways = -GetRightVector() * CurrentMoveSpeed.X * MoveSpeed.X * DeltaTime;
+
+			FVector NextLocation = GetRelativeLocation() + Forward + Sideways;
+			SetRelativeLocation(NextLocation);
 		}
-
-		// Move Camera
-		FVector ForwardVector = GetForwardVector();
-		//ForwardVector.Normalize();
-
-		FVector Forward = ForwardVector * CurrentMoveSpeed.X * MoveSpeed.X * DeltaTime;
-		FVector Sideways = GetRightVector() * CurrentMoveSpeed.Y * MoveSpeed.Y * DeltaTime;
-
-		FVector NextLocation = GetRelativeLocation() + Forward + Sideways;
-		SetRelativeLocation(NextLocation);
 	}
 }
 

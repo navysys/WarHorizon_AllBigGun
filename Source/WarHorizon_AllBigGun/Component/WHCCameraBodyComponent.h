@@ -27,14 +27,15 @@ public:
 public:
 	TObjectPtr<APlayerController> PlayerController;
 
-	UPROPERTY()
+	UPROPERTY(EditAnywhere)
 	FVector2D ScreenEdgePadding;
 
-	UPROPERTY()
+	UPROPERTY(EditAnywhere)
 	FVector2D MoveSpeed;
 
+	UPROPERTY(EditAnywhere)
 	FVector2D CurrentInputMoveSpeed;
 
-	UPROPERTY()
+	UPROPERTY(EditAnywhere, Category = "Camera Pawn")
 	bool bCanCameraMove = true;
 };

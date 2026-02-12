@@ -14,7 +14,7 @@ struct FSkillData
 	FTimerHandle TimerHandle;
 
 	UPROPERTY()
-	float CoolTime = 0.f;
+	float CoolTime = 1.0f;
 
 	UPROPERTY()
 	bool bIsOnCooldown = false;

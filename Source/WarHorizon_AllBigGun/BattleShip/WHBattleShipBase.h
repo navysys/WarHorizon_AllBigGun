@@ -8,25 +8,23 @@
 #include "Interface/SkillUsableInterface.h"
 #include "Enum/EBattleShipType.h"
 #include "Game/WHCustomStructs.h"
+#include "FogOfWar/FOW_RevealerPawn.h"
 #include "WHBattleShipBase.generated.h"
 
 class UBoxComponent;
 class USkeletalMeshComponent;
-class UCameraComponent;
-class USpringArmComponent;
 class UWHCBattleShipMovement;
 class UWHCDetectEnemy;
 class UWHCTurretHandler;
 class USkeletalMesh;
 class AWHTurretBase;
 class AWHAircraftsBase;
-class UWHCCameraBodyComponent;
 class UNiagaraComponent;
 class UNiagaraSystem;
 class UWHSkillBase;
 
 UCLASS()
-class WARHORIZON_ALLBIGGUN_API AWHBattleShipBase : public APawn, public IBattleShipInterface, public ISkillUsableInterface
+class WARHORIZON_ALLBIGGUN_API AWHBattleShipBase : public AFOW_RevealerPawn, public IBattleShipInterface, public ISkillUsableInterface
 {
 	GENERATED_BODY()
 
@@ -50,9 +48,8 @@ public:
 	//void SetDead();
 
 	// 함선 인터페이스 관련 함수
-	virtual void RapidAttack() override;
-	virtual void NormalAttack() override;
-	virtual void SpinTurrets(AActor* Target) override;
+	
+	virtual void SetTrackingTarget(AActor* Target) override;
 	virtual void SpinTurrets(FVector HitPoint) override;
 	virtual void SpinBattleShip(FVector HitPoint) override;
 	virtual void IncreaseMoveSpeed() override;
@@ -60,8 +57,12 @@ public:
 	virtual void SpawnAircrafts(int Index) override;
 
 	// 스킬 인터페이스 관련 함수
-	virtual UObject* GetSkill(char Button) override;
+	virtual UWHSkillBase* GetSkill(char Button) override;
 	virtual bool CanUseSkill(char Code) override;
+
+	//
+	bool NormalAttack(float RTime);
+
 
 protected:
 	UPROPERTY(VisibleAnywhere, Category = "BattleShip | ID")
@@ -70,8 +71,6 @@ protected:
 	FString BattleShipName = TEXT("Yamato");
 	UPROPERTY(EditAnywhere, Category = "BattleShip | ID")
 	EBattleShipType BattleShipType = EBattleShipType::Invalid;
-	UPROPERTY(VisibleAnywhere, Category = "BattleShip | ID")
-	uint8 TeamInt = 1;
 
 	UPROPERTY(EditAnywhere, Category = "BattleShip | Collsion")
 	FVector BoxSize = FVector(8500.0f, 1300.0f, 1500.0f);
@@ -115,13 +114,6 @@ protected:
 	TObjectPtr<USkeletalMeshComponent> SkeletalMeshComp;
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UNiagaraComponent> SmokestackComp;
-	UPROPERTY(VisibleAnywhere)
-	TObjectPtr<UWHCCameraBodyComponent> CameraBodyComp;
-	UPROPERTY(VisibleAnywhere)
-	TObjectPtr<UCameraComponent> CameraComp;
-	UPROPERTY(VisibleAnywhere)
-	TObjectPtr<USpringArmComponent> SpringArmComp;
-
 
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UWHCBattleShipMovement> BattleShipMovementComp;

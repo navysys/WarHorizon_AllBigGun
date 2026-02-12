@@ -5,6 +5,7 @@
 #include "NiagaraComponent.h"
 #include "Turret/WHShell.h"
 #include "Engine/SkeletalMeshSocket.h"
+#include "Component/WHCTurretFSM.h"
 
 
 AWHTurretBase::AWHTurretBase()
@@ -25,6 +26,8 @@ AWHTurretBase::AWHTurretBase()
 		Muzzle->SetupAttachment(SkeletalMeshComp);
 		MuzzleComps.Emplace(Muzzle);
 	}
+
+	FSMComps = CreateDefaultSubobject<UWHCTurretFSM>(TEXT("FSMComp"));
 }
 
 void AWHTurretBase::BeginPlay()
@@ -33,7 +36,7 @@ void AWHTurretBase::BeginPlay()
 	
 	BaseBattleShip = GetInstigator();
 	
-	GetWorld()->GetTimerManager().SetTimer(RotationTimerHandle, this, &AWHTurretBase::SpinToTargetAngle, RotationDelay, false);
+	GetWorld()->GetTimerManager().SetTimer(RotationTimerHandle, this, &AWHTurretBase::CalculateAngleBetweenTarget, 0.1f, true);
 }
 
 void AWHTurretBase::Tick(float DeltaTime)
@@ -41,15 +44,30 @@ void AWHTurretBase::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 	BeforeFireTime += DeltaTime;
-	if (!bIsFireReady)
+	if (!bIsLoaded)
 	{
-		if (TurretState == ETurretState::Ready)
+		if (BeforeFireTime > ReloadTime)
 		{
-			if (BeforeFireTime > ReloadTime)
-			{
-				bIsFireReady = true;
-			}
+			bIsLoaded = true;
 		}
+	}
+	
+	if (abs(TurretYaw - Angle) > 0.5f)
+	{
+		bIsAimed = false;
+	}
+	else
+	{
+		bIsAimed = true;
+	}
+
+	if (bIsLoaded && bIsAimed)
+	{
+		bIsFireReady = true;
+	}
+	else
+	{
+		bIsFireReady = false;
 	}
 
 	DebugTurretForward();
@@ -105,6 +123,7 @@ void AWHTurretBase::SetFrontDirection(char Dir)
 void AWHTurretBase::Fire()
 {
 	bIsFireReady = false;
+	bIsLoaded = false;
 	BeforeFireTime = 0.0f;
 	if (GunFireEffect)
 	{
@@ -116,6 +135,34 @@ void AWHTurretBase::Fire()
 			NiagaraActor->GetNiagaraComponent()->SetAsset(GunFireEffect);
 			NiagaraActor->GetNiagaraComponent()->Activate(true);
 		}
+	}
+}
+
+ETurretState AWHTurretBase::GetTurretState()
+{
+	if (IsValid(FSMComps))
+	{
+		return FSMComps->GetCurrentState();
+	}
+	return ETurretState::Invalid;
+}
+
+void AWHTurretBase::SetReloadTime(float RTime)
+{
+	ReloadTime = RTime;
+}
+
+void AWHTurretBase::SetIsLoaded(bool Loaded)
+{
+	BeforeFireTime = 0.0f;
+	bIsLoaded = Loaded;
+}
+
+void AWHTurretBase::SetFSMCommandState(ETurretState State)
+{
+	if (IsValid(FSMComps))
+	{
+		FSMComps->SetCommandState(State);
 	}
 }
 
@@ -151,121 +198,191 @@ void AWHTurretBase::DebugTurretForward()
 	FVector TurretLocation = SkeletalMeshComp->GetComponentLocation();
 	FVector ForwardVector = SkeletalMeshComp->GetForwardVector();
 	FVector LineEnd = TurretLocation + ForwardVector * Range;
-	FColor Color = FColor::Yellow;
+	FColor Color = FColor::Black;
 	float Thickness = 10.0f;
 
 	if (TurretType == ETurretType::Main)
 	{
-		Color = FColor::Red;
+		if (bIsAimed && bIsLoaded)
+		{
+			Color = FColor::Green;
+		}
+		else if(bIsLoaded && !bIsAimed)
+		{
+			Color = FColor::Yellow;
+		}
+		//else if (!bIsLoaded && bIsAimed)
+		//{
+		//	Color = FColor::Orange;
+		//}
+		else
+		{
+			Color = FColor::Red;
+		}
+		
 		Thickness = 20.0f;
 	}
 	else if (TurretType == ETurretType::Sub)
 	{
-		Color = FColor::Yellow;
+		Color = FColor::Blue;
 		Thickness = 10.0f;
 	}
 	else if (TurretType == ETurretType::Air)
 	{
-		Color = FColor::Blue;
+		Color = FColor::Silver;
 		Thickness = 5.0f;
 	}
 	else if (TurretType == ETurretType::DualPurpose)
 	{
-		Color = FColor::Green;
+		Color = FColor::Purple;
 		Thickness = 10.0f;
 	}
 
 	DrawDebugLine(GetWorld(), TurretLocation, LineEnd, Color, false, -1.f, 0, Thickness);
 }
 
+void AWHTurretBase::CalculateAngleBetweenTarget()
+{
+	if (IsValid(SkeletalMeshComp))
+	{
+		TurretYaw = SkeletalMeshComp->GetRelativeRotation().Yaw;
+
+		// 초기 상태
+		if (TargetData.Angle == 0)
+		{
+			Angle = 0.0f;
+		}
+		// 360도 회전 계산
+		else if (MaxHorizontalAngle == 360.0f)
+		{
+			Angle = TurretYaw + TargetData.Angle - SocketYaw;
+		}
+		// 제한된 각도 회전
+		else
+		{
+			Angle = round(TargetData.Angle - SocketYaw);
+		}
+
+		// 각도를 180 ~ -180 으로 제한
+		if (Angle > 180.0f)
+		{
+			Angle -= 360.0f;
+		}
+		else if (Angle < -180.0f)
+		{
+			Angle += 360.0f;
+		}
+	}
+}
+
 void AWHTurretBase::SpinToTargetAngle()
 {
-	if (IsValid(SkeletalMeshComp) && IsValid(BaseBattleShip))
+	if (IsValid(SkeletalMeshComp))
 	{
-		float TurretYaw = SkeletalMeshComp->GetRelativeRotation().Yaw;
+		TurretYaw = SkeletalMeshComp->GetRelativeRotation().Yaw;
 		
 		// 360도 회전 계산용 각도
 		if (MaxHorizontalAngle == 360.0f)
 		{
-			float Angle;
-			if (TargetData.Angle == 0)
+			// 목표 각도까지 회전 가속
+			if (TurretYaw < Angle - 0.5f)
 			{
-				Angle = 0.0f;
+				if (SpinAcceleration < 1.0f)
+				{
+					SpinAcceleration += 0.2f;
+				}
+			}
+			else if (TurretYaw > Angle + 0.5f)
+			{
+				if (SpinAcceleration > -1.0f)
+				{
+					SpinAcceleration -= 0.2f;
+				}
 			}
 			else
 			{
-				Angle = TurretYaw + TargetData.Angle - SocketYaw;
-			}
+				SpinAcceleration = 0.0f;
+				SkeletalMeshComp->SetRelativeRotation(FRotator(0, Angle, 0));
 
-			// 각도를 180 ~ -180 으로 제한
-			if (Angle > 180.0f)
-			{
-				Angle -= 360.0f;
+				return;
 			}
-			else if (Angle < -180.0f)
+			
+			// 실질적인 회전
+			float NewYaw = SpinAcceleration * 0.25f;
+			if (NewYaw != 0)
 			{
-				Angle += 360.0f;
+				SkeletalMeshComp->AddRelativeRotation(FRotator(0, NewYaw, 0));
 			}
-
-			// 목표 각도까지 실질적인 회전
-			if (Angle > 1.0f)
+			
+			// 더 돌아갔을 때 후처리
+			if (TurretYaw > Angle)
 			{
-				SkeletalMeshComp->AddRelativeRotation(FRotator(0, 0.5f, 0));
+				if (SkeletalMeshComp->GetRelativeRotation().Yaw < Angle)
+				{
+					SpinAcceleration = 0.0f;
+					SkeletalMeshComp->SetRelativeRotation(FRotator(0, Angle, 0));
+				}
 			}
-			else if (Angle < -1.0f)
+			else
 			{
-				SkeletalMeshComp->AddRelativeRotation(FRotator(0, -0.5f, 0));
+				if (SkeletalMeshComp->GetRelativeRotation().Yaw > Angle)
+				{
+					SpinAcceleration = 0.0f;
+					SkeletalMeshComp->SetRelativeRotation(FRotator(0, Angle, 0));
+				}
 			}
 		}
 		// 제한된 각도 내에서의 회전 각도
 		else
 		{
-			float RelativeAngle;
-			// 초기 상태일 경우
-			if (TargetData.Angle == 0)
-			{
-				RelativeAngle = 0.0f;
-			}
-			else
-			{
-				RelativeAngle = round(TargetData.Angle - SocketYaw);
-			}
-
-			// 각도를 180 ~ -180 으로 제한
-			if (RelativeAngle > 180.0f)
-			{
-				RelativeAngle -= 360.0f;
-			}
-			else if (RelativeAngle < -180.0f)
-			{
-				RelativeAngle += 360.0f;
-			}
-
 			// 절대값 기준으로 회전이 가능한 각도일 경우
-			if (abs(RelativeAngle) < MaxHorizontalAngle)
+			if (abs(Angle) < MaxHorizontalAngle)
 			{
 				// 목표 각도가 1도 이상 차이 나는 경우
-				if (TurretYaw > RelativeAngle + 1.0f)
+				if (TurretYaw > Angle + 0.5f)
 				{
-					SkeletalMeshComp->AddRelativeRotation(FRotator(0, -0.5f, 0));
-					if (SkeletalMeshComp->GetRelativeRotation().Yaw < RelativeAngle)
+					if (SpinAcceleration > -1.0f)
 					{
-						SkeletalMeshComp->SetRelativeRotation(FRotator(0, RelativeAngle, 0));
+						SpinAcceleration -= 0.2f;
 					}
 				}
 				// 목표 각도가 -1도 이상 차이나는 경우
-				else if (TurretYaw < RelativeAngle - 1.0f)
+				else if (TurretYaw < Angle - 0.5f)
 				{
-					SkeletalMeshComp->AddRelativeRotation(FRotator(0, 0.5f, 0));
-					if (SkeletalMeshComp->GetRelativeRotation().Yaw > RelativeAngle)
+					if (SpinAcceleration < 1.0f)
 					{
-						SkeletalMeshComp->SetRelativeRotation(FRotator(0, RelativeAngle, 0));
+						SpinAcceleration += 0.2f;
 					}
 				}
-				// 목표 각도가 -1 ~ 1 사이인 경우 도달한 것으로 취급
+				// 목표 각도가 -0.5 ~ 0.5 사이인 경우 도달한 것으로 취급
 				else
 				{
-					SkeletalMeshComp->SetRelativeRotation(FRotator(0, RelativeAngle, 0));
+					SpinAcceleration = 0.0f;
+					SkeletalMeshComp->SetRelativeRotation(FRotator(0, Angle, 0));
+
+					return;
+				}
+
+				// 실질적인 회전
+				float NewYaw = SpinAcceleration * 0.25f;
+				SkeletalMeshComp->AddRelativeRotation(FRotator(0, NewYaw, 0));
+
+				// 더 돌아갔을 때 후처리
+				if (TurretYaw > Angle)
+				{
+					if (SkeletalMeshComp->GetRelativeRotation().Yaw < Angle)
+					{
+						SpinAcceleration = 0.0f;
+						SkeletalMeshComp->SetRelativeRotation(FRotator(0, Angle, 0));
+					}
+				}
+				else
+				{
+					if (SkeletalMeshComp->GetRelativeRotation().Yaw > Angle)
+					{
+						SpinAcceleration = 0.0f;
+						SkeletalMeshComp->SetRelativeRotation(FRotator(0, Angle, 0));
+					}
 				}
 			}
 			// 절대값 기준으로 도달 불가능한 각도가 주어진 경우
@@ -276,41 +393,51 @@ void AWHTurretBase::SpinToTargetAngle()
 				{
 					if (TurretYaw >= 0)
 					{
-						SkeletalMeshComp->AddRelativeRotation(FRotator(0, 0.5f, 0));
+						if (SpinAcceleration < 1.0f)
+						{
+							SpinAcceleration += 0.2f;
+						}
 					}
 					else
 					{
-						SkeletalMeshComp->AddRelativeRotation(FRotator(0, -0.5f, 0));
+						if (SpinAcceleration > -1.0f)
+						{
+							SpinAcceleration -= 0.2f;
+						}
 					}
+					float NewYaw = SpinAcceleration * 0.25f;
+					SkeletalMeshComp->AddRelativeRotation(FRotator(0, NewYaw, 0));
 				}
 				// 테렛이 최대 회전가능한 값에 고정
 				else
 				{
-					SkeletalMeshComp->SetRelativeRotation(FRotator(0, MaxHorizontalAngle, 0));
+					SpinAcceleration = 0.0f;
+					if (TurretYaw > 0)
+					{
+						SpinAcceleration = 0.0f;
+						SkeletalMeshComp->SetRelativeRotation(FRotator(0, MaxHorizontalAngle, 0));
+					}
+					else
+					{
+						SpinAcceleration = 0.0f;
+						SkeletalMeshComp->SetRelativeRotation(FRotator(0, -MaxHorizontalAngle, 0));
+					}
 				}
 			}
 		}
-		// 타겟정보가 초기값이 아닐 경우 상태를 변경하기 위한 코드 (최대 각도 이상일 경우 수정해야함)
-		if (TargetData.Angle != 0 && TargetData.Distance != 0)
-		{
-			float RAngle = round(TargetData.Angle - SocketYaw);
-			if (RAngle > 180.0f)
-			{
-				RAngle -= 360.0f;
-			}
-			else if (RAngle < -180.0f)
-			{
-				RAngle += 360.0f;
-			}
-
-			float Abs = abs(TurretYaw - RAngle);
-			if (Abs < 1.0f)
-			{
-				TurretState = ETurretState::Ready;
-			}
-		}
-
-		GetWorld()->GetTimerManager().SetTimer(RotationTimerHandle, this, &AWHTurretBase::SpinToTargetAngle, RotationDelay, false);
+		//// 타겟정보가 초기값이 아닐 경우 상태를 변경하기 위한 코드 (최대 각도 이상일 경우 수정해야함)
+		//if (TargetData.Angle != 0 && TargetData.Distance != 0)
+		//{
+		//	float RAngle = round(TargetData.Angle - SocketYaw);
+		//	if (RAngle > 180.0f)
+		//	{
+		//		RAngle -= 360.0f;
+		//	}
+		//	else if (RAngle < -180.0f)
+		//	{
+		//		RAngle += 360.0f;
+		//	}
+		//}
 	}
 }
 

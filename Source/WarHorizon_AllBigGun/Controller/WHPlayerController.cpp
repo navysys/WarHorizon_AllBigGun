@@ -9,6 +9,7 @@
 #include "DrawDebugHelpers.h"
 #include "Widget/WHInGameWidgetBase.h"
 #include "Component/WHCSkillHandler.h"
+#include "FogOfWar/FOW_ClientManager.h"
 
 
 AWHPlayerController::AWHPlayerController()
@@ -26,8 +27,15 @@ void AWHPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
 
-	//나중에 서버로 바꾸면 빙의 할 때 설정하도록 변경
-	BattleShipPawn =GetPawn();
+	//테스트 용도 - 나중에 포스트 로그인 시 할당
+	//BattleShipPawn =GetPawn();
+	if (!HasAuthority())
+	{
+		if (FogOfWarClientManagerClass)
+		{
+			FogOfWarClientManager = GetWorld()->SpawnActor<AFOW_ClientManager>(FogOfWarClientManagerClass);
+		}
+	}
 
 	if (IsValid(SkillHandlerComp))
 	{
@@ -69,19 +77,19 @@ void AWHPlayerController::SetupInputComponent()
 	{
 		EnhancedInputComponent->BindAction(MoveOrTargetingAction, ETriggerEvent::Triggered, this, &AWHPlayerController::MoveOrTargeting);
 		EnhancedInputComponent->BindAction(SetFocusTargetAction, ETriggerEvent::Triggered, this, &AWHPlayerController::SetFocusTarget);
-		EnhancedInputComponent->BindAction(UseSkillAction_Q, ETriggerEvent::Completed, this, &AWHPlayerController::UseSkill_Q);
-		EnhancedInputComponent->BindAction(UseSkillAction_W, ETriggerEvent::Triggered, this, &AWHPlayerController::UseSkill_W);
-		EnhancedInputComponent->BindAction(UseSkillAction_E, ETriggerEvent::Triggered, this, &AWHPlayerController::UseSkill_E);
-		EnhancedInputComponent->BindAction(UseSkillAction_R, ETriggerEvent::Triggered, this, &AWHPlayerController::UseSkill_R);
+		EnhancedInputComponent->BindAction(UseSkillAction_1, ETriggerEvent::Completed, this, &AWHPlayerController::UseSkill_1);
+		EnhancedInputComponent->BindAction(UseSkillAction_2, ETriggerEvent::Triggered, this, &AWHPlayerController::UseSkill_2);
+		EnhancedInputComponent->BindAction(UseSkillAction_3, ETriggerEvent::Triggered, this, &AWHPlayerController::UseSkill_3);
+		EnhancedInputComponent->BindAction(UseSkillAction_4, ETriggerEvent::Triggered, this, &AWHPlayerController::UseSkill_4);
 		EnhancedInputComponent->BindAction(TargetAttackAction, ETriggerEvent::Triggered, this, &AWHPlayerController::TargetAttack);
 		EnhancedInputComponent->BindAction(SpinTurretAction, ETriggerEvent::Started, this, &AWHPlayerController::SpinTurret);
 		EnhancedInputComponent->BindAction(AccelerationAction, ETriggerEvent::Triggered, this, &AWHPlayerController::Acceleration);
 		EnhancedInputComponent->BindAction(DecelerationAction, ETriggerEvent::Triggered, this, &AWHPlayerController::Deceleration);
 		EnhancedInputComponent->BindAction(AimingFocusTargetAction, ETriggerEvent::Triggered, this, &AWHPlayerController::AimingFocusTarget);
-		EnhancedInputComponent->BindAction(AimingSkillAction_Q, ETriggerEvent::Triggered, this, &AWHPlayerController::AimingSkill_Q);
-		EnhancedInputComponent->BindAction(AimingSkillAction_W, ETriggerEvent::Triggered, this, &AWHPlayerController::AimingSkill_W);
-		EnhancedInputComponent->BindAction(AimingSkillAction_E, ETriggerEvent::Triggered, this, &AWHPlayerController::AimingSkill_E);
-		EnhancedInputComponent->BindAction(AimingSkillAction_R, ETriggerEvent::Triggered, this, &AWHPlayerController::AimingSkill_R);
+		EnhancedInputComponent->BindAction(AimingSkillAction_1, ETriggerEvent::Triggered, this, &AWHPlayerController::AimingSkill_1);
+		EnhancedInputComponent->BindAction(AimingSkillAction_2, ETriggerEvent::Triggered, this, &AWHPlayerController::AimingSkill_2);
+		EnhancedInputComponent->BindAction(AimingSkillAction_3, ETriggerEvent::Triggered, this, &AWHPlayerController::AimingSkill_3);
+		EnhancedInputComponent->BindAction(AimingSkillAction_4, ETriggerEvent::Triggered, this, &AWHPlayerController::AimingSkill_4);
 	}
 }
 
@@ -131,25 +139,12 @@ void AWHPlayerController::MoveOrTargeting(const FInputActionValue& Value)
 				DrawDebugCircle(GetWorld(), FVector(TargetShip->GetActorLocation().X, TargetShip->GetActorLocation().Y, 800.0f), 8000.0f, 100, FColor::White, true, -1.f, 0, 50, FVector(1, 0, 0), FVector(0, 1, 0), true);
 				if (BSI != nullptr)
 				{
-					BSI->SpinTurrets(TargetShip);
+					BSI->SetTrackingTarget(TargetShip);
 				}
 				// 타겟이 되면 포탑이 이동속도에 비례해서 위치를 보정하고 서브 터렛이 해당 타겟을 조준하도록 해야함
 			}
 		}
 	}
-}
-
-void AWHPlayerController::RapidAttack(const FInputActionValue& Value)
-{
-	if (BattleShipPawn != nullptr)
-	{
-		IBattleShipInterface* BSI = Cast<IBattleShipInterface>(BattleShipPawn);
-		if (BSI != nullptr)
-		{
-			BSI->RapidAttack();
-		}
-	}
-
 }
 
 void AWHPlayerController::TargetAttack(const FInputActionValue& Value)
@@ -167,8 +162,8 @@ void AWHPlayerController::TargetAttack(const FInputActionValue& Value)
 			{
 				if (BSI != nullptr)
 				{
-					BSI->SpinTurrets(Hit.GetActor());
-					BSI->NormalAttack();
+					BSI->SetTrackingTarget(Hit.GetActor());
+					//BSI->NormalAttack();
 				}
 
 			}
@@ -178,7 +173,7 @@ void AWHPlayerController::TargetAttack(const FInputActionValue& Value)
 				if (BSI != nullptr)
 				{
 					BSI->SpinTurrets(Hit.Location);
-					BSI->NormalAttack();
+					//BSI->NormalAttack();
 				}
 
 			}
@@ -238,13 +233,13 @@ void AWHPlayerController::AimingFocusTarget(const FInputActionValue& Value)
 	// 여기서 사거리 UI 출력
 }
 
-void AWHPlayerController::AimingSkill_Q(const FInputActionValue& Value)
+void AWHPlayerController::AimingSkill_1(const FInputActionValue& Value)
 {
 	// 일단 쿨타임인지 클라이언트 기준으로 검사
 
 
-	UE_LOG(LogTemp, Warning, TEXT("Aim Skill Q"));
-	ActionKey = 'Q';
+	UE_LOG(LogTemp, Warning, TEXT("Aim Skill 1"));
+	ActionKey = '1';
 	// 여기서 사거리 UI 출력 , 다른 키와 동시에 누른 경우에 이전에 활성화 되어 있던 UI 비활성화 후 UI 출력
 	if (!bIsAiming)
 	{
@@ -256,53 +251,53 @@ void AWHPlayerController::AimingSkill_Q(const FInputActionValue& Value)
 	}
 }
 
-void AWHPlayerController::AimingSkill_W(const FInputActionValue& Value)
+void AWHPlayerController::AimingSkill_2(const FInputActionValue& Value)
 {
-	ActionKey = 'W';
+	ActionKey = '2';
 	// 여기서 사거리 UI 출력
 }
 
-void AWHPlayerController::AimingSkill_E(const FInputActionValue& Value)
+void AWHPlayerController::AimingSkill_3(const FInputActionValue& Value)
 {
-	ActionKey = 'E';
+	ActionKey = '3';
 	// 여기서 사거리 UI 출력
 }
 
-void AWHPlayerController::AimingSkill_R(const FInputActionValue& Value)
+void AWHPlayerController::AimingSkill_4(const FInputActionValue& Value)
 {
-	ActionKey = 'R';
+	ActionKey = '4';
 	// 여기서 사거리 UI 출력
 }
 
-void AWHPlayerController::UseSkill_Q(const FInputActionValue& Value)
+void AWHPlayerController::UseSkill_1(const FInputActionValue& Value)
 {
-	if (ActionKey == 'Q')
+	if (ActionKey == '1')
 	{
-		UE_LOG(LogTemp, Warning, TEXT("UseSkill_Q"));
+		UE_LOG(LogTemp, Warning, TEXT("UseSkill_1"));
 		bIsAiming = false;
 		SkillHandlerComp->UseSkill(ActionKey);
 	}
 }
 
-void AWHPlayerController::UseSkill_W(const FInputActionValue& Value)
+void AWHPlayerController::UseSkill_2(const FInputActionValue& Value)
 {
-	if (ActionKey == 'W')
+	if (ActionKey == '2')
 	{
 		SkillHandlerComp->UseSkill(ActionKey);
 	}
 }
 
-void AWHPlayerController::UseSkill_E(const FInputActionValue& Value)
+void AWHPlayerController::UseSkill_3(const FInputActionValue& Value)
 {
-	if (ActionKey == 'E')
+	if (ActionKey == '3')
 	{
 		SkillHandlerComp->UseSkill(ActionKey);
 	}
 }
 
-void AWHPlayerController::UseSkill_R(const FInputActionValue& Value)
+void AWHPlayerController::UseSkill_4(const FInputActionValue& Value)
 {
-	if (ActionKey == 'R')
+	if (ActionKey == '4')
 	{
 		SkillHandlerComp->UseSkill(ActionKey);
 	}

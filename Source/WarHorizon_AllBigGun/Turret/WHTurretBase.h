@@ -10,6 +10,8 @@
 class UNiagaraSystem;
 class UStaticMesh;
 class AWHShell;
+class UWHCTurretFSM;
+
 
 UCLASS()
 class WARHORIZON_ALLBIGGUN_API AWHTurretBase : public AActor
@@ -30,18 +32,31 @@ public:
 
 	virtual void Fire();
 
+	void CalculateAngleBetweenTarget();
+	void SpinToTargetAngle();
+
 	void SetFrontDirection(char Dir);
 	char GetFrontDirection() { return FrontDirection; }
 	void SetTargetData(FTargetData Data);
 	void SetTargetData(const TArray<FTargetData>* DatasPtr);
 	
 	ETurretType GetTurretType() { return TurretType; }
-	ETurretState GetTurretState() { return TurretState; }
+	ETurretState GetTurretState();
+	bool GetIsLoaded() { return bIsLoaded; }
+	bool GetIsAimed() { return bIsAimed; }
+	bool GetIsFireReady() { return bIsFireReady; }
+
+	void SetReloadTime(float RTime);
+	float GetReloadTime() { return ReloadTime; }
+
+	void SetIsLoaded(bool Loaded);
+
+	void SetFSMCommandState(ETurretState State);
 
 protected:
 	void LoadDataTableToName(FName Name);
 	void DebugTurretForward();
-	void SpinToTargetAngle();
+	
 
 protected:
 	UPROPERTY()
@@ -59,6 +74,10 @@ protected:
 	UPROPERTY(EditAnywhere)
 	TArray<USceneComponent*> MuzzleComps;
 
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<UWHCTurretFSM> FSMComps;
+
+
 	// 데이터 베이스 초기화 변수
 protected:
 	UPROPERTY(EditAnywhere)
@@ -67,8 +86,6 @@ protected:
 	FString TurretName;
 	UPROPERTY(EditAnywhere)
 	ETurretType TurretType;
-	UPROPERTY(VisibleAnywhere)
-	ETurretState TurretState = ETurretState::Idle;
 
 	UPROPERTY(EditAnywhere)
 	float ReloadTime = 8.0f;
@@ -95,6 +112,13 @@ protected:
 	float SocketYaw;
 
 	float BeforeFireTime = 0.0f;
-
+	bool bIsLoaded = true;
+	bool bIsAimed = false;
 	bool bIsFireReady = false;
+
+	float SpinAcceleration = 0.0f;
+
+public: 
+	float Angle = 0.0f;
+	float TurretYaw = 0.0f;
 };

@@ -5,6 +5,7 @@
 #include "Game/WHCustomStructs.h"
 #include "Enum/ETurretAttackType.h"
 #include "Enum/ETurretState.h"
+#include "Enum/EBattleShipType.h"
 #include "WHCTurretHandler.generated.h"
 
 struct FTurretArray;
@@ -26,14 +27,16 @@ protected:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 public:
-	void InitTurretHandlerComponent(const TArray<FTurretArray> AllArray, TArray<APawn*>* BattleShips, TArray<APawn*> Aircrafts);
+	void InitTurretHandlerComponent(const TArray<FTurretArray> AllArray, TArray<APawn*>* BattleShips, TArray<APawn*> Aircrafts, EBattleShipType BattleShipType);
 	void SetTargetBattleShips(TArray<APawn*>* BattleShips) { BSTargetArray = BattleShips; }
 	void SetTargetAircreafts(const TArray<APawn*>* Aircrafts) { ACTargetArray = *Aircrafts; }
 
 	bool CheckTurretsState(ETurretType TurretsType, ETurretState TurretState);
+	void SetTurretsCommandState(ETurretType TurretsType, ETurretState CommandState);
+	void SetTurretsReloadTime(ETurretType TurretsType, float RTime);
 
-	void SetMainTurretTarget(AActor* Target);
-	void SetMainTurretPoint(FVector Point);
+	void SetTrackingTarget(AActor* Target);
+	void SetTargetPoint(FVector Point);
 	void CommandTurretsFire(ETurretType TurretType);
 protected:
 	void SetAirTurretDataToTargetArray();
@@ -44,6 +47,7 @@ protected:
 	AActor* Owner;
 	bool bIsTracingTarget;
 	AActor* MTTarget;
+	EBattleShipType OwnerType = EBattleShipType::Invalid;
 
 	// Å¸°Ù
 	TArray<APawn*>* BSTargetArray;

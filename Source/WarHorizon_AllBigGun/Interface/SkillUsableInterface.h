@@ -4,6 +4,7 @@
 #include "UObject/Interface.h"
 #include "SkillUsableInterface.generated.h"
 
+class UWHSkillBase;
 
 UINTERFACE(MinimalAPI)
 class USkillUsableInterface : public UInterface
@@ -16,7 +17,7 @@ class WARHORIZON_ALLBIGGUN_API ISkillUsableInterface
 	GENERATED_BODY()
 
 public:
-	virtual UObject* GetSkill(char Button) = 0;
+	virtual UWHSkillBase* GetSkill(char Button) = 0;
 	virtual bool CanUseSkill(char Code) = 0;
 
 };

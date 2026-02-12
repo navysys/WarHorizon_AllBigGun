@@ -12,11 +12,12 @@ void UWHSkillBase::Init(ISkillUsableInterface* Base)
 	BaseUnit = Base;
 }
 
-void UWHSkillBase::Effect()
+bool UWHSkillBase::Effect()
 {
 	if (BaseUnit == nullptr)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Skill : BaseUnit Not Valid"));
-		return;
+		return false;
 	}
+	return true;
 }

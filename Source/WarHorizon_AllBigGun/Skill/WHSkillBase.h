@@ -14,15 +14,19 @@ public:
 	UWHSkillBase();
 
 	void Init(ISkillUsableInterface* Base);
-	virtual void Effect();
+	virtual bool Effect();
 
 public:
 	ISkillUsableInterface* BaseUnit;
 
+	UPROPERTY(EditAnywhere)
 	float Value;
+	UPROPERTY(EditAnywhere)
 	float Coefficient;
+	UPROPERTY(EditAnywhere)
 	float Cost;
-	float CoolTime;
+	UPROPERTY(EditAnywhere)
+	float CoolTime = 1.0f;
 
 	// 이펙트도 여기서 소유해야 할 것
 };

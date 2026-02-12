@@ -30,12 +30,21 @@ public:
 
 protected:
 	void Idle(float DeltaTime);
+	void Delay(float DeltaTime);
 	void Turn(float DeltaTime);
-	void Stop(float DeltaTime);
 	void Ready(float DeltaTime);
 	void Fire(float DeltaTime);
+	void AfterDelay(float DeltaTime);
+	void Stop(float DeltaTime);
+	
 
 private:
+	class AWHTurretBase* Turret;
+
 	ETurretState CurrentState;
 	ETurretState CommandState;
+
+	float BeforeActionTime = 0.0f;
+	float TurnDelay = 0.02f;
+	float FireDelay = 0.5f;
 };

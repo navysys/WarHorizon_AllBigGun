@@ -2,9 +2,22 @@
 
 
 #include "Skill/WHSkillYamatoQ.h"
+#include "BattleShip/WHBattleShipBase.h"
 
-void UWHSkillYamatoQ::Effect()
+bool UWHSkillYamatoQ::Effect()
 {
-	UE_LOG(LogTemp, Warning, TEXT("YamatoQ"));
-	//BaseUnit->RapidAttack();
+	if (Super::Effect())
+	{
+		AWHBattleShipBase* BaseShip = Cast<AWHBattleShipBase>(BaseUnit);
+		if (IsValid(BaseShip))
+		{
+			if (BaseShip->NormalAttack(CoolTime))
+			{
+				// 정상적으로 공격이 성공했을 때
+
+				return true;
+			}
+		}
+	}
+	return false;
 }

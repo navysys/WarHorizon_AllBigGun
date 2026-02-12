@@ -2,6 +2,7 @@
 
 
 #include "Component/WHCTurretFSM.h"
+#include "Turret/WHTurretBase.h"
 
 // Sets default values for this component's properties
 UWHCTurretFSM::UWHCTurretFSM()
@@ -19,7 +20,7 @@ void UWHCTurretFSM::BeginPlay()
 {
 	Super::BeginPlay();
 
-	// ...
+	Turret = Cast<AWHTurretBase>(GetOwner());
 	
 }
 
@@ -29,28 +30,40 @@ void UWHCTurretFSM::TickComponent(float DeltaTime, ELevelTick TickType, FActorCo
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	switch (CurrentState)
+	if (IsValid(Turret))
 	{
-	case ETurretState::Idle:
-		Idle(DeltaTime);
-		break;
-	case ETurretState::Turn:
-		Turn(DeltaTime);
-		break;
-	case ETurretState::Stop:
-		Stop(DeltaTime);
-		break;
-	case ETurretState::Ready:
-		Ready(DeltaTime);
-		break;
-	case ETurretState::Fire:
-		Fire(DeltaTime);
-		break;
-	case ETurretState::Invalid:
-		UE_LOG(LogTemp, Warning, TEXT("Turret State Invalid"));
-		break;
-	default:
-		break;
+		// 포신 상하 조정하는 함수는 상태 관계없이 계속 되도록 여기서 호출
+
+
+		switch (CurrentState)
+		{
+		case ETurretState::Idle:
+			Idle(DeltaTime);
+			break;
+		case ETurretState::Delay:
+			Delay(DeltaTime);
+			break;
+		case ETurretState::Turn:
+			Turn(DeltaTime);
+			break;
+		case ETurretState::Ready:
+			Ready(DeltaTime);
+			break;
+		case ETurretState::Fire:
+			Fire(DeltaTime);
+			break;
+		case ETurretState::AfterDelay:
+			AfterDelay(DeltaTime);
+			break;
+		case ETurretState::Stop:
+			Stop(DeltaTime);
+			break;
+		case ETurretState::Invalid:
+			UE_LOG(LogTemp, Warning, TEXT("Turret State Invalid"));
+			break;
+		default:
+			break;
+		}
 	}
 }
 
@@ -68,8 +81,51 @@ void UWHCTurretFSM::Idle(float DeltaTime)
 {
 	if (CommandState == ETurretState::Turn)
 	{
-		CurrentState = ETurretState::Turn;
-		CommandState = ETurretState::Idle;
+		BeforeActionTime = 0.0f;
+		CurrentState = ETurretState::Delay;
+	}
+
+	//if (CommandState == ETurretState::Attack)
+	//{
+	//	BeforeActionTime = 0.0f;
+	//	CurrentState = ETurretState::Delay;
+	//}
+
+	if (CommandState == ETurretState::AllClear)
+	{
+		BeforeActionTime = 0.0f;
+		CurrentState = ETurretState::Ready;
+	}
+
+	if (CommandState == ETurretState::Stop)
+	{
+		CurrentState = ETurretState::Stop;
+	}
+}
+
+void UWHCTurretFSM::Delay(float DeltaTime)
+{
+	BeforeActionTime += DeltaTime;
+
+	if (BeforeActionTime > 0.5f)
+	{
+		if (CommandState == ETurretState::Turn)
+		{
+			BeforeActionTime = 0.0f;
+			CurrentState = ETurretState::Turn;
+			CommandState = ETurretState::Idle;
+		}
+
+		//if (CommandState == ETurretState::Attack)
+		//{
+		//	BeforeActionTime = 0.0f;
+		//	CurrentState = ETurretState::Turn;
+		//	CommandState = ETurretState::WaitingAttack;
+		//}
+	}
+	if (CommandState == ETurretState::Stop)
+	{
+		CurrentState = ETurretState::Stop;
 	}
 }
 
@@ -78,50 +134,96 @@ void UWHCTurretFSM::Turn(float DeltaTime)
 	if (CommandState == ETurretState::Stop)
 	{
 		CurrentState = ETurretState::Stop;
+		return;
+	}
+
+	//if (CommandState == ETurretState::Attack)
+	//{
+	//	CurrentState = ETurretState::Idle;
+	//	return;
+	//}
+
+	if (CommandState == ETurretState::AllClear)
+	{
+		Turret->SetIsLoaded(false);
 		CommandState = ETurretState::Idle;
 	}
-	//회전 로직
 
+	//회전 로직
+	BeforeActionTime += DeltaTime;
+	if (BeforeActionTime > TurnDelay)
+	{
+		BeforeActionTime -= TurnDelay;
+		Turret->SpinToTargetAngle();
+	}
 
 	//회전 종료
-	//if (Angle == GoalAngle)
-	//{
-	//	if (CommandState == ETurretState::Ready)
-	//	{
-	//		CurrentState = ETurretState::Ready;
-	//	}
-	//	else if (CommandState == ETurretState::Idle)
-	//	{
-	//		CurrentState = ETurretState::Idle;
-	//	}
-	//}
-}
-
-void UWHCTurretFSM::Stop(float DeltaTime)
-{
-	// GoalAngle 같은 수치 초기화 진행해야 함
-	CurrentState = ETurretState::Idle;
+	if (Turret->GetIsAimed())
+	{
+		//if (CommandState == ETurretState::Idle)
+		//{
+		//	BeforeActionTime = 0.0f;
+		//	CurrentState = ETurretState::Idle;
+		//}
+		BeforeActionTime = 0.0f;
+		CurrentState = ETurretState::Ready;
+	}
 }
 
 void UWHCTurretFSM::Ready(float DeltaTime)
 {
-	// AllClear 명령이 떨어지면 사격
-	// 기본적으로 플레이어 조작으로는 Ready 까지만 가능
-	// TurretHandler 컴포넌트에서 포탑이 준비가 되었을 때 AllClear 상태 넘어가도록
-	// 부포의 경우 타겟이 존재하면 쿨타임마다 상태 전환
+	if (CommandState == ETurretState::Stop)
+	{
+		CurrentState = ETurretState::Stop;
+		return;
+	}
 
-	// 목표 각도와 차이가 일정 이상되면 Turn 상태로 변환
-	//if(Angle )
+	//Turret->CalculateAngleBetweenTarget();
+	// 배가 회전하거나 타겟이 움직였을 경우
+	if (!Turret->GetIsAimed())
+	{
+		CurrentState = ETurretState::Turn;
+		return;
+	}
+
+	// AllClear 명령이 떨어지면 사격
+	// TurretHandler 컴포넌트에서 포탑이 준비가 되었을 때 AllClear 상태 넘어가도록
 
 	if (CommandState == ETurretState::AllClear)
 	{
+		CommandState = ETurretState::Idle;
 		CurrentState = ETurretState::Fire;
 	}
 }
 
 void UWHCTurretFSM::Fire(float DeltaTime)
 {
-	// TurretBase 클래스의 Fire 함수 호출
-
+	Turret->Fire();
+	//쿨다운 상태로 전환 후 일정 시간 강제 대기
+	CurrentState = ETurretState::AfterDelay;
 }
 
+void UWHCTurretFSM::AfterDelay(float DeltaTime)
+{
+	BeforeActionTime += DeltaTime;
+	if (BeforeActionTime > 0.5f)
+	{
+		BeforeActionTime = 0.0f;
+		if (Turret->GetIsAimed())
+		{
+			CurrentState = ETurretState::Ready;
+		}
+		else
+		{
+			CurrentState = ETurretState::Turn;
+		}
+	}
+}
+
+void UWHCTurretFSM::Stop(float DeltaTime)
+{
+	// GoalAngle 같은 수치 초기화 진행해야 함
+	BeforeActionTime = 0.0f;
+	CurrentState = ETurretState::Idle;
+	CommandState = ETurretState::Idle;
+}

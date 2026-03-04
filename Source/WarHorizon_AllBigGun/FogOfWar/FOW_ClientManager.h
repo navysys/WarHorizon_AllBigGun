@@ -9,8 +9,6 @@
 #include "FOW_ClientManager.generated.h"
 
 class UPostProcessComponent;
-class UMaterialInstanceDynamic;
-
 
 UCLASS()
 class WARHORIZON_ALLBIGGUN_API AFOW_ClientManager : public AFOW_Base
@@ -31,6 +29,8 @@ public:
 
 protected:
 	virtual void UpdateGrid() override;
+	void UpdateFogTexture();
+
 
 public:
 	UPROPERTY()
@@ -47,8 +47,17 @@ public:
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Fog Of War")
 	UTexture2D* FogGridTexture;
 
+	TArray<uint8> TextureBuffer;
+
+	FUpdateTextureRegion2D FullRegion;
+
+	float TextureRatio = 4;
+
 	UPROPERTY(BlueprintReadWrite, Category = "Fog Of War")
 	FVector FogColor = FVector(5, 15, 25);
+
+	UPROPERTY(BlueprintReadWrite, Category = "Fog Of War")
+	int32 TextureSize = 2000;
 
 	UPROPERTY(BlueprintReadWrite, Category = "Fog Of War")
 	float FogBlurStrength = 1.0f;

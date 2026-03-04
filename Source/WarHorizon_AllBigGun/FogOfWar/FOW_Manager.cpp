@@ -5,15 +5,13 @@
 #include "Materials/MaterialInstanceDynamic.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "FogOfWar/FOW_Obstacle.h"
+#include "FogOfWar/FOW_RevealerPawn.h"
 
 // Sets default values
 AFOW_Manager::AFOW_Manager()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-
-
-	
 
 }
 
@@ -22,8 +20,6 @@ void AFOW_Manager::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	InitGrid();
-	UE_LOG(LogTemp, Warning, TEXT("AFogOfWarManager : BeginPlay"));
 	GetWorld()->GetTimerManager().SetTimer(FOVTimerHandle, this, &AFOW_Manager::UpdateGrid, 0.2f, true);
 	
 	//FogMaterialInstance = UMaterialInstanceDynamic::Create(FogMaterial, this);
@@ -70,87 +66,80 @@ void AFOW_Manager::Tick(float DeltaTime)
 
 }
 
-void AFOW_Manager::AddBattleShipRevealer(AActor* NewFogActor, int Range, ETeamType Team)
+void AFOW_Manager::AddRevealer(AFOW_RevealerPawn* RevealerPawn)
 {
-	UFogRevealer* NewRevealer = NewObject<UFogRevealer>();
-	NewRevealer->Revealer = NewFogActor;
-	NewRevealer->SightRange = Range;
+	if (IsValid(RevealerPawn))
+	{
+		BattleShipRevealers.Add(RevealerPawn);
+		if (RevealerPawn->TeamType == ETeamType::Red)
+		{
+			RedTeamFogRevealers.Add(RevealerPawn);
+		}
+		else if (RevealerPawn->TeamType == ETeamType::Blue)
+		{
+			BlueTeamFogRevealers.Add(RevealerPawn);
+		}
+	}
 
-	if (Team == ETeamType::Red)
-	{
-		RedTeamFogRevealers.Add(NewRevealer);
-	}
-	else if (Team == ETeamType::Blue)
-	{
-		BlueTeamFogRevealers.Add(NewRevealer);
-	}
+
 }
 
-void AFOW_Manager::AddAircraftRevealer(AActor* NewFogActor, int Range, ETeamType Team)
+void AFOW_Manager::RemoveRevealer(AFOW_RevealerPawn* RevealerPawn)
 {
-	UFogRevealer* NewRevealer = NewObject<UFogRevealer>();
-	NewRevealer->Revealer = NewFogActor;
-	NewRevealer->SightRange = Range;
-	if (Team == ETeamType::Red)
+	if (IsValid(RevealerPawn))
 	{
-		RedTeamAircraftRevealers.Add(NewRevealer);
+		if (RevealerPawn->RevealerType == ERevealerType::BattleShip)
+		{
+			if (RevealerPawn->TeamType == ETeamType::Red)
+			{
+				for (int i = 0; i < RedTeamFogRevealers.Num(); i++)
+				{
+					if (RedTeamFogRevealers[i] == RevealerPawn)
+					{
+						RedTeamFogRevealers.RemoveAt(i);
+						break;
+					}
+				}
+			}
+			else if (RevealerPawn->TeamType == ETeamType::Blue)
+			{
+				for (int i = 0; i < BlueTeamFogRevealers.Num(); i++)
+				{
+					if (BlueTeamFogRevealers[i] == RevealerPawn)
+					{
+						BlueTeamFogRevealers.RemoveAt(i);
+						break;
+					}
+				}
+			}
+		}
+		else if (RevealerPawn->RevealerType == ERevealerType::Aircraft)
+		{
+			if (RevealerPawn->TeamType == ETeamType::Red)
+			{
+				for (int i = 0; i < RedTeamAircraftRevealers.Num(); i++)
+				{
+					if (RedTeamAircraftRevealers[i] == RevealerPawn)
+					{
+						RedTeamAircraftRevealers.RemoveAt(i);
+						break;
+					}
+				}
+			}
+			else if (RevealerPawn->TeamType == ETeamType::Blue)
+			{
+				for (int i = 0; i < BlueTeamAircraftRevealers.Num(); i++)
+				{
+					if (BlueTeamAircraftRevealers[i] == RevealerPawn)
+					{
+						BlueTeamAircraftRevealers.RemoveAt(i);
+						break;
+					}
+				}
+			}
+		}
 	}
-	else if (Team == ETeamType::Blue)
-	{
-		BlueTeamAircraftRevealers.Add(NewRevealer);
-	}
-}
 
-void AFOW_Manager::RemoveBattleShipRevealer(AActor* NewFogActor, ETeamType Team)
-{
-	if (Team == ETeamType::Red)
-	{
-		for (int i = 0; i < RedTeamFogRevealers.Num(); i++)
-		{
-			if (RedTeamFogRevealers[i]->Revealer == NewFogActor)
-			{
-				RedTeamFogRevealers.RemoveAt(i);
-				break;
-			}
-		}
-	}
-	else if (Team == ETeamType::Blue)
-	{
-		for (int i = 0; i < BlueTeamFogRevealers.Num(); i++)
-		{
-			if (BlueTeamFogRevealers[i]->Revealer == NewFogActor)
-			{
-				BlueTeamFogRevealers.RemoveAt(i);
-				break;
-			}
-		}
-	}
-}
-
-void AFOW_Manager::RemoveAircraftRevealer(AActor* NewFogActor, ETeamType Team)
-{
-	if (Team == ETeamType::Red)
-	{
-		for (int i = 0; i < RedTeamAircraftRevealers.Num(); i++)
-		{
-			if (RedTeamAircraftRevealers[i]->Revealer == NewFogActor)
-			{
-				RedTeamAircraftRevealers.RemoveAt(i);
-				break;
-			}
-		}
-	}
-	else if (Team == ETeamType::Blue)
-	{
-		for (int i = 0; i < BlueTeamAircraftRevealers.Num(); i++)
-		{
-			if (BlueTeamAircraftRevealers[i]->Revealer == NewFogActor)
-			{
-				BlueTeamAircraftRevealers.RemoveAt(i);
-				break;
-			}
-		}
-	}
 }
 
 void AFOW_Manager::UpdateGrid()
@@ -158,40 +147,6 @@ void AFOW_Manager::UpdateGrid()
 	// 시야에 노출된 Revealer 계산
 	ComputeRevealerIsExposed(RedTeamFogRevealers, RedTeamAircraftRevealers, BlueTeamFogRevealers, BlueTeamAircraftRevealers);
 	ComputeRevealerIsExposed(BlueTeamFogRevealers, BlueTeamAircraftRevealers, RedTeamFogRevealers, RedTeamAircraftRevealers);
-
-	RedTeamExposedRevealers.Empty();
-	BlueTeamExposedRevealers.Empty();
-	for(UFogRevealer* Revealer : RedTeamFogRevealers)
-	{
-		if (Revealer->bIsExposedToEnemy)
-		{
-			RedTeamExposedRevealers.Add(Revealer);
-		}
-	}
-	for (UFogRevealer* Revealer : BlueTeamFogRevealers)
-	{
-		if (Revealer->bIsExposedToEnemy)
-		{
-			BlueTeamExposedRevealers.Add(Revealer);
-		}
-	}
-	for(UFogRevealer* Revealer : RedTeamAircraftRevealers)
-	{
-		if (Revealer->bIsExposedToEnemy)
-		{
-			RedTeamExposedRevealers.Add(Revealer);
-		}
-	}
-	for (UFogRevealer* Revealer : BlueTeamAircraftRevealers)
-	{
-		if (Revealer->bIsExposedToEnemy)
-		{
-			BlueTeamExposedRevealers.Add(Revealer);
-		}
-	}
-
-	// 여기서 게임모드 함수 호출해서 레드팀에게는 노출된 블루팀, 블루팀에게는 노출된 레드팀 정보를 전달
-
 }
 
 FIntPoint AFOW_Manager::GetGridIndexToWorldLocation(const FVector& WorldLocation)
@@ -203,111 +158,90 @@ FIntPoint AFOW_Manager::GetGridIndexToWorldLocation(const FVector& WorldLocation
 	return FIntPoint(TileX, TileY);
 }
 
-void AFOW_Manager::ComputeRevealerIsExposed(TArray<UFogRevealer*> TeamBattleShips, TArray<UFogRevealer*> TeamAircratfs, TArray<UFogRevealer*> EnemyBattleShips, TArray<UFogRevealer*> EnemyAircreafts)
+bool AFOW_Manager::CheckObstacle(FIntPoint Coord, bool& result)
+{
+	if (ObstacleCoordinates.Find(FIntPoint(Coord.X, Coord.Y)) == INDEX_NONE)
+	{
+		if (GridDataArray[Coord.Y * GridSize + Coord.X] == 255)
+		{
+			result = true;
+		}
+		else
+		{
+			result = false;
+		}
+		return false;
+	}
+	return true;
+}
+
+void AFOW_Manager::ComputeRevealerIsExposed(TArray<AFOW_RevealerPawn*> TeamBattleShips, TArray<AFOW_RevealerPawn*> TeamAircratfs, TArray<AFOW_RevealerPawn*> EnemyBattleShips, TArray<AFOW_RevealerPawn*> EnemyAircreafts)
 {
 	ComputeFogOfWarVisibility(TeamBattleShips, TeamAircratfs);
 
-	if (GridDataPtr != nullptr)
+	// 그리드 기준으로 시야에 노출된 적팀 유닛 처리
+	for (AFOW_RevealerPawn* EnemyBattleShip : EnemyBattleShips)
 	{
-		// 그리드 기준으로 시야에 노출된 적팀 유닛 처리
-		for (UFogRevealer* EnemyBattleShip : EnemyBattleShips)
+		FVector RevealerLocation = EnemyBattleShip->GetActorLocation();
+		FIntPoint RevealerIndex = GetGridIndexToWorldLocation(RevealerLocation);
+		if (GridDataArray[RevealerIndex.Y * GridSize + RevealerIndex.X] == 0)
 		{
-			FVector RevealerLocation = EnemyBattleShip->GetCurrentLocation();
-			FIntPoint RevealerIndex = GetGridIndexToWorldLocation(RevealerLocation);
-			if ((*GridDataPtr)[RevealerIndex.X][RevealerIndex.Y] == ETileState::Invisible)
+			// 적 유닛이 시야에 노출됨
+			EnemyBattleShip->FOWVisibility = EFOWVisibility::Visible;
+		}
+		else
+		{
+			EnemyBattleShip->FOWVisibility = EFOWVisibility::Hidden;
+		}
+	}
+
+	for (AFOW_RevealerPawn* EnemyAircraft : EnemyAircreafts)
+	{
+		FVector RevealerLocation = EnemyAircraft->GetActorLocation();
+		FIntPoint RevealerIndex = GetGridIndexToWorldLocation(RevealerLocation);
+		if (GridDataArray[RevealerIndex.Y * GridSize + RevealerIndex.X] == 0)
+		{
+			// 적 유닛이 시야에 노출됨
+			EnemyAircraft->FOWVisibility = EFOWVisibility::Hidden;
+		}
+		else if (GridDataArray[RevealerIndex.Y * GridSize + RevealerIndex.X] == 255)
+		{
+			EnemyAircraft->FOWVisibility = EFOWVisibility::Visible;
+		}
+		else if (ObstacleCoordinates.Find(FIntPoint(RevealerIndex.X, RevealerIndex.Y)) != INDEX_NONE)
+		{
+			// 보이는 장애물 위에 있는 지 검사
+			bool bIsObstacleVisible;
+			int Count = 0;
+			while (true)
 			{
-				// 적 유닛이 시야에 노출됨
-				EnemyBattleShip->bIsExposedToEnemy = false;
+				Count++;
+				if (!CheckObstacle(FIntPoint(RevealerIndex.X + Count, RevealerIndex.Y),  bIsObstacleVisible))
+				{
+					break;
+				}
+				else if (!CheckObstacle(FIntPoint(RevealerIndex.X - Count, RevealerIndex.Y),  bIsObstacleVisible))
+				{
+					break;
+				}
+				else if (!CheckObstacle(FIntPoint(RevealerIndex.X, RevealerIndex.Y + Count), bIsObstacleVisible))
+				{
+					break;
+				}
+				else if (!CheckObstacle(FIntPoint(RevealerIndex.X, RevealerIndex.Y - Count), bIsObstacleVisible))
+				{
+					break;
+				}
+			}
+			// 제일 가까운 노드 정보
+			if (bIsObstacleVisible)
+			{
+				EnemyAircraft->FOWVisibility = EFOWVisibility::Visible;
 			}
 			else
 			{
-				EnemyBattleShip->bIsExposedToEnemy = true;
+				EnemyAircraft->FOWVisibility = EFOWVisibility::Hidden;
 			}
 		}
-
-		for (UFogRevealer* EnemyAircraft : EnemyAircreafts)
-		{
-			FVector RevealerLocation = EnemyAircraft->GetCurrentLocation();
-			FIntPoint RevealerIndex = GetGridIndexToWorldLocation(RevealerLocation);
-			if ((*GridDataPtr)[RevealerIndex.X][RevealerIndex.Y] == ETileState::Invisible)
-			{
-				// 적 유닛이 시야에 노출됨
-				EnemyAircraft->bIsExposedToEnemy = false;
-			}
-			else if ((*GridDataPtr)[RevealerIndex.X][RevealerIndex.Y] == ETileState::Visible)
-			{
-				EnemyAircraft->bIsExposedToEnemy = true;
-			}
-			else if ((*GridDataPtr)[RevealerIndex.X][RevealerIndex.Y] == ETileState::Obstacle)
-			{
-				// 보이는 장애물 위에 있는 지 검사
-				bool bIsObstacleVisible;
-				int Count = 0;
-				while (true)
-				{
-					Count++;
-					if ((*GridDataPtr)[RevealerIndex.X + Count][RevealerIndex.Y] != ETileState::Obstacle)
-					{
-						if ((*GridDataPtr)[RevealerIndex.X + Count][RevealerIndex.Y] == ETileState::Visible)
-						{
-							bIsObstacleVisible = true;
-						}
-						else
-						{
-							bIsObstacleVisible = false;
-						}
-						break;
-					}
-					else if ((*GridDataPtr)[RevealerIndex.X - Count][RevealerIndex.Y] != ETileState::Obstacle)
-					{
-						if ((*GridDataPtr)[RevealerIndex.X - Count][RevealerIndex.Y] == ETileState::Visible)
-						{
-							bIsObstacleVisible = true;
-						}
-						else
-						{
-							bIsObstacleVisible = false;
-						}
-						break;
-					}
-					else if ((*GridDataPtr)[RevealerIndex.X][RevealerIndex.Y + Count] != ETileState::Obstacle)
-					{
-						if ((*GridDataPtr)[RevealerIndex.X][RevealerIndex.Y + Count] == ETileState::Visible)
-						{
-							bIsObstacleVisible = true;
-						}
-						else
-						{
-							bIsObstacleVisible = false;
-						}
-						break;
-					}
-					else if ((*GridDataPtr)[RevealerIndex.X][RevealerIndex.Y - Count] != ETileState::Obstacle)
-					{
-						if ((*GridDataPtr)[RevealerIndex.X][RevealerIndex.Y - Count] == ETileState::Visible)
-						{
-							bIsObstacleVisible = true;
-						}
-						else
-						{
-							bIsObstacleVisible = false;
-						}
-						break;
-					}
-				}
-				if (bIsObstacleVisible)
-				{
-					EnemyAircraft->bIsExposedToEnemy = true;
-				}
-				else
-				{
-					EnemyAircraft->bIsExposedToEnemy = false;
-				}
-			}
-		}
-	}
-	else
-	{
-		UE_LOG(LogTemp, Warning, TEXT("GridDataPtr is Nullptr"));
 	}
 }

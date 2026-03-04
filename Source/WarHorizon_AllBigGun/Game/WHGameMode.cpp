@@ -54,6 +54,8 @@ void AWHGameMode::BeginPlay()
 				}
 				AWHBattleShipBase* NewBattleShip = GetWorld()->SpawnActorDeferred<AWHBattleShipBase>(RedTeamBattleShipClasses[i], FTransform(SpawnRotation, SpawnLocation));
 				NewBattleShip->TeamType = ETeamType::Red;
+				NewBattleShip->RevealerType = ERevealerType::BattleShip;
+				NewBattleShip->SightRange = 10000;
 				UGameplayStatics::FinishSpawningActor(NewBattleShip, FTransform(SpawnRotation, SpawnLocation));
 				RedTeamBattleShips.Add(NewBattleShip);
 			}
@@ -79,6 +81,8 @@ void AWHGameMode::BeginPlay()
 				}
 				AWHBattleShipBase* NewBattleShip = GetWorld()->SpawnActorDeferred<AWHBattleShipBase>(BlueTeamBattleShipClasses[i], FTransform(SpawnRotation, SpawnLocation));
 				NewBattleShip->TeamType = ETeamType::Blue;
+				NewBattleShip->RevealerType = ERevealerType::BattleShip;
+				NewBattleShip->SightRange = 10000;
 				UGameplayStatics::FinishSpawningActor(NewBattleShip, FTransform(SpawnRotation, SpawnLocation));
 				BlueTeamBattleShips.Add(NewBattleShip);
 			}

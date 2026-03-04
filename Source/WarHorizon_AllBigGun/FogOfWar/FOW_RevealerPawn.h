@@ -5,22 +5,17 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Pawn.h"
 #include "Enum/ETeamType.h"
+#include "Enum/ERevealerType.h"
 #include "FOW_RevealerPawn.generated.h"
 
 class AFOW_Manager;
+class AFOW_ClientManager;
 
 UENUM()
 enum class EFOWVisibility : uint8
 {
 	Visible = 0 UMETA(DisplayName = "Visible"),
 	Hidden UMETA(DisplayName = "Hidden"),
-};
-
-UENUM()
-enum class ERevealerType : uint8
-{
-	BattleShip = 0 UMETA(DisplayName = "BattleShip"),
-	Aircraft UMETA(DisplayName = "Aircraft"),
 };
 
 UCLASS()
@@ -52,14 +47,19 @@ public:
 	void RegisterToFogOfWarManager();
 
 public:
+	AFOW_Manager* FogManager;
+	AFOW_ClientManager* ClientManager;
+
 	UPROPERTY(ReplicatedUsing = OnRep_FOWVisibility)
 	EFOWVisibility FOWVisibility = EFOWVisibility::Hidden;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Fog Of War")
+	ERevealerType RevealerType = ERevealerType::Invalid;
 
-	UPROPERTY(BlueprintReadWrite, Category = "Fog Of War")
-	int SightRange = 500;
-
-	AFOW_Manager* FogManager;
+	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category = "Fog Of War")
+	int SightRange = 10000;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Fog Of War")
 	ETeamType TeamType = ETeamType::Invalid;
+
 };

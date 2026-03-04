@@ -8,7 +8,7 @@
 #include "FogOfWar/FOW_Base.h"
 #include "FOW_Manager.generated.h"
 
-
+class AFOW_RevealerPawn;
 class AFogObstacle;
 
 UCLASS()
@@ -28,37 +28,26 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	virtual void AddBattleShipRevealer(AActor* NewFogActor, int Range, ETeamType Team) override;
-	virtual void AddAircraftRevealer(AActor* NewFogActor, int Range, ETeamType Team) override;
-	virtual void RemoveBattleShipRevealer(AActor* NewFogActor, ETeamType Team) override;
-	virtual void RemoveAircraftRevealer(AActor* NewFogActor, ETeamType Team) override;
+	virtual void AddRevealer(AFOW_RevealerPawn* RevealerPawn) override;
+	virtual void RemoveRevealer(AFOW_RevealerPawn* RevealerPawn) override;
 protected:
 	virtual void UpdateGrid() override;
 	FIntPoint GetGridIndexToWorldLocation(const FVector& WorldLocation);
-
-	void ComputeRevealerIsExposed(TArray<UFogRevealer*> TeamBattleShips, TArray<UFogRevealer*> TeamAircratfs, TArray<UFogRevealer*> EnemyBattleShips, TArray<UFogRevealer*> EnemyAircreafts);
+	bool CheckObstacle(FIntPoint Coord, bool& result);
+	void ComputeRevealerIsExposed(TArray<AFOW_RevealerPawn*> TeamBattleShips, TArray<AFOW_RevealerPawn*> TeamAircratfs, TArray<AFOW_RevealerPawn*> EnemyBattleShips, TArray<AFOW_RevealerPawn*> EnemyAircreafts);
 
 public:
 	// Fog settings
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Fog Of War")
-	TArray<UFogRevealer*> RedTeamFogRevealers;
+	TArray<AFOW_RevealerPawn*> RedTeamFogRevealers;
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Fog Of War")
-	TArray<UFogRevealer*> BlueTeamFogRevealers;
+	TArray<AFOW_RevealerPawn*> BlueTeamFogRevealers;
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Fog Of War")
-	TArray<UFogRevealer*> RedTeamAircraftRevealers;
+	TArray<AFOW_RevealerPawn*> RedTeamAircraftRevealers;
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Fog Of War")
-	TArray<UFogRevealer*> BlueTeamAircraftRevealers;
-
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Fog Of War")
-	TArray<UFogRevealer*> RedTeamExposedRevealers;
-
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Fog Of War")
-	TArray<UFogRevealer*> BlueTeamExposedRevealers;
-
-
-
+	TArray<AFOW_RevealerPawn*> BlueTeamAircraftRevealers;
 
 };

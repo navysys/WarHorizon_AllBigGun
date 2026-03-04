@@ -4,8 +4,11 @@
 #include "FogOfWar/FOW_RevealerPawn.h"
 #include "Net/UnrealNetwork.h"
 #include "Game/WHGameMode.h"
+#include "Controller/WHPlayerController.h"
 #include "Kismet/GameplayStatics.h"
 #include "FogOfWar/FOW_Manager.h"
+#include "FogOfWar/FOW_ClientManager.h"
+
 
 // Sets default values
 AFOW_RevealerPawn::AFOW_RevealerPawn()
@@ -27,9 +30,19 @@ void AFOW_RevealerPawn::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
 	Super::EndPlay(EndPlayReason);
 
-	if (IsValid(FogManager))
+	if (HasAuthority())
 	{
-		FogManager->RemoveBattleShipRevealer(this, TeamType);
+		if (IsValid(FogManager))
+		{
+			FogManager->RemoveRevealer(this);
+		}
+	}
+	else
+	{
+		if (IsValid(ClientManager))
+		{
+			ClientManager->RemoveRevealer(this);
+		}
 	}
 }
 
@@ -70,17 +83,36 @@ void AFOW_RevealerPawn::OnRep_FOWVisibility()
 
 void AFOW_RevealerPawn::RegisterToFogOfWarManager()
 {
+	UE_LOG(LogTemp, Warning, TEXT("RegisterToFogOfWarManager Called"));
 	//매니저에 등록 - 서버에서만 작동
-	AWHGameMode* GameMode = Cast<AWHGameMode>(UGameplayStatics::GetGameMode((GetWorld())));
-	if (IsValid(GameMode))
+	if (HasAuthority())
 	{
-		FogManager = GameMode->GetFogOfWarManager();
-		if (IsValid(FogManager))
+		AWHGameMode* GameMode = Cast<AWHGameMode>(UGameplayStatics::GetGameMode((GetWorld())));
+		if (IsValid(GameMode))
 		{
-			FogManager->AddBattleShipRevealer(this, SightRange, TeamType);
-			return;
+			FogManager = GameMode->GetFogOfWarManager();
+			if (IsValid(FogManager))
+			{
+				UE_LOG(LogTemp, Warning, TEXT("Add Revealer Called"));
+				FogManager->AddRevealer(this);
+				return;
+			}
 		}
 	}
-	UE_LOG(LogTemp, Warning, TEXT("WHBattleShipBase : BeginPlay -> RegisterToFogOfWarManager Failed"));
+	else
+	{
+		AWHPlayerController* PlayerController = Cast<AWHPlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
+		if(IsValid(PlayerController))
+		{
+			ClientManager = PlayerController->FogOfWarClientManager;
+			if (IsValid(ClientManager))
+			{
+				UE_LOG(LogTemp, Warning, TEXT("Add Revealer Called"));
+				ClientManager->AddRevealer(this);
+				return;
+			}
+		}
+	}
+
 	GetWorld()->GetTimerManager().SetTimerForNextTick(this, &AFOW_RevealerPawn::RegisterToFogOfWarManager);
 }

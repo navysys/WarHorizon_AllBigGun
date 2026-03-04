@@ -29,13 +29,6 @@ void AWHPlayerController::BeginPlay()
 
 	//테스트 용도 - 나중에 포스트 로그인 시 할당
 	//BattleShipPawn =GetPawn();
-	if (!HasAuthority())
-	{
-		if (FogOfWarClientManagerClass)
-		{
-			FogOfWarClientManager = GetWorld()->SpawnActor<AFOW_ClientManager>(FogOfWarClientManagerClass);
-		}
-	}
 
 	if (IsValid(SkillHandlerComp))
 	{
@@ -52,6 +45,13 @@ void AWHPlayerController::BeginPlay()
 
 	if (IsLocalPlayerController())
 	{
+		// 로컬 시야 시스템
+		if (FogOfWarClientManagerClass)
+		{
+			FogOfWarClientManager = GetWorld()->SpawnActor<AFOW_ClientManager>(FogOfWarClientManagerClass);
+		}
+
+		// 인게임 UI 위젯
 		UClass* WidgetClass = InGameWidgetClassPath.TryLoadClass<UWHInGameWidgetBase>();
 		if (IsValid(WidgetClass))
 		{

@@ -3,13 +3,13 @@
 using UnrealBuildTool;
 using System.Collections.Generic;
 
-public class WarHorizon_AllBigGunTarget : TargetRules
+public class WarHorizon_AllBigGunServerTarget : TargetRules
 {
-	public WarHorizon_AllBigGunTarget(TargetInfo Target) : base(Target)
+	public WarHorizon_AllBigGunServerTarget(TargetInfo Target) : base(Target)
 	{
-		Type = TargetType.Game;
+		Type = TargetType.Server;
 		DefaultBuildSettings = BuildSettingsVersion.V6;
-		IncludeOrderVersion = EngineIncludeOrderVersion.Unreal5_7;
+
 		ExtraModuleNames.Add("WarHorizon_AllBigGun");
 	}
 }

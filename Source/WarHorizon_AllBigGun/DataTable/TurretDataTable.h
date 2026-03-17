@@ -2,7 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "Engine/DataTable.h"
-#include "Enum/ETurretType.h"
+#include "WarHorizon_AllBigGun/Enum/ETurretType.h"
 #include "TurretDataTable.generated.h"
 
 

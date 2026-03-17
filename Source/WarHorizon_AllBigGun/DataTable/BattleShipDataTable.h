@@ -2,8 +2,8 @@
 
 #include "CoreMinimal.h"
 #include "Engine/DataTable.h"
-#include "Enum/EBattleShipType.h"
-#include "BattleShip/WHBattleShipBase.h"
+#include "WarHorizon_AllBigGun/Enum/EBattleShipType.h"
+#include "WarHorizon_AllBigGun/BattleShip/WHBattleShipBase.h"
 #include "BattleShipDataTable.generated.h"
 
 

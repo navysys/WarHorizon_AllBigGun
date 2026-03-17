@@ -2,9 +2,9 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "Game/WHCustomStructs.h"
-#include "Enum/ETurretType.h"
-#include "Enum/ETurretState.h"
+#include "WarHorizon_AllBigGun/Game/WHCustomStructs.h"
+#include "WarHorizon_AllBigGun/Enum/ETurretType.h"
+#include "WarHorizon_AllBigGun/Enum/ETurretState.h"
 #include "WHTurretBase.generated.h"
 
 class UNiagaraSystem;

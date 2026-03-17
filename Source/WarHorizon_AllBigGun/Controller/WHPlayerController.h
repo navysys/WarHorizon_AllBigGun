@@ -3,7 +3,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerController.h"
 #include "InputActionValue.h"
-#include "Game/WHCustomStructs.h"
+#include "WarHorizon_AllBigGun/Game/WHCustomStructs.h"
 #include "WHPlayerController.generated.h"
 
 class UWHCSkillHandler;

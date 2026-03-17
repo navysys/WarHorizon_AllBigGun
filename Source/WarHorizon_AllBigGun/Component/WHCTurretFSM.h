@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
-#include "Enum/ETurretState.h"
+#include "WarHorizon_AllBigGun/Enum/ETurretState.h"
 #include "WHCTurretFSM.generated.h"
 
 

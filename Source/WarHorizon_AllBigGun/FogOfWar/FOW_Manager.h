@@ -4,8 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "Enum/ETeamType.h"
-#include "FogOfWar/FOW_Base.h"
+#include "WarHorizon_AllBigGun/Enum/ETeamType.h"
+#include "WarHorizon_AllBigGun/FogOfWar/FOW_Base.h"
 #include "FOW_Manager.generated.h"
 
 class AFOW_RevealerPawn;

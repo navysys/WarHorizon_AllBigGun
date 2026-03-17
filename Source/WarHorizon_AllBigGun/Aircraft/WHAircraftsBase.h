@@ -4,8 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Pawn.h"
-#include "Interface/AircraftsInterface.h"
-#include "Enum/EAircraftsType.h"
+#include "WarHorizon_AllBigGun/Interface/AircraftsInterface.h"
+#include "WarHorizon_AllBigGun/Enum/EAircraftsType.h"
 #include "WHAircraftsBase.generated.h"
 
 class UWHCAircraftsMovement;

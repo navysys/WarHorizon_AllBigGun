@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "Enum/EAircraftState.h"
+#include "WarHorizon_AllBigGun/Enum/EAircraftState.h"
 #include "WHAircraft.generated.h"
 
 UCLASS()

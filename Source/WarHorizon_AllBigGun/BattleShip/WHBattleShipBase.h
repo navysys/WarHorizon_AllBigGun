@@ -4,11 +4,11 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Pawn.h"
-#include "Interface/BattleShipInterface.h"
-#include "Interface/SkillUsableInterface.h"
-#include "Enum/EBattleShipType.h"
-#include "Game/WHCustomStructs.h"
-#include "FogOfWar/FOW_RevealerPawn.h"
+#include "WarHorizon_AllBigGun/Interface/BattleShipInterface.h"
+#include "WarHorizon_AllBigGun/Interface/SkillUsableInterface.h"
+#include "WarHorizon_AllBigGun/Enum/EBattleShipType.h"
+#include "WarHorizon_AllBigGun/Game/WHCustomStructs.h"
+#include "WarHorizon_AllBigGun/FogOfWar/FOW_RevealerPawn.h"
 #include "WHBattleShipBase.generated.h"
 
 class UBoxComponent;

@@ -4,8 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "FogOfWar/FOW_Base.h"
-#include "Enum/ETeamType.h"
+#include "WarHorizon_AllBigGun/FogOfWar/FOW_Base.h"
+#include "WarHorizon_AllBigGun/Enum/ETeamType.h"
 #include "Rendering/Texture2DResource.h"
 #include "FOW_ClientManager.generated.h"
 

@@ -2,10 +2,10 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
-#include "Game/WHCustomStructs.h"
-#include "Enum/ETurretAttackType.h"
-#include "Enum/ETurretState.h"
-#include "Enum/EBattleShipType.h"
+#include "WarHorizon_AllBigGun/Game/WHCustomStructs.h"
+#include "WarHorizon_AllBigGun/Enum/ETurretAttackType.h"
+#include "WarHorizon_AllBigGun/Enum/ETurretState.h"
+#include "WarHorizon_AllBigGun/Enum/EBattleShipType.h"
 #include "WHCTurretHandler.generated.h"
 
 struct FTurretArray;

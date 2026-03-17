@@ -1,11 +1,12 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "FogOfWar/FOW_Manager.h"
+#include "WarHorizon_AllBigGun/FogOfWar/FOW_Manager.h"
+#include "WarHorizon_AllBigGun/FogOfWar/FOW_Obstacle.h"
+#include "WarHorizon_AllBigGun/FogOfWar/FOW_RevealerPawn.h"
 #include "Materials/MaterialInstanceDynamic.h"
 #include "Kismet/KismetSystemLibrary.h"
-#include "FogOfWar/FOW_Obstacle.h"
-#include "FogOfWar/FOW_RevealerPawn.h"
+
 
 // Sets default values
 AFOW_Manager::AFOW_Manager()

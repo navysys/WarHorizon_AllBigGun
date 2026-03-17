@@ -1,10 +1,10 @@
 
-#include "Game/WHGameMode.h"
-#include "Game/WHGameState.h"
-#include "Game/WHGameInstance.h"
-#include "Controller/WHPlayerController.h"
-#include "BattleShip/WHBattleShipBase.h"
-#include "FogOfWar/FOW_Manager.h"
+#include "WarHorizon_AllBigGun/Game/WHGameMode.h"
+#include "WarHorizon_AllBigGun/Game/WHGameState.h"
+#include "WarHorizon_AllBigGun/Game/WHGameInstance.h"
+#include "WarHorizon_AllBigGun/Controller/WHPlayerController.h"
+#include "WarHorizon_AllBigGun/BattleShip/WHBattleShipBase.h"
+#include "WarHorizon_AllBigGun/FogOfWar/FOW_Manager.h"
 #include "Kismet/GameplayStatics.h"
 
 AWHGameMode::AWHGameMode()

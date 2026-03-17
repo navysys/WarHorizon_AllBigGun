@@ -2,9 +2,9 @@
 
 #include "CoreMinimal.h"
 #include "Engine/GameInstance.h"
-#include "DataTable/BattleShipDataTable.h"
-#include "DataTable/TurretDataTable.h"
-#include "DataTable/AircraftDataTable.h"
+#include "WarHorizon_AllBigGun/DataTable/BattleShipDataTable.h"
+#include "WarHorizon_AllBigGun/DataTable/TurretDataTable.h"
+#include "WarHorizon_AllBigGun/DataTable/AircraftDataTable.h"
 #include "WHGameInstance.generated.h"
 
 

@@ -2,7 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "Engine/DataTable.h"
-#include "Enum/EAircraftsType.h"
+#include "WarHorizon_AllBigGun/Enum/EAircraftsType.h"
 #include "AircraftDataTable.generated.h"
 
 

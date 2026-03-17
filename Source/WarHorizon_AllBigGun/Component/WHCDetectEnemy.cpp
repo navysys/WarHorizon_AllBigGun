@@ -1,6 +1,7 @@
 
-#include "Component/WHCDetectEnemy.h"
+#include "WarHorizon_AllBigGun/Component/WHCDetectEnemy.h"
 #include "DrawDebugHelpers.h"
+#include "Engine/OverlapResult.h"
 
 
 UWHCDetectEnemy::UWHCDetectEnemy()

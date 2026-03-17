@@ -1,8 +1,8 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Component/WHCTurretFSM.h"
-#include "Turret/WHTurretBase.h"
+#include "WarHorizon_AllBigGun/Component/WHCTurretFSM.h"
+#include "WarHorizon_AllBigGun/Turret/WHTurretBase.h"
 
 // Sets default values for this component's properties
 UWHCTurretFSM::UWHCTurretFSM()

@@ -1,8 +1,8 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Skill/WHSkillYamatoQ.h"
-#include "BattleShip/WHBattleShipBase.h"
+#include "WarHorizon_AllBigGun/Skill/WHSkillYamatoQ.h"
+#include "WarHorizon_AllBigGun/BattleShip/WHBattleShipBase.h"
 
 bool UWHSkillYamatoQ::Effect()
 {

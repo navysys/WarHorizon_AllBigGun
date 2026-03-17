@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Game/WHLoginGameMode.h"
+#include "WarHorizon_AllBigGun/Game/WHLoginGameMode.h"
 #include "Kismet/GameplayStatics.h"
 
 AWHLoginGameMode::AWHLoginGameMode()

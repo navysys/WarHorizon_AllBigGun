@@ -4,14 +4,14 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
-#include "WHClientWidgetBase.generated.h"
+#include "WHLobbyWidgetBase.generated.h"
 
 class UEditableTextBox;
 class UButton;
 
 
 UCLASS()
-class WARHORIZON_ALLBIGGUN_API UWHClientWidgetBase : public UUserWidget
+class WARHORIZON_ALLBIGGUN_API UWHLobbyWidgetBase : public UUserWidget
 {
 	GENERATED_BODY()
 public:

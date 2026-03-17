@@ -1,7 +1,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Interface/SkillUsableInterface.h"
+#include "WarHorizon_AllBigGun/Interface/SkillUsableInterface.h"
 #include "WHSkillBase.generated.h"
 
 

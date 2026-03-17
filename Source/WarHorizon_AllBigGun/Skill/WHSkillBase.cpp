@@ -1,6 +1,6 @@
 
-#include "Skill/WHSkillBase.h"
-#include "BattleShip/WHBattleShipBase.h"
+#include "WarHorizon_AllBigGun/Skill/WHSkillBase.h"
+#include "WarHorizon_AllBigGun/BattleShip/WHBattleShipBase.h"
 
 UWHSkillBase::UWHSkillBase()
 {

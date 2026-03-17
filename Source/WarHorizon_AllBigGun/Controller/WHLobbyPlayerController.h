@@ -4,14 +4,14 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerController.h"
-#include "WHClientPlayerController.generated.h"
+#include "WHLobbyPlayerController.generated.h"
 
 
-class UWHClientWidgetBase;
+class UWHLobbyWidgetBase;
 
 
 UCLASS()
-class WARHORIZON_ALLBIGGUN_API AWHClientPlayerController : public APlayerController
+class WARHORIZON_ALLBIGGUN_API AWHLobbyPlayerController : public APlayerController
 {
 	GENERATED_BODY()
 	
@@ -19,7 +19,7 @@ public:
 	virtual void BeginPlay() override;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UI")
-	TObjectPtr<UWHClientWidgetBase> ClientWidget;
+	TObjectPtr<UWHLobbyWidgetBase> LobbyWidget;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UI")
 	TSubclassOf<UUserWidget> WidgetClass;

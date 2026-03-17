@@ -2,7 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "UObject/NoExportTypes.h"
-#include "Enum/ETurretType.h"
+#include "WarHorizon_AllBigGun/Enum/ETurretType.h"
 #include "WHCustomStructs.generated.h"
 
 

@@ -1,7 +1,7 @@
 
-#include "Widget/WHInGameWidgetBase.h"
-#include "Controller/WHPlayerController.h"
-#include "FogOfWar/FOW_ClientManager.h"
+#include "WarHorizon_AllBigGun/Widget/WHInGameWidgetBase.h"
+#include "WarHorizon_AllBigGun/Controller/WHPlayerController.h"
+#include "WarHorizon_AllBigGun/FogOfWar/FOW_ClientManager.h"
 #include "Components/TextBlock.h"
 #include "Components/ScrollBox.h"
 #include "Components/EditableTextBox.h"

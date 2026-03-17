@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Skill/WHSkillBase.h"
+#include "WarHorizon_AllBigGun/Skill/WHSkillBase.h"
 #include "WHSkillYamatoQ.generated.h"
 
 /**

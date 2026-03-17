@@ -2,7 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerState.h"
-#include "Enum/EBattleShipType.h"
+#include "WarHorizon_AllBigGun/Enum/EBattleShipType.h"
 #include "WHPlayerState.generated.h"
 
 

@@ -4,8 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Pawn.h"
-#include "Enum/ETeamType.h"
-#include "Enum/ERevealerType.h"
+#include "WarHorizon_AllBigGun/Enum/ETeamType.h"
+#include "WarHorizon_AllBigGun/Enum/ERevealerType.h"
 #include "FOW_RevealerPawn.generated.h"
 
 class AFOW_Manager;

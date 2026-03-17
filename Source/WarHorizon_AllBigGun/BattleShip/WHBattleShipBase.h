@@ -66,7 +66,7 @@ public:
 
 protected:
 	UPROPERTY(VisibleAnywhere, Category = "BattleShip | ID")
-	uint32 ID = 0;
+	uint16 BattleShipId = 0;
 	UPROPERTY(EditAnywhere, Category = "BattleShip | ID")
 	FString BattleShipName = TEXT("Yamato");
 	UPROPERTY(EditAnywhere, Category = "BattleShip | ID")

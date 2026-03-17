@@ -32,7 +32,7 @@ public:
 
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaTime) override;
-
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 protected:
 	virtual void SetupInputComponent() override;
 
@@ -42,9 +42,16 @@ public:
 	UPROPERTY(BlueprintReadOnly, Category = "Fog Of War")
 	AFOW_ClientManager* FogOfWarClientManager;
 
-	APawn* BattleShipPawn;
+	
 	char ActionKey;
 	bool bIsAiming = false;
+
+	UPROPERTY(Replicated)
+	FString PlayerId;
+	UPROPERTY(Replicated)
+	FString Team;
+	UPROPERTY(Replicated)
+	APawn* BattleShipPawn;
 
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UWHCSkillHandler> SkillHandlerComp;
@@ -138,5 +145,5 @@ public:
 	void S2C_AddMessage(const FText& Messsage);
 	void S2C_AddMessage_Implementation(const FText& Messsage);
 
-
+	AFOW_ClientManager* GetFogOfWarClientManager() const { return FogOfWarClientManager; }
 };

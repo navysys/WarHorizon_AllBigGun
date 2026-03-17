@@ -6,15 +6,37 @@
 #include "GameFramework/Actor.h"
 #include "FogOfWar/FOW_Base.h"
 #include "Enum/ETeamType.h"
+#include "Rendering/Texture2DResource.h"
 #include "FOW_ClientManager.generated.h"
 
 class UPostProcessComponent;
+
+USTRUCT()
+struct FTexel2X2
+{
+	GENERATED_BODY()
+
+	bool operator==(const FTexel2X2& Rhs) const
+	{
+		return T[0] == Rhs.T[0] && T[1] == Rhs.T[1] && T[2] == Rhs.T[2] && T[3] == Rhs.T[3];
+	}
+	uint8 T[4];
+};
+uint32 GetTypeHash(const FTexel2X2& Texel); // TMap을 사용하기 위한 커스텀 해시 함수
+
+USTRUCT()
+struct FTexel4X4
+{
+	GENERATED_BODY()
+
+	uint8 T[4][4];
+};
 
 UCLASS()
 class WARHORIZON_ALLBIGGUN_API AFOW_ClientManager : public AFOW_Base
 {
 	GENERATED_BODY()
-	
+
 public:	
 	// Sets default values for this actor's properties
 	AFOW_ClientManager();
@@ -30,8 +52,10 @@ public:
 protected:
 	virtual void UpdateGrid() override;
 	void UpdateFogTexture();
-
-
+	void UpdateTextuerBuffer();
+	void GenerateUpscaleMap();
+	/** (X,Y), (X+1,Y), (X,Y+1), (X+1,Y+1) 텍셀을 가져옵니다. */
+	FTexel2X2 GetTexel2X2(int X, int Y);
 public:
 	UPROPERTY()
 	UPostProcessComponent* FogPostProcessVolume;
@@ -41,15 +65,24 @@ public:
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Fog Of War")
 	UMaterialInterface* FogMaterial;
 
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Fog Of War")
+	UMaterialInterface* FogMiniMapMaterial;
+
 	UPROPERTY(BlueprintReadOnly, Category = "Fog Of War")
 	UMaterialInstanceDynamic* FogMaterialInstance;
 
+	UPROPERTY(BlueprintReadOnly, Category = "Fog Of War")
+	UMaterialInstanceDynamic* FogMiniMapMaterialInstance;
+
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Fog Of War")
-	UTexture2D* FogGridTexture;
+	UTexture2D* FogTexture;
 
 	TArray<uint8> TextureBuffer;
+	FUpdateTextureRegion2D UpscaleUpdateRegion;
 
-	FUpdateTextureRegion2D FullRegion;
+	/** 2X2 텍셀을 4X4 텍셀로 어떻게 맵핑할지 저장해 놓은 템플릿입니다. */
+	UPROPERTY()
+	TMap<FTexel2X2, FTexel4X4> UpscaleMap;
 
 	float TextureRatio = 4;
 

@@ -1,9 +1,11 @@
 
 #include "Widget/WHInGameWidgetBase.h"
+#include "Controller/WHPlayerController.h"
+#include "FogOfWar/FOW_ClientManager.h"
 #include "Components/TextBlock.h"
 #include "Components/ScrollBox.h"
 #include "Components/EditableTextBox.h"
-#include "Controller/WHPlayerController.h"
+#include "Components/Image.h"
 
 void UWHInGameWidgetBase::NativeConstruct()
 {
@@ -15,6 +17,16 @@ void UWHInGameWidgetBase::NativeConstruct()
 	{
 		// ChatText 의 델리게이트에 함수 추가
 		ChatText->OnTextCommitted.AddDynamic(this, &UWHInGameWidgetBase::OnCommittedText);
+	}
+	MapMaterial = Cast<UImage>(GetWidgetFromName(TEXT("MapMaterial")));
+	AWHPlayerController* PC = Cast<AWHPlayerController>(GetOwningPlayer());
+	if (IsValid(PC))
+	{
+		AFOW_ClientManager* FOWManager = PC->GetFogOfWarClientManager();
+		if (FOWManager != nullptr)
+		{
+			UpdateMapMaterial(FOWManager->FogMiniMapMaterialInstance);
+		}
 	}
 }
 
@@ -50,5 +62,13 @@ void UWHInGameWidgetBase::AddChatMessage(FText AddMessage)
 		NewTextBox->SetFont(NewFont);
 		ChatScroll->AddChild(NewTextBox);
 		ChatScroll->ScrollToEnd();
+	}
+}
+
+void UWHInGameWidgetBase::UpdateMapMaterial(UMaterialInstanceDynamic* NewMaterial)
+{
+	if (IsValid(MapMaterial))
+	{
+		MapMaterial->SetBrushFromMaterial(NewMaterial);
 	}
 }

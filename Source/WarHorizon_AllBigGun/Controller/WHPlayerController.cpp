@@ -6,6 +6,7 @@
 #include "EnhancedInputSubsystems.h"
 #include "GameFramework/Actor.h"
 #include "Interface/BattleShipInterface.h"
+#include "Net/UnrealNetwork.h"
 #include "DrawDebugHelpers.h"
 #include "Widget/WHInGameWidgetBase.h"
 #include "Component/WHCSkillHandler.h"
@@ -26,9 +27,6 @@ AWHPlayerController::AWHPlayerController()
 void AWHPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
-
-	//테스트 용도 - 나중에 포스트 로그인 시 할당
-	//BattleShipPawn =GetPawn();
 
 	if (IsValid(SkillHandlerComp))
 	{
@@ -67,6 +65,14 @@ void AWHPlayerController::BeginPlay()
 void AWHPlayerController::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+}
+
+void AWHPlayerController::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	DOREPLIFETIME(AWHPlayerController, PlayerId);
+	DOREPLIFETIME(AWHPlayerController, Team);
+	DOREPLIFETIME(AWHPlayerController, BattleShipPawn);
 }
 
 void AWHPlayerController::SetupInputComponent()

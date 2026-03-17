@@ -4,13 +4,13 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/GameModeBase.h"
-#include "WHClientGameMode.generated.h"
+#include "WHLobbyGameMode.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class WARHORIZON_ALLBIGGUN_API AWHClientGameMode : public AGameModeBase
+class WARHORIZON_ALLBIGGUN_API AWHLobbyGameMode : public AGameModeBase
 {
 	GENERATED_BODY()
 	

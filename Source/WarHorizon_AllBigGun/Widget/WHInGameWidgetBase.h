@@ -8,6 +8,7 @@
 
 class UScrollBox;
 class UEditableTextBox;
+class UImage;
 
 
 UCLASS()
@@ -23,6 +24,8 @@ public:
 
 	void AddChatMessage(FText AddMessage);
 
+	void UpdateMapMaterial(UMaterialInstanceDynamic* NewMaterial);
+
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Components")
 	TObjectPtr<UScrollBox> ChatScroll;
@@ -30,5 +33,6 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Components")
 	TObjectPtr<UEditableTextBox> ChatText;
 
-
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Components")
+	TObjectPtr<UImage> MapMaterial;
 };

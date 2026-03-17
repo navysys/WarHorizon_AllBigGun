@@ -3,6 +3,7 @@
 #include "CoreMinimal.h"
 #include "Engine/DataTable.h"
 #include "Enum/EBattleShipType.h"
+#include "BattleShip/WHBattleShipBase.h"
 #include "BattleShipDataTable.generated.h"
 
 
@@ -11,15 +12,16 @@ struct WARHORIZON_ALLBIGGUN_API FBattleShipDataTable : public FTableRowBase
 {
 	GENERATED_BODY()
 	
-	// 함선 식별 번호
-	UPROPERTY(EditAnywhere)
-	uint16 ID = 0;
 	// 함선 이름
 	UPROPERTY(EditAnywhere)
 	FString Name = TEXT("None");
 	// 함종 구분
 	UPROPERTY(EditAnywhere)
 	EBattleShipType Type = EBattleShipType::Invalid;
+
+	// 함선 클래스
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<AWHBattleShipBase> BattleShipClass = nullptr;
 
 	// 소켓을 포함하는 함체 매시
 	UPROPERTY(EditAnywhere)

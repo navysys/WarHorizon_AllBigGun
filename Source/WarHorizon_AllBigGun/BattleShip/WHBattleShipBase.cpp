@@ -67,7 +67,7 @@ void AWHBattleShipBase::PostInitializeComponents()
 
 	SmokestackComp->SetIntParameter(TEXT("SpawnRate"), 0);
 
-	LoadDataTableToName(FName(BattleShipName));
+	LoadDataTableToName(FName(*FString::FromInt(BattleShipId)));
 	CreateTurretToMeshCompSocket(SkeletalMeshComp);
 
 	if (IsValid(BattleShipMovementComp))
@@ -128,7 +128,6 @@ void AWHBattleShipBase::LoadDataTableToName(FName Name)
 
 			if (Table)
 			{
-				ID = Table->ID;
 				BattleShipName = Table->Name;
 				BattleShipType = Table->Type;
 

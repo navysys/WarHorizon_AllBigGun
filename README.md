@@ -29,7 +29,8 @@ IBattleShipInterface : 함선의 기능을 정의해놓은  인터페이스
 ISkillUsableInterface : 스킬을 사용하기 위한 인터페이스
 <br>
 #### 컴포넌트
-BoxComp : 러프하게 다른 유닛과 거리 비교 등을 수행하기 위한 UBoxComponent
+##### BoxComp
+러프하게 다른 유닛과 거리 비교 등을 수행하기 위한 UBoxComponent
 
 SkeletalMeshComp : 실질적인 충돌과 함포를 배치하기 위한 스켈레톤 구조를 가지는 USkeletalMeshComponent
 

@@ -21,14 +21,14 @@
 ### BattleShipBase.cpp
 플레이어가 조종하는 함선으로 가장 기능이 많이 들어가 있는 주요 클래스로 플레이어가 직접 빙의하지 않고 AI 컨트롤러가 조종하고 플레이어는 AI 에 명령하는 구조
 
-####상속 클래스
+#### 상속 클래스
 AFOW_RevealerPawn : 시야 시스템을 위한 기능을 포함하는 클래스
 
 IBattleShipInterface : 함선의 기능을 정의해놓은  인터페이스
 
 ISkillUsableInterface : 스킬을 사용하기 위한 인터페이스
 <br>
-####컴포넌트
+#### 컴포넌트
 BoxComp : 러프하게 다른 유닛과 거리 비교 등을 수행하기 위한 UBoxComponent
 
 SkeletalMeshComp : 실질적인 충돌과 함포를 배치하기 위한 스켈레톤 구조를 가지는 USkeletalMeshComponent
@@ -43,15 +43,15 @@ TurretHandlerComp : 함포들을 관리하고 탐지된 적을 공격 가능한 
 
 ## BehaviorTree
 AI 컨트롤러에서 사용하는 비헤이비어 트리에 사용되는 클래스
-###BTService_AircraftChangeAngle.cpp
+### BTService_AircraftChangeAngle.cpp
 함재기의 방향을 전환하는 서비스 노드
-###BTService_AircraftHeight.cpp
+### BTService_AircraftHeight.cpp
 함재기의 높낮이를 전환하는 서비스 노드
-###BTTask_AircraftATAAttack.cpp
+### BTTask_AircraftATAAttack.cpp
 함재기의 공격 상태를 위한 테스크 노드
-###BTTask_AircraftATAMove.cpp
+### BTTask_AircraftATAMove.cpp
 함재기의 움직임 상태를 위한 테스크 노드
-###BTTask_AircraftTurnCircle.cpp
+### BTTask_AircraftTurnCircle.cpp
 함재기가 목표에 도착했을 때 목표지점을 중심으로 원을 그리며 제자리 선회하기 위한 테스크 노드
 
-##Component
+## Component

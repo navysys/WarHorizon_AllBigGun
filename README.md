@@ -20,10 +20,14 @@
 ## BattleShip
 ### BattleShipBase.cpp
 플레이어가 조종하는 함선으로 가장 기능이 많이 들어가 있는 주요 클래스
+
 플레이어가 직접 빙의하지 않고 AI 컨트롤러가 조종하고 플레이어는 AI 에 명령하는 구조
+
 상속 클래스
 AFOW_RevealerPawn : 시야 시스템을 위한 기능을 포함하는 클래스
+
 IBattleShipInterface : 함선의 기능을 정의해놓은  인터페이스
+
 ISkillUsableInterface : 스킬을 사용하기 위한 인터페이스
 <br>
 컴포넌트
